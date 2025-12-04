@@ -28,6 +28,9 @@ export interface Pet {
   name: string;
   color: string; // Hex code
   health: number; // 0-100
+  maxHealth: number; // Default 100
+  level: number;
+  xp: number;
   mood: PetMood;
   history: {
     date: string;
