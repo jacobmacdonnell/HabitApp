@@ -36,4 +36,23 @@ export interface Pet {
     date: string;
     healthSnapshot: number;
   }[];
+  lastInteraction: string; // ISO Date
+}
+
+export interface HabitContextType {
+  habits: Habit[];
+  pet: Pet | null;
+  progress: DailyProgress[];
+  addHabit: (habit: Omit<Habit, 'id'>) => void;
+  updateHabit: (id: string, updates: Partial<Habit>) => void;
+  deleteHabit: (id: string) => void;
+  logProgress: (habitId: string, date: string) => void;
+  resetPet: (name: string, color: string) => void;
+  updatePet: (updates: Partial<Pet>) => void;
+  getStreak: (habitId: string) => number;
+  resetData: () => void;
+}
+
+export interface HabitProviderProps {
+  children: React.ReactNode;
 }

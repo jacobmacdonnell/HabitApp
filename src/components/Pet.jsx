@@ -1,4 +1,5 @@
 import React from 'react';
+import { Heart, Zap } from 'lucide-react';
 
 export const Pet = ({ pet }) => {
     if (!pet) return null;
@@ -53,7 +54,7 @@ export const Pet = ({ pet }) => {
         <div className="flex flex-col items-center justify-center py-6 relative z-10">
             {/* Soul Glow */}
             <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-3xl opacity-40 pointer-events-none animate-pulse-glow"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-3xl opacity-30 pointer-events-none animate-pulse-glow"
                 style={{ backgroundColor: pet.color }}
             />
 
@@ -101,33 +102,38 @@ export const Pet = ({ pet }) => {
                 </svg>
             </div>
 
-            <div className="mt-2 text-center space-y-3 w-full max-w-[200px]">
+            <div className="mt-2 text-center space-y-3 w-full max-w-[220px]">
                 <h2 className="text-4xl font-bold text-white tracking-tight drop-shadow-lg flex items-center justify-center gap-2">
                     {pet.name}
                 </h2>
 
-                <div className="glass-panel p-3 rounded-2xl space-y-2 backdrop-blur-md">
+                <div className="glass-panel p-4 rounded-2xl space-y-3 backdrop-blur-md border border-white/10">
                     {/* Health Bar */}
-                    <div className="flex items-center gap-3 text-xs font-bold text-white/90">
-                        <span className="w-4">HP</span>
-                        <div className="flex-1 h-2 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/10">
+                    <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold text-white/60 uppercase tracking-wider">
+                            <span className="flex items-center gap-1"><Heart size={10} className="text-red-400" /> Health</span>
+                            <span>{Math.round(pet.health)}%</span>
+                        </div>
+                        <div className="h-2 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5">
                             <div
-                                className={`h-full transition-all duration-700 ease-out ${pet.health < 30 ? 'bg-red-500 shadow-[0_0_10px_red]' : 'bg-green-400 shadow-[0_0_10px_#4ade80]'}`}
+                                className={`h-full transition-all duration-700 ease-out ${pet.health < 30 ? 'bg-gradient-to-r from-red-600 to-red-400' : 'bg-gradient-to-r from-green-500 to-emerald-400'}`}
                                 style={{ width: `${pet.health}%` }}
                             />
                         </div>
                     </div>
 
                     {/* XP Bar */}
-                    <div className="flex items-center gap-3 text-xs font-bold text-white/90">
-                        <span className="w-4">LV</span>
-                        <div className="flex-1 h-2 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/10">
+                    <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold text-white/60 uppercase tracking-wider">
+                            <span className="flex items-center gap-1"><Zap size={10} className="text-yellow-400" /> Level {currentLevel}</span>
+                            <span>{Math.round(xpPercentage)}%</span>
+                        </div>
+                        <div className="h-2 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5">
                             <div
-                                className="h-full bg-yellow-400 shadow-[0_0_10px_#facc15] transition-all duration-700 ease-out"
+                                className="h-full bg-gradient-to-r from-yellow-500 to-amber-400 transition-all duration-700 ease-out"
                                 style={{ width: `${xpPercentage}%` }}
                             />
                         </div>
-                        <span className="text-[10px] opacity-70">{currentLevel}</span>
                     </div>
                 </div>
             </div>

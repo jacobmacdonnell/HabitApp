@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, X, Minus } from 'lucide-react';
 
 export const WeeklyView = ({ habits, progress }) => {
     const today = new Date();
@@ -16,44 +16,67 @@ export const WeeklyView = ({ habits, progress }) => {
 
     return (
         <div className="space-y-4 animate-fade-in">
-            <div className="grid grid-cols-[1fr_repeat(7,minmax(0,1fr))] gap-2 items-center mb-2 px-4">
-                <div className="text-xs font-bold text-white/40">HABIT</div>
-                {last7Days.map(date => (
-                    <div key={date} className="text-center">
-                        <div className="text-[10px] font-bold text-white/40 uppercase">{getDayLabel(date)}</div>
-                        <div className="text-[10px] text-white/20">{date.split('-')[2]}</div>
-                    </div>
-                ))}
+            {/* Header Row */}
+            <div className="grid grid-cols-[1.5fr_repeat(7,1fr)] gap-2 items-end mb-2 px-4">
+                <div className="text-xs font-bold text-white/30 uppercase tracking-wider pb-1">Habit</div>
+                {last7Days.map(date => {
+                    const isToday = date === today.toISOString().split('T')[0];
+                    return (
+                        <div key={date} className="flex flex-col items-center gap-1">
+                            <div className={`text-[10px] font-bold uppercase tracking-wider ${isToday ? 'text-indigo-400' : 'text-white/30'}`}>
+                                {getDayLabel(date)}
+                            </div>
+                            <div className={`w-6 h-6 flex items-center justify-center text-xs font-bold rounded-full ${isToday ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'text-white/50'}`}>
+                                {date.split('-')[2]}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             <div className="space-y-3">
                 {habits.map(habit => (
-                    <div key={habit.id} className="p-4 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-lg">
+                    <div key={habit.id} className="p-4 rounded-[1.5rem] glass-card flex flex-col gap-4">
+                        <div className="flex items-center gap-3">
+                            <div
+                                className="w-8 h-8 rounded-xl flex items-center justify-center text-lg shadow-inner ring-1 ring-white/10"
+                                style={{ backgroundColor: `${habit.color}20`, color: habit.color }}
+                            >
                                 {habit.icon}
                             </div>
-                            <h4 className="font-bold text-white/90">{habit.title}</h4>
+                            <h4 className="font-bold text-white/90 text-sm">{habit.title}</h4>
                         </div>
 
-                        <div className="grid grid-cols-7 gap-2">
+                        <div className="grid grid-cols-[1.5fr_repeat(7,1fr)] gap-2 items-center">
+                            <div className="text-xs font-medium text-white/40 pl-1">
+                                Progress
+                            </div>
                             {last7Days.map(date => {
                                 const dayProgress = progress.find(p => p.habitId === habit.id && p.date === date);
                                 const isCompleted = dayProgress?.completed;
                                 const isMissed = !isCompleted && new Date(date) < new Date(today.toISOString().split('T')[0]);
+                                const isFuture = new Date(date) > new Date(today.toISOString().split('T')[0]);
 
                                 return (
-                                    <div key={date} className="flex flex-col items-center gap-1">
+                                    <div key={date} className="flex justify-center">
                                         <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isCompleted
-                                                    ? 'bg-green-400 text-white shadow-lg shadow-green-400/20'
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted
+                                                    ? 'bg-green-500 text-white shadow-lg shadow-green-500/20 scale-100'
                                                     : isMissed
                                                         ? 'bg-white/5 text-white/20'
-                                                        : 'bg-white/10 text-white/40'
+                                                        : isFuture
+                                                            ? 'opacity-0'
+                                                            : 'bg-white/5 text-white/20'
                                                 }`}
                                             title={`${date}: ${isCompleted ? 'Completed' : 'Incomplete'}`}
                                         >
-                                            {isCompleted ? <Check size={14} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-current" />}
+                                            {isCompleted ? (
+                                                <Check size={14} strokeWidth={4} />
+                                            ) : isMissed ? (
+                                                <Minus size={14} strokeWidth={3} />
+                                            ) : (
+                                                <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+                                            )}
                                         </div>
                                     </div>
                                 );

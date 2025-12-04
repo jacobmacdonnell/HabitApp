@@ -154,20 +154,25 @@ const Dashboard = () => {
 
           {/* Time Filters (Only show in Today view) */}
           {viewMode === 'today' && (
-            <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide mask-fade-right">
+            <div className="bg-white/5 p-1 rounded-2xl flex justify-between items-center backdrop-blur-md border border-white/5 relative">
               {[
-                { id: 'all', icon: <Clock size={16} />, label: 'All' },
-                { id: 'morning', icon: <Sun size={16} />, label: 'Morning' },
-                { id: 'midday', icon: <Sun size={16} />, label: 'Noon' },
-                { id: 'evening', icon: <Sunset size={16} />, label: 'Evening' },
-              ].map(filter => (
+                { id: 'all', label: 'All' },
+                { id: 'morning', label: 'Morning' },
+                { id: 'midday', label: 'Noon' },
+                { id: 'evening', label: 'Evening' },
+              ].map((filter) => (
                 <button
                   key={filter.id}
                   onClick={() => setTimeFilter(filter.id)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap border ${timeFilter === filter.id ? 'bg-white text-black border-white shadow-lg' : 'glass-button text-white/60 border-transparent hover:border-white/10'}`}
+                  className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 relative z-10 ${timeFilter === filter.id
+                      ? 'text-black shadow-lg'
+                      : 'text-white/40 hover:text-white/80'
+                    }`}
                 >
-                  {filter.icon}
                   {filter.label}
+                  {timeFilter === filter.id && (
+                    <div className="absolute inset-0 bg-white rounded-xl -z-10 animate-fade-in" />
+                  )}
                 </button>
               ))}
             </div>
@@ -179,9 +184,27 @@ const Dashboard = () => {
         ) : (
           <div className="space-y-4">
             {filteredHabits.length === 0 ? (
-              <div className="text-center py-12 glass-panel rounded-[2rem] border-dashed border-white/20">
-                <p className="text-white/50 text-lg">No habits found.</p>
-                <p className="text-sm text-white/30 mt-2">Add a new one to get started.</p>
+              <div className="flex flex-col items-center justify-center py-16 px-6 glass-panel rounded-[2.5rem] border border-white/10 text-center space-y-6 mt-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 flex items-center justify-center mb-2 ring-1 ring-white/10">
+                  <Plus size={32} className="text-white/80" />
+                </div>
+                <div className="space-y-2 max-w-xs">
+                  <h3 className="text-xl font-bold text-white">
+                    {timeFilter === 'all' ? "No habits yet" : `No ${timeFilter} habits`}
+                  </h3>
+                  <p className="text-white/40 text-sm leading-relaxed">
+                    {timeFilter === 'all'
+                      ? "Your journey to a better you begins with a single step. Create your first habit now."
+                      : `You don't have any habits scheduled for the ${timeFilter} yet.`}
+                  </p>
+                </div>
+                <button
+                  onClick={openAddModal}
+                  className="px-8 py-4 bg-white text-black font-bold rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  <Plus size={20} strokeWidth={3} />
+                  <span>Create New Habit</span>
+                </button>
               </div>
             ) : (
               filteredHabits.map((habit) => {
@@ -194,28 +217,31 @@ const Dashboard = () => {
                 return (
                   <div
                     key={habit.id}
-                    className={`glass-card p-5 rounded-[2rem] relative overflow-hidden group ${isCompleted ? 'opacity-60' : ''}`}
+                    className={`glass-card p-5 rounded-[2rem] relative overflow-hidden group transition-all duration-500 ${isCompleted ? 'opacity-60 grayscale-[0.3]' : 'hover:translate-y-[-4px]'}`}
                   >
                     {/* Progress Background Fill */}
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 transition-all duration-700 ease-out"
+                      className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-700 ease-out"
                       style={{ width: `${progressPercent}%` }}
                     />
 
                     <div className="relative z-10 flex items-center justify-between">
                       <div className="flex items-center gap-5">
                         <div
-                          className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner ring-1 ring-white/10"
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner ring-1 ring-white/10 relative overflow-hidden"
                           style={{ backgroundColor: `${habit.color}20`, color: habit.color }}
                         >
                           {habit.icon}
+                          {isCompleted && (
+                            <div className="absolute inset-0 bg-white/20 animate-pulse-glow" />
+                          )}
                         </div>
                         <div>
-                          <h4 className="font-bold text-xl tracking-tight">{habit.title}</h4>
-                          <div className="flex items-center gap-3 text-sm font-medium text-white/60 mt-1">
+                          <h4 className="font-bold text-xl tracking-tight text-white">{habit.title}</h4>
+                          <div className="flex items-center gap-3 text-sm font-medium text-white/50 mt-1">
                             <span>{current} / {habit.targetCount}</span>
                             {streak > 0 && (
-                              <span className="flex items-center gap-1 text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-full">
+                              <span className="flex items-center gap-1 text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-full border border-orange-400/20">
                                 🔥 {streak}
                               </span>
                             )}
@@ -226,15 +252,15 @@ const Dashboard = () => {
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => handleLogProgress(habit.id)}
-                          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg active:scale-90 ${isCompleted ? 'bg-green-400 text-white' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'}`}
+                          className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg active:scale-90 ${isCompleted ? 'bg-green-500 text-white shadow-green-500/30' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'}`}
                         >
                           <Check size={26} strokeWidth={3} />
                         </button>
 
-                        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity absolute right-20 top-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-md p-1 rounded-xl">
+                        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity absolute right-20 top-1/2 -translate-y-1/2 bg-[#1c1c1e]/80 backdrop-blur-md p-1.5 rounded-xl border border-white/10 shadow-xl translate-x-4 group-hover:translate-x-0 duration-300">
                           <button
                             onClick={() => openEditModal(habit)}
-                            className="p-2 hover:bg-white/20 rounded-lg text-white/70 hover:text-white transition-colors"
+                            className="p-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors"
                           >
                             <Pencil size={16} />
                           </button>
