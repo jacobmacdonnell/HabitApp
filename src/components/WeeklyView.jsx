@@ -36,7 +36,7 @@ export const WeeklyView = ({ habits, progress }) => {
 
             <div className="space-y-3">
                 {habits.map(habit => (
-                    <div key={habit.id} className="p-4 rounded-[1.5rem] glass-card flex flex-col gap-4">
+                    <div key={habit.id} className="p-5 rounded-[2rem] glass-card flex flex-col gap-4">
                         <div className="flex items-center gap-3">
                             <div
                                 className="w-8 h-8 rounded-xl flex items-center justify-center text-lg shadow-inner ring-1 ring-white/10"
