@@ -117,37 +117,17 @@ const Dashboard = ({ viewMode }) => {
   if (viewMode === 'pet') {
     return (
       <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fade-in">
-        <div className="absolute top-6 right-6 z-50">
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="p-3 glass-button rounded-full text-white/70 hover:text-white hover:rotate-90 transition-transform duration-500"
-          >
-            <Settings size={20} strokeWidth={2.5} />
-          </button>
-        </div>
         <Pet pet={pet} />
         <div className="text-center space-y-2 max-w-xs">
           <h3 className="text-xl font-bold text-white">Companion Status</h3>
           <p className="text-white/50 text-sm">Keep up your habits to keep {pet.name} happy and healthy!</p>
         </div>
-        <SettingsModal
-          isOpen={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
-        />
       </div>
     );
   }
 
   return (
     <div className="space-y-8 pb-8 relative">
-      {/* Settings Button - Top Right Absolute (Global) */}
-      <button
-        onClick={() => setIsSettingsOpen(true)}
-        className="absolute top-0 right-0 p-3 glass-button rounded-full text-white/70 hover:text-white hover:rotate-90 transition-transform duration-500 z-50"
-      >
-        <Settings size={20} strokeWidth={2.5} />
-      </button>
-
       {/* Show Pet ONLY on Today View */}
       {viewMode === 'today' && <Pet pet={pet} />}
 
@@ -302,23 +282,23 @@ const Dashboard = ({ viewMode }) => {
         onSubmit={handleHabitSubmit}
         initialData={editingHabit}
       />
-
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
     </div>
   );
 };
 
 function App() {
   const [viewMode, setViewMode] = useState('today');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <HabitProvider>
-      <Layout currentView={viewMode} onNavigate={setViewMode}>
+      <Layout currentView={viewMode} onNavigate={setViewMode} onOpenSettings={() => setIsSettingsOpen(true)}>
         <Dashboard viewMode={viewMode} />
       </Layout>
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </HabitProvider>
   );
 }

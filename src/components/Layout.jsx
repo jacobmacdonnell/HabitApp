@@ -1,7 +1,7 @@
 import React from 'react';
-import { Home, Calendar, User, Battery, Wifi } from 'lucide-react';
+import { Home, Calendar, User, Settings, Battery, Wifi } from 'lucide-react';
 
-export const Layout = ({ children, currentView, onNavigate }) => {
+export const Layout = ({ children, currentView, onNavigate, onOpenSettings }) => {
     return (
         <div className="min-h-screen mesh-bg text-white font-sans selection:bg-pink-500/30 flex items-center justify-center p-4 sm:p-8">
             <div className="w-full max-w-md h-[850px] max-h-[90vh] glass-panel rounded-[3.5rem] shadow-2xl flex flex-col relative overflow-hidden ring-1 ring-white/10 transition-all duration-500">
@@ -46,6 +46,13 @@ export const Layout = ({ children, currentView, onNavigate }) => {
                         >
                             <User size={24} strokeWidth={3} className="group-hover:-translate-y-1 transition-transform duration-300" />
                             {currentView === 'pet' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
+                        </button>
+
+                        <button
+                            onClick={onOpenSettings}
+                            className="p-4 rounded-full hover:bg-white/10 text-white/50 hover:text-white hover:-translate-y-1 transition-all duration-300 group"
+                        >
+                            <Settings size={24} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-500" />
                         </button>
                     </nav>
                 </div>
