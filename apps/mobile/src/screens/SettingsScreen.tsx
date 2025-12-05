@@ -7,9 +7,9 @@ import { BlurView } from 'expo-blur';
 
 export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
-    const [notifications, setNotifications] = useState(true);
-    const [sound, setSound] = useState(true);
-    const [theme, setTheme] = useState<'auto' | 'light' | 'dark'>('auto');
+    const [notifications, setNotifications] = useState(settings.notifications ?? true);
+    const [sound, setSound] = useState(settings.sound ?? true);
+    const [theme, setTheme] = useState<'auto' | 'light' | 'dark'>(settings.theme || 'auto');
 
     const handleReset = () => {
         Alert.alert(
@@ -41,6 +41,21 @@ export const SettingsScreen = () => {
         return date;
     };
 
+    const handleThemeChange = (newTheme: 'auto' | 'light' | 'dark') => {
+        setTheme(newTheme);
+        updateSettings({ theme: newTheme });
+    };
+
+    const handleNotificationChange = (val: boolean) => {
+        setNotifications(val);
+        updateSettings({ notifications: val });
+    };
+
+    const handleSoundChange = (val: boolean) => {
+        setSound(val);
+        updateSettings({ sound: val });
+    };
+
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Text style={styles.headerTitle}>Settings</Text>
@@ -64,7 +79,7 @@ export const SettingsScreen = () => {
                         {['auto', 'light', 'dark'].map((t) => (
                             <TouchableOpacity
                                 key={t}
-                                onPress={() => setTheme(t as any)}
+                                onPress={() => handleThemeChange(t as any)}
                                 style={[styles.segmentButton, theme === t && styles.segmentActive]}
                             >
                                 {t === 'auto' && <Smartphone size={16} color={theme === t ? '#fff' : 'rgba(255,255,255,0.5)'} />}
@@ -89,7 +104,7 @@ export const SettingsScreen = () => {
                         </View>
                         <Switch
                             value={sound}
-                            onValueChange={setSound}
+                            onValueChange={handleSoundChange}
                             trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
                             ios_backgroundColor="#3e3e3e"
                         />
@@ -107,7 +122,7 @@ export const SettingsScreen = () => {
                         </View>
                         <Switch
                             value={notifications}
-                            onValueChange={setNotifications}
+                            onValueChange={handleNotificationChange}
                             trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
                             ios_backgroundColor="#3e3e3e"
                         />
@@ -140,7 +155,7 @@ export const SettingsScreen = () => {
                                 display="compact"
                                 onChange={(e, date) => onTimeChange('bedtime', e, date)}
                                 themeVariant="dark"
-                                style={{ width: 90 }}
+                                style={{ width: 100 }}
                             />
                         </View>
                         <View style={styles.pickerContainer}>
@@ -151,7 +166,7 @@ export const SettingsScreen = () => {
                                 display="compact"
                                 onChange={(e, date) => onTimeChange('wakeup', e, date)}
                                 themeVariant="dark"
-                                style={{ width: 90 }}
+                                style={{ width: 100 }}
                             />
                         </View>
                     </View>
@@ -300,5 +315,6 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.2)',
         fontSize: 13,
         fontWeight: '500',
+        marginTop: 20,
     },
 });

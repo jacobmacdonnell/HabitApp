@@ -8,7 +8,13 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
     const [pet, setPet] = useState<Pet | null>(null);
     const [progress, setProgress] = useState<DailyProgress[]>([]);
     const [isOnboarding, setIsOnboarding] = useState(true);
-    const [settings, setSettings] = useState<Settings>({ sleepStart: '22:00', sleepEnd: '06:00' });
+    const [settings, setSettings] = useState<Settings>({
+        sleepStart: '22:00',
+        sleepEnd: '06:00',
+        notifications: true,
+        sound: true,
+        theme: 'auto'
+    });
 
     useEffect(() => {
         const loadData = async () => {

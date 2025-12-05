@@ -60,10 +60,22 @@ export const MobileStorageService: StorageServiceType = {
     getSettings: async (): Promise<Settings> => {
         try {
             const data = await AsyncStorage.getItem(KEYS.SETTINGS);
-            return data ? JSON.parse(data) : { sleepStart: '22:00', sleepEnd: '06:00' };
+            return data ? JSON.parse(data) : {
+                sleepStart: '22:00',
+                sleepEnd: '06:00',
+                notifications: true,
+                sound: true,
+                theme: 'auto'
+            };
         } catch (e) {
             console.error('Failed to load settings', e);
-            return { sleepStart: '22:00', sleepEnd: '06:00' };
+            return {
+                sleepStart: '22:00',
+                sleepEnd: '06:00',
+                notifications: true,
+                sound: true,
+                theme: 'auto'
+            };
         }
     },
     saveSettings: async (settings: Settings) => {

@@ -8,13 +8,19 @@ import { TrendsScreen } from '../screens/TrendsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { HabitFormScreen } from '../screens/HabitFormScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
-import { useHabit } from '@habitapp/shared';
+import { useHabit, Habit } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
 import { StyleSheet } from 'react-native';
 import { Home, User, TrendingUp, Settings } from 'lucide-react-native';
 
+export type RootStackParamList = {
+    Onboarding: undefined;
+    Main: undefined;
+    HabitForm: { habit?: Habit };
+};
+
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const TabNavigator = () => (
     <Tab.Navigator

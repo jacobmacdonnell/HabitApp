@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
+import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
 import { BlurView } from 'expo-blur';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { X, Check } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
+import { X, Check, Trash2 } from 'lucide-react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
-const COLORS = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5', '#FF99CC', '#3B82F6', '#10B981'];
-const ICONS = ['📝', '💧', '🏃', '🧘', '📚', '💊', '🧹', '🎨', '🎸', '💰', '🥗', '💤'];
+type ParamList = {
+    HabitForm: { habit?: Habit };
+};
 
 export const HabitFormScreen = () => {
-    const { addHabit } = useHabit();
+    const { addHabit, updateHabit, deleteHabit } = useHabit();
     const navigation = useNavigation();
+    const route = useRoute<RouteProp<ParamList, 'HabitForm'>>();
+    const editingHabit = route.params?.habit;
 
-    const [title, setTitle] = useState('');
-    const [color, setColor] = useState(COLORS[0]);
-    const [icon, setIcon] = useState(ICONS[0]);
-    const [timeOfDay, setTimeOfDay] = useState('anytime');
-    const [frequencyIndex, setFrequencyIndex] = useState(0); // 0: Daily, 1: Weekly
-    const [targetCount, setTargetCount] = useState(1);
+    const [title, setTitle] = useState(editingHabit?.title || '');
+    const [color, setColor] = useState(editingHabit?.color || HABIT_COLORS[0]);
+    const [icon, setIcon] = useState(editingHabit?.icon || HABIT_ICONS[0]);
+    const [timeOfDay, setTimeOfDay] = useState(editingHabit?.timeOfDay || 'anytime');
+    const [frequencyIndex, setFrequencyIndex] = useState(editingHabit?.frequency?.type === 'weekly' ? 1 : 0);
+    const [targetCount, setTargetCount] = useState(editingHabit?.targetCount || 1);
 
     const handleSave = () => {
         if (!title.trim()) {
@@ -26,16 +30,41 @@ export const HabitFormScreen = () => {
             return;
         }
 
-        addHabit({
+        const habitData = {
             title,
             color,
             icon,
             timeOfDay: timeOfDay as any,
-            frequency: { type: frequencyIndex === 0 ? 'daily' : 'weekly', days: [] },
+            frequency: { type: (frequencyIndex === 0 ? 'daily' : 'weekly') as 'daily' | 'weekly', days: [] },
             targetCount,
-        });
+        };
+
+        if (editingHabit) {
+            updateHabit(editingHabit.id, habitData);
+        } else {
+            addHabit(habitData);
+        }
 
         navigation.goBack();
+    };
+
+    const handleDelete = () => {
+        if (!editingHabit) return;
+        Alert.alert(
+            'Delete Habit',
+            'Are you sure you want to delete this habit?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: () => {
+                        deleteHabit(editingHabit.id);
+                        navigation.goBack();
+                    }
+                }
+            ]
+        );
     };
 
     return (
@@ -44,7 +73,7 @@ export const HabitFormScreen = () => {
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
                     <X size={24} color="#fff" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>New Habit</Text>
+                <Text style={styles.headerTitle}>{editingHabit ? 'Edit Habit' : 'New Habit'}</Text>
                 <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
                     <Check size={24} color="#000" />
                 </TouchableOpacity>
@@ -62,7 +91,6 @@ export const HabitFormScreen = () => {
                             placeholderTextColor="rgba(255,255,255,0.3)"
                             value={title}
                             onChangeText={setTitle}
-                            autoFocus
                         />
                     </View>
 
@@ -70,7 +98,7 @@ export const HabitFormScreen = () => {
                     <View style={styles.section}>
                         <Text style={styles.label}>COLOR</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorRow}>
-                            {COLORS.map(c => (
+                            {HABIT_COLORS.map(c => (
                                 <TouchableOpacity
                                     key={c}
                                     style={[styles.colorDot, { backgroundColor: c }, color === c && styles.colorSelected]}
@@ -84,7 +112,7 @@ export const HabitFormScreen = () => {
                     <View style={styles.section}>
                         <Text style={styles.label}>ICON</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconRow}>
-                            {ICONS.map(i => (
+                            {HABIT_ICONS.map(i => (
                                 <TouchableOpacity
                                     key={i}
                                     style={[styles.iconButton, icon === i && { backgroundColor: color }]}
@@ -104,7 +132,8 @@ export const HabitFormScreen = () => {
                             selectedIndex={['anytime', 'morning', 'midday', 'evening'].indexOf(timeOfDay)}
                             onChange={(event) => {
                                 const index = event.nativeEvent.selectedSegmentIndex;
-                                setTimeOfDay(['anytime', 'morning', 'midday', 'evening'][index]);
+                                const times = ['anytime', 'morning', 'midday', 'evening'] as const;
+                                setTimeOfDay(times[index]);
                             }}
                             appearance="dark"
                             backgroundColor="rgba(255,255,255,0.1)"
@@ -132,6 +161,14 @@ export const HabitFormScreen = () => {
                     </View>
 
                 </ScrollView>
+                {editingHabit && (
+                    <View style={styles.footer}>
+                        <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+                            <Trash2 size={20} color="#ef4444" />
+                            <Text style={styles.deleteText}>Delete Habit</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </KeyboardAvoidingView>
         </View>
     );
@@ -250,5 +287,23 @@ const styles = StyleSheet.create({
         color: '#fff',
         width: 40,
         textAlign: 'center',
+    },
+    footer: {
+        padding: 20,
+        paddingBottom: 40,
+    },
+    deleteButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        padding: 16,
+        borderRadius: 16,
+        gap: 8,
+    },
+    deleteText: {
+        color: '#ef4444',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

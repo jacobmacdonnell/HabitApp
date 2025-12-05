@@ -26,6 +26,7 @@ export type PetMood = 'happy' | 'neutral' | 'sad' | 'sick' | 'sleeping';
 
 export interface Pet {
     name: string;
+    hat?: string;
     color: string; // Hex code
     health: number; // 0-100
     maxHealth: number; // Default 100
@@ -42,6 +43,9 @@ export interface Pet {
 export interface Settings {
     sleepStart: string;
     sleepEnd: string;
+    notifications: boolean;
+    sound: boolean;
+    theme: 'auto' | 'light' | 'dark';
 }
 
 export interface StorageServiceType {

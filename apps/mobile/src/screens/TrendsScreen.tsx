@@ -1,39 +1,66 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { useHabit } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
-import { TrendingUp, Calendar, Award } from 'lucide-react-native';
+import { TrendingUp, Award, Calendar, Check, X, Grid, List as ListIcon } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
+type ViewMode = 'weekly' | 'monthly';
+
 export const TrendsScreen = () => {
     const { habits, progress, getStreak } = useHabit();
+    const [viewMode, setViewMode] = useState<ViewMode>('weekly');
 
-    const weeklyData = useMemo(() => {
-        const days = Array.from({ length: 7 }, (_, i) => {
+    // --- Data Processing ---
+
+    // 1. Weekly History (Last 7 Days) for EACH habit
+    const last7Days = useMemo(() => {
+        return Array.from({ length: 7 }, (_, i) => {
             const d = new Date();
             d.setDate(d.getDate() - (6 - i));
-            return d;
+            return {
+                dateStr: d.toISOString().split('T')[0],
+                dayName: d.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+                isToday: i === 6
+            };
         });
+    }, []);
 
-        return days.map(date => {
-            const dateStr = date.toISOString().split('T')[0];
-            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const habitWeeklyStatus = useMemo(() => {
+        return habits.map(habit => {
+            const history = last7Days.map(day => {
+                const entry = progress.find(p => p.date === day.dateStr && p.habitId === habit.id);
+                const isCompleted = entry?.completed || false;
+                const isPartiallyDone = (entry?.currentCount || 0) > 0;
+                return { ...day, isCompleted, isPartiallyDone };
+            });
+            return { ...habit, history };
+        });
+    }, [habits, progress, last7Days]);
 
-            // Get habits active on this day (simplified: all habits)
-            // In a real app, check creation date or frequency
-            const activeHabits = habits;
-            const totalTarget = activeHabits.length;
+    // 2. Monthly Heatmap (Last 30 Days) - Aggregate
+    const last30Days = useMemo(() => {
+        return Array.from({ length: 30 }, (_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (29 - i));
+            return d.toISOString().split('T')[0];
+        });
+    }, []);
 
+    const heatmapData = useMemo(() => {
+        return last30Days.map(dateStr => {
             const dayProgress = progress.filter(p => p.date === dateStr);
+            const totalTarget = habits.length; // Simplified: usually check if habit existed
             const completedCount = dayProgress.filter(p => p.completed).length;
 
-            const percentage = totalTarget > 0 ? (completedCount / totalTarget) * 100 : 0;
-
-            return { dayName, percentage, dateStr };
+            // Opacity calculation
+            const intensity = totalTarget > 0 ? completedCount / totalTarget : 0;
+            return { dateStr, intensity, completedCount };
         });
-    }, [habits, progress]);
+    }, [progress, habits, last30Days]);
 
+    // 3. Stats
     const bestStreak = useMemo(() => {
         if (habits.length === 0) return 0;
         return Math.max(...habits.map(h => getStreak(h.id)));
@@ -43,69 +70,138 @@ export const TrendsScreen = () => {
         return progress.filter(p => p.completed).length;
     }, [progress]);
 
-    return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Text style={styles.headerTitle}>Trends</Text>
+    const consistencyScore = useMemo(() => {
+        if (heatmapData.length === 0) return 0;
+        const sumIntensity = heatmapData.reduce((acc, curr) => acc + curr.intensity, 0);
+        return Math.round((sumIntensity / heatmapData.length) * 100);
+    }, [heatmapData]);
 
-            {/* Weekly Chart */}
-            <View style={styles.section}>
-                <Text style={styles.sectionHeader}>LAST 7 DAYS</Text>
-                <BlurView intensity={20} tint="dark" style={styles.chartCard}>
-                    <View style={styles.chartContainer}>
-                        {weeklyData.map((day, index) => (
-                            <View key={day.dateStr} style={styles.barColumn}>
-                                <View style={styles.barTrack}>
-                                    <View
-                                        style={[
-                                            styles.barFill,
-                                            {
-                                                height: `${Math.max(day.percentage, 5)}%`,
-                                                backgroundColor: day.percentage >= 100 ? '#22c55e' : (day.percentage > 0 ? '#6366f1' : 'rgba(255,255,255,0.1)')
-                                            }
-                                        ]}
-                                    />
-                                </View>
-                                <Text style={[styles.dayLabel, index === 6 && styles.todayLabel]}>
-                                    {day.dayName.charAt(0)}
-                                </Text>
+
+    // --- Render Components ---
+
+    const renderToggle = () => (
+        <View style={styles.toggleContainer}>
+            <View style={styles.toggleTrack}>
+                <TouchableOpacity
+                    style={[styles.toggleOption, viewMode === 'weekly' && styles.toggleActive]}
+                    onPress={() => setViewMode('weekly')}
+                >
+                    <ListIcon size={16} color={viewMode === 'weekly' ? '#fff' : 'rgba(255,255,255,0.5)'} />
+                    <Text style={[styles.toggleText, viewMode === 'weekly' && styles.toggleTextActive]}>Weekly</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.toggleOption, viewMode === 'monthly' && styles.toggleActive]}
+                    onPress={() => setViewMode('monthly')}
+                >
+                    <Grid size={16} color={viewMode === 'monthly' ? '#fff' : 'rgba(255,255,255,0.5)'} />
+                    <Text style={[styles.toggleText, viewMode === 'monthly' && styles.toggleTextActive]}>Monthly</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+
+    const renderWeeklyView = () => (
+        <View style={styles.listContainer}>
+            <View style={styles.weekHeaderRow}>
+                <View style={{ flex: 1 }} />
+                <View style={styles.daysRow}>
+                    {last7Days.map((day, i) => (
+                        <Text key={i} style={[styles.columnLabel, day.isToday && styles.todayLabel]}>
+                            {day.dayName}
+                        </Text>
+                    ))}
+                </View>
+            </View>
+
+            {habitWeeklyStatus.map(habit => (
+                <BlurView key={habit.id} intensity={10} tint="dark" style={styles.habitRowCard}>
+                    <View style={styles.habitInfo}>
+                        <Text style={styles.habitTitle} numberOfLines={1}>{habit.title}</Text>
+                        <Text style={styles.streakLabel}>{getStreak(habit.id)} day streak</Text>
+                    </View>
+                    <View style={styles.daysRow}>
+                        {habit.history.map((day, i) => (
+                            <View key={i} style={styles.statusBubbleContainer}>
+                                {day.isCompleted ? (
+                                    <View style={[styles.statusBubble, { backgroundColor: habit.color }]}>
+                                        <Check size={10} color="#fff" strokeWidth={4} />
+                                    </View>
+                                ) : day.isPartiallyDone ? (
+                                    <View style={[styles.statusBubble, styles.partialBubble, { borderColor: habit.color }]}>
+                                        <Text style={{ fontSize: 8, color: habit.color }}>•</Text>
+                                    </View>
+                                ) : (
+                                    <View style={[styles.statusBubble, styles.emptyBubble]} />
+                                )}
                             </View>
                         ))}
                     </View>
                 </BlurView>
+            ))}
+        </View>
+    );
+
+    const renderMonthlyView = () => (
+        <View>
+            {/* Stats Overview */}
+            <View style={styles.statsGrid}>
+                <BlurView intensity={20} tint="dark" style={styles.statCard}>
+                    <Text style={styles.statLabel}>Consistency</Text>
+                    <Text style={styles.statBigValue}>{consistencyScore}%</Text>
+                </BlurView>
+                <BlurView intensity={20} tint="dark" style={styles.statCard}>
+                    <Text style={styles.statLabel}>Best Streak</Text>
+                    <Text style={styles.statBigValue}>{bestStreak}</Text>
+                </BlurView>
             </View>
 
-            {/* Stats Grid */}
-            <View style={styles.section}>
-                <Text style={styles.sectionHeader}>OVERVIEW</Text>
-                <View style={styles.grid}>
-                    <BlurView intensity={20} tint="dark" style={styles.statCard}>
-                        <View style={[styles.iconContainer, { backgroundColor: 'rgba(251, 146, 60, 0.2)' }]}>
-                            <TrendingUp size={24} color="#fb923c" />
-                        </View>
-                        <Text style={styles.statValue}>{bestStreak}</Text>
-                        <Text style={styles.statLabel}>Best Streak</Text>
-                    </BlurView>
-
-                    <BlurView intensity={20} tint="dark" style={styles.statCard}>
-                        <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
-                            <Award size={24} color="#34d399" />
-                        </View>
-                        <Text style={styles.statValue}>{totalCompletions}</Text>
-                        <Text style={styles.statLabel}>Total Done</Text>
-                    </BlurView>
-                </View>
+            <View style={styles.statsGrid}>
+                <BlurView intensity={20} tint="dark" style={[styles.statCard, { flex: 2 }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Award size={16} color="#fbbf24" />
+                        <Text style={styles.statLabel}>Total Completions</Text>
+                    </View>
+                    <Text style={styles.statBigValue}>{totalCompletions}</Text>
+                </BlurView>
             </View>
 
-            {/* Consistency (Placeholder for Heatmap) */}
+            {/* Heatmap */}
             <View style={styles.section}>
-                <Text style={styles.sectionHeader}>CONSISTENCY</Text>
-                <BlurView intensity={20} tint="dark" style={styles.consistencyCard}>
-                    <View style={styles.row}>
-                        <Calendar size={20} color="rgba(255,255,255,0.5)" />
-                        <Text style={styles.consistencyText}>Keep your streaks alive to fill the grid!</Text>
+                <Text style={styles.sectionHeader}>30 DAY HEATMAP</Text>
+                <BlurView intensity={20} tint="dark" style={styles.heatmapCard}>
+                    <View style={styles.heatmapGrid}>
+                        {heatmapData.map((day, i) => (
+                            <View
+                                key={day.dateStr}
+                                style={[
+                                    styles.heatmapSquare,
+                                    {
+                                        backgroundColor: day.intensity > 0 ? '#22c55e' : 'rgba(255,255,255,0.05)',
+                                        opacity: day.intensity > 0 ? Math.max(0.3, day.intensity) : 1
+                                    }
+                                ]}
+                            />
+                        ))}
+                    </View>
+                    <View style={styles.heatmapLegend}>
+                        <Text style={styles.legendText}>Less</Text>
+                        <View style={styles.legendGradient} />
+                        <Text style={styles.legendText}>More</Text>
                     </View>
                 </BlurView>
             </View>
+        </View>
+    );
+
+    return (
+        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+            <View style={styles.headerRow}>
+                <Text style={styles.headerTitle}>Trends</Text>
+            </View>
+
+            {renderToggle()}
+
+            {viewMode === 'weekly' ? renderWeeklyView() : renderMonthlyView()}
         </ScrollView>
     );
 };
@@ -120,14 +216,120 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         paddingBottom: 100,
     },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
     headerTitle: {
         fontSize: 34,
         fontWeight: '800',
         color: '#fff',
+    },
+    // Toggle
+    toggleContainer: {
+        alignItems: 'center',
         marginBottom: 24,
     },
+    toggleTrack: {
+        flexDirection: 'row',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 30,
+        padding: 4,
+        width: 240,
+    },
+    toggleOption: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        gap: 8,
+        borderRadius: 26,
+    },
+    toggleActive: {
+        backgroundColor: 'rgba(255,255,255,0.2)',
+    },
+    toggleText: {
+        color: 'rgba(255,255,255,0.5)',
+        fontWeight: '600',
+        fontSize: 14,
+    },
+    toggleTextActive: {
+        color: '#fff',
+        fontWeight: '700',
+    },
+    // Weekly
+    listContainer: {
+        gap: 12,
+    },
+    weekHeaderRow: {
+        flexDirection: 'row',
+        paddingRight: 16,
+        marginBottom: 4,
+    },
+    daysRow: {
+        flexDirection: 'row',
+        gap: 8,
+        width: 190, // Fixed width for bubbles aligned right
+        justifyContent: 'flex-end',
+    },
+    columnLabel: {
+        width: 20,
+        textAlign: 'center',
+        fontSize: 10,
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.3)',
+    },
+    todayLabel: {
+        color: '#fff',
+    },
+    habitRowCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 16,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        overflow: 'hidden',
+    },
+    habitInfo: {
+        flex: 1,
+        marginRight: 12,
+    },
+    habitTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#fff',
+        marginBottom: 4,
+    },
+    streakLabel: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.6)',
+        fontWeight: '500',
+    },
+    statusBubbleContainer: {
+        width: 20,
+        alignItems: 'center',
+    },
+    statusBubble: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    partialBubble: {
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+    },
+    emptyBubble: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
+    // Monthly
     section: {
-        marginBottom: 24,
+        marginTop: 24,
     },
     sectionHeader: {
         fontSize: 12,
@@ -136,90 +338,62 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         marginLeft: 12,
     },
-    chartCard: {
-        borderRadius: 24,
-        padding: 20,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        overflow: 'hidden',
-    },
-    chartContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        height: 150,
-        alignItems: 'flex-end',
-    },
-    barColumn: {
-        alignItems: 'center',
-        gap: 8,
-        flex: 1,
-    },
-    barTrack: {
-        width: 8,
-        height: '100%',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 4,
-        justifyContent: 'flex-end',
-        overflow: 'hidden',
-    },
-    barFill: {
-        width: '100%',
-        borderRadius: 4,
-        minHeight: 8,
-    },
-    dayLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.3)',
-    },
-    todayLabel: {
-        color: '#fff',
-        fontWeight: '800',
-    },
-    grid: {
+    statsGrid: {
         flexDirection: 'row',
         gap: 12,
+        marginBottom: 12,
     },
     statCard: {
         flex: 1,
-        borderRadius: 24,
-        padding: 20,
         backgroundColor: 'rgba(255,255,255,0.05)',
+        padding: 20,
+        borderRadius: 24,
         overflow: 'hidden',
-        alignItems: 'center',
-    },
-    iconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    statValue: {
-        fontSize: 28,
-        fontWeight: '800',
-        color: '#fff',
-        marginBottom: 4,
     },
     statLabel: {
         fontSize: 12,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.5)',
+        marginBottom: 8,
     },
-    consistencyCard: {
-        borderRadius: 20,
-        padding: 20,
+    statBigValue: {
+        fontSize: 32,
+        fontWeight: '800',
+        color: '#fff',
+    },
+    heatmapCard: {
         backgroundColor: 'rgba(255,255,255,0.05)',
+        padding: 20,
+        borderRadius: 24,
         overflow: 'hidden',
     },
-    row: {
+    heatmapGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6,
+        justifyContent: 'center',
+    },
+    heatmapSquare: {
+        width: (width - 40 - 40 - 36) / 7, // Card padding, gaps
+        aspectRatio: 1,
+        borderRadius: 4,
+    },
+    heatmapLegend: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        justifyContent: 'center',
+        marginTop: 16,
+        gap: 8,
     },
-    consistencyText: {
+    legendGradient: {
+        width: 100,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: 'rgba(255,255,255,0.2)', // Simplified linear gradient simulation
+    },
+    legendText: {
+        fontSize: 10,
         color: 'rgba(255,255,255,0.5)',
-        fontSize: 14,
-        fontWeight: '500',
+        fontWeight: '600',
     },
 });
