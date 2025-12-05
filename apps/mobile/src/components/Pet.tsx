@@ -330,7 +330,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                 </Animated.View>
             </View>
 
-            <BlurView intensity={20} tint="dark" style={styles.statsCard}>
+            <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.statsCard}>
                 <View style={styles.nameRow}>
                     <Text style={styles.label}>NAME</Text>
                     <Text style={styles.name}>{pet.name}</Text>
@@ -487,17 +487,17 @@ const styles = StyleSheet.create({
     },
     statsCard: {
         width: width - 40,
-        borderRadius: 24,
-        padding: 24,
+        borderRadius: 20,
+        padding: 16,
         backgroundColor: 'rgba(255,255,255,0.05)',
         overflow: 'hidden',
     },
     nameRow: {
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.1)',
-        paddingBottom: 10,
+        borderBottomColor: 'rgba(255,255,255,0.08)',
+        paddingBottom: 8,
     },
     label: {
         fontSize: 10,
@@ -506,20 +506,19 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     name: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: '700',
         color: '#fff',
-        marginBottom: 4,
     },
     statsGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 12,
+        gap: 8,
         justifyContent: 'space-between',
     },
     statFullRow: {
         width: '100%',
-        marginBottom: 8,
+        marginBottom: 4,
     },
     halfWidth: {
         width: '47%', // Slightly less than 50% to account for gap
@@ -547,27 +546,23 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     barBg: {
-        height: 12,
+        height: 8,
         backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: 6,
+        borderRadius: 4,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
     },
     barFill: {
         height: '100%',
-        borderRadius: 6,
+        borderRadius: 4,
     },
     miniStat: {
         width: '100%',
-        height: 100,
+        height: 72,
         backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 16,
-        padding: 12,
+        borderRadius: 12,
+        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
     },
     miniIcon: {
         padding: 6,
@@ -587,16 +582,14 @@ const styles = StyleSheet.create({
     },
     actionButton: {
         width: '100%',
-        height: 60,
+        height: 44,
         backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 16,
-        padding: 12,
+        borderRadius: 12,
+        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
         gap: 6,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
     },
     actionText: {
         fontSize: 13,

@@ -62,158 +62,168 @@ export const SettingsScreen = () => {
     const insets = useSafeAreaInsets();
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={[styles.content, { paddingTop: insets.top + 20 }]}
-            contentInsetAdjustmentBehavior="automatic"
-        >
-            <View style={styles.headerRow}>
-                <Text style={styles.headerTitle}>Settings</Text>
-            </View>
+        <View style={styles.wrapper}>
+            {/* Ambient Background - iOS 26 style */}
+            <View style={[styles.blob, { backgroundColor: '#6366f1', top: -100, left: -100 }]} />
+            <View style={[styles.blob, { backgroundColor: '#a855f7', bottom: -100, right: -100 }]} />
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
-            {/* Preferences */}
-            <View style={styles.section}>
-                <Text style={styles.sectionHeader}>PREFERENCES</Text>
-                <BlurView intensity={20} tint="dark" style={styles.card}>
-                    {/* Theme Selector */}
-                    <View style={styles.row}>
-                        <View style={styles.iconLabel}>
-                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(99, 102, 241, 0.2)' }]}>
-                                <Moon size={20} color="#818cf8" />
-                            </View>
-                            <Text style={styles.label}>Appearance</Text>
-                        </View>
-                    </View>
+            <ScrollView
+                style={styles.container}
+                contentContainerStyle={[styles.content, { paddingTop: insets.top }]}
+                contentInsetAdjustmentBehavior="automatic"
+            >
+                <View style={styles.headerRow}>
+                    <Text style={styles.headerTitle}>Settings</Text>
+                </View>
 
-                    <View style={styles.segmentContainer}>
-                        <SegmentedControl
-                            values={['Auto', 'Light', 'Dark']}
-                            selectedIndex={['auto', 'light', 'dark'].indexOf(theme)}
-                            onChange={(event) => {
-                                const index = event.nativeEvent.selectedSegmentIndex;
-                                handleThemeChange(['auto', 'light', 'dark'][index] as any);
-                            }}
-                            appearance="dark"
-                        />
-                    </View>
-
-                    <View style={styles.separator} />
-
-                    {/* Sound */}
-                    <View style={styles.row}>
-                        <View style={styles.iconLabel}>
-                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(236, 72, 153, 0.2)' }]}>
-                                <Volume2 size={20} color="#f472b6" />
-                            </View>
-                            <Text style={styles.label}>Sound Effects</Text>
-                        </View>
-                        <Switch
-                            value={sound}
-                            onValueChange={handleSoundChange}
-                            trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
-                            ios_backgroundColor="#3e3e3e"
-                        />
-                    </View>
-
-                    <View style={styles.separator} />
-
-                    {/* Notifications */}
-                    <View style={styles.row}>
-                        <View style={styles.iconLabel}>
-                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
-                                <Bell size={20} color="#34d399" />
-                            </View>
-                            <Text style={styles.label}>Notifications</Text>
-                        </View>
-                        <Switch
-                            value={notifications}
-                            onValueChange={handleNotificationChange}
-                            trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
-                            ios_backgroundColor="#3e3e3e"
-                        />
-                    </View>
-                </BlurView>
-            </View>
-
-            {/* Sleep Schedule */}
-            <View style={styles.section}>
-                <Text style={styles.sectionHeader}>SLEEP SCHEDULE</Text>
-                <BlurView intensity={20} tint="dark" style={styles.card}>
-                    <View style={styles.row}>
-                        <View style={styles.iconLabel}>
-                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(168, 85, 247, 0.2)' }]}>
-                                <Moon size={20} color="#c084fc" />
-                            </View>
-                            <View>
-                                <Text style={styles.label}>Pet Sleep Schedule</Text>
-                                <Text style={styles.subLabel}>Your pet will sleep during these hours</Text>
+                {/* Preferences */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionHeader}>PREFERENCES</Text>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
+                        {/* Theme Selector */}
+                        <View style={styles.row}>
+                            <View style={styles.iconLabel}>
+                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(99, 102, 241, 0.2)' }]}>
+                                    <Moon size={20} color="#818cf8" />
+                                </View>
+                                <Text style={styles.label}>Appearance</Text>
                             </View>
                         </View>
-                    </View>
 
-                    <View style={styles.pickerRow}>
-                        <View style={styles.pickerContainer}>
-                            <Text style={styles.pickerLabel}>BEDTIME</Text>
-                            <DateTimePicker
-                                value={parseTime(settings.sleepStart)}
-                                mode="time"
-                                display="compact"
-                                onChange={(e, date) => onTimeChange('bedtime', e, date)}
-                                themeVariant="dark"
-                                style={{ width: 100 }}
+                        <View style={styles.segmentContainer}>
+                            <SegmentedControl
+                                values={['Auto', 'Light', 'Dark']}
+                                selectedIndex={['auto', 'light', 'dark'].indexOf(theme)}
+                                onChange={(event) => {
+                                    const index = event.nativeEvent.selectedSegmentIndex;
+                                    handleThemeChange(['auto', 'light', 'dark'][index] as any);
+                                }}
+                                appearance="dark"
                             />
                         </View>
-                        <View style={styles.pickerContainer}>
-                            <Text style={styles.pickerLabel}>WAKE UP</Text>
-                            <DateTimePicker
-                                value={parseTime(settings.sleepEnd)}
-                                mode="time"
-                                display="compact"
-                                onChange={(e, date) => onTimeChange('wakeup', e, date)}
-                                themeVariant="dark"
-                                style={{ width: 100 }}
+
+                        <View style={styles.separator} />
+
+                        {/* Sound */}
+                        <View style={styles.row}>
+                            <View style={styles.iconLabel}>
+                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(236, 72, 153, 0.2)' }]}>
+                                    <Volume2 size={20} color="#f472b6" />
+                                </View>
+                                <Text style={styles.label}>Sound Effects</Text>
+                            </View>
+                            <Switch
+                                value={sound}
+                                onValueChange={handleSoundChange}
+                                trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
+                                ios_backgroundColor="#3e3e3e"
                             />
                         </View>
-                    </View>
-                </BlurView>
-            </View>
 
-            {/* Data & Privacy */}
-            <View style={styles.section}>
-                <Text style={styles.sectionHeader}>DATA & PRIVACY</Text>
-                <BlurView intensity={20} tint="dark" style={styles.card}>
-                    <TouchableOpacity style={styles.row}>
-                        <View style={styles.iconLabel}>
-                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
-                                <Shield size={20} color="#60a5fa" />
+                        <View style={styles.separator} />
+
+                        {/* Notifications */}
+                        <View style={styles.row}>
+                            <View style={styles.iconLabel}>
+                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
+                                    <Bell size={20} color="#34d399" />
+                                </View>
+                                <Text style={styles.label}>Notifications</Text>
                             </View>
-                            <Text style={styles.label}>Privacy Policy</Text>
+                            <Switch
+                                value={notifications}
+                                onValueChange={handleNotificationChange}
+                                trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
+                                ios_backgroundColor="#3e3e3e"
+                            />
                         </View>
-                        <ChevronRight size={20} color="rgba(255,255,255,0.3)" />
-                    </TouchableOpacity>
+                    </BlurView>
+                </View>
 
-                    <View style={styles.separator} />
-
-                    <TouchableOpacity style={styles.row} onPress={handleReset}>
-                        <View style={styles.iconLabel}>
-                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
-                                <Trash2 size={20} color="#ef4444" />
+                {/* Sleep Schedule */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionHeader}>SLEEP SCHEDULE</Text>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
+                        <View style={styles.row}>
+                            <View style={styles.iconLabel}>
+                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(168, 85, 247, 0.2)' }]}>
+                                    <Moon size={20} color="#c084fc" />
+                                </View>
+                                <View>
+                                    <Text style={styles.label}>Pet Sleep Schedule</Text>
+                                    <Text style={styles.subLabel}>Your pet will sleep during these hours</Text>
+                                </View>
                             </View>
-                            <Text style={[styles.label, { color: '#ef4444' }]}>Reset All Data</Text>
                         </View>
-                    </TouchableOpacity>
-                </BlurView>
-            </View>
 
-            <Text style={styles.footer}>Habit Companion v1.0.2 (iOS)</Text>
-        </ScrollView>
+                        <View style={styles.pickerRow}>
+                            <View style={styles.pickerContainer}>
+                                <Text style={styles.pickerLabel}>BEDTIME</Text>
+                                <DateTimePicker
+                                    value={parseTime(settings.sleepStart)}
+                                    mode="time"
+                                    display="compact"
+                                    onChange={(e, date) => onTimeChange('bedtime', e, date)}
+                                    themeVariant="dark"
+                                    style={{ width: 100 }}
+                                />
+                            </View>
+                            <View style={styles.pickerContainer}>
+                                <Text style={styles.pickerLabel}>WAKE UP</Text>
+                                <DateTimePicker
+                                    value={parseTime(settings.sleepEnd)}
+                                    mode="time"
+                                    display="compact"
+                                    onChange={(e, date) => onTimeChange('wakeup', e, date)}
+                                    themeVariant="dark"
+                                    style={{ width: 100 }}
+                                />
+                            </View>
+                        </View>
+                    </BlurView>
+                </View>
+
+                {/* Data & Privacy */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionHeader}>DATA & PRIVACY</Text>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
+                        <TouchableOpacity style={styles.row}>
+                            <View style={styles.iconLabel}>
+                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
+                                    <Shield size={20} color="#60a5fa" />
+                                </View>
+                                <Text style={styles.label}>Privacy Policy</Text>
+                            </View>
+                            <ChevronRight size={20} color="rgba(255,255,255,0.3)" />
+                        </TouchableOpacity>
+
+                        <View style={styles.separator} />
+
+                        <TouchableOpacity style={styles.row} onPress={handleReset}>
+                            <View style={styles.iconLabel}>
+                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
+                                    <Trash2 size={20} color="#ef4444" />
+                                </View>
+                                <Text style={[styles.label, { color: '#ef4444' }]}>Reset All Data</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </BlurView>
+                </View>
+
+                <Text style={styles.footer}>Habit Companion v1.0.2 (iOS)</Text>
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    wrapper: {
         flex: 1,
         backgroundColor: '#000',
+    },
+    container: {
+        flex: 1,
     },
     content: {
         padding: 20,
@@ -227,7 +237,6 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         color: '#fff',
         letterSpacing: -0.5,
-        marginLeft: 12, // Align with section headers
     },
 
     section: {
@@ -241,7 +250,7 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
     card: {
-        borderRadius: 20,
+        borderRadius: 24,
         overflow: 'hidden',
         backgroundColor: 'rgba(255,255,255,0.05)',
     },
@@ -304,5 +313,13 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '500',
         marginTop: 20,
+    },
+    // iOS 26 ambient background
+    blob: {
+        position: 'absolute',
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+        opacity: 0.3,
     },
 });

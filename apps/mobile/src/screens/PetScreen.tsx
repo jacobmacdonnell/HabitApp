@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
 import { useHabit } from '@habitapp/shared';
 import { Pet } from '../components/Pet';
 import { BlurView } from 'expo-blur';
@@ -10,6 +10,7 @@ export const PetScreen = () => {
     const { pet, resetPet, updatePet } = useHabit();
     const [name, setName] = useState('');
     const [color, setColor] = useState('#FF6B6B');
+    const insets = useSafeAreaInsets();
 
     const handleHatch = () => {
         if (!name.trim()) {
@@ -21,13 +22,13 @@ export const PetScreen = () => {
 
     if (!pet) {
         return (
-            <View style={styles.container}>
+            <View style={styles.wrapper}>
                 <View style={styles.eggContainer}>
                     <Egg size={120} color={color} strokeWidth={1.5} />
                     <Text style={styles.eggTitle}>Hatch Your Companion</Text>
                     <Text style={styles.eggSubtitle}>Complete habits to help them grow!</Text>
 
-                    <BlurView intensity={20} tint="dark" style={styles.formCard}>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.formCard}>
                         <TextInput
                             style={styles.input}
                             placeholder="Name your pet..."
@@ -55,25 +56,47 @@ export const PetScreen = () => {
         );
     }
 
-    const insets = useSafeAreaInsets();
-
     return (
-        <View style={styles.container}>
-            <View style={{ paddingTop: insets.top + 20, paddingHorizontal: 20 }}>
-                <Text style={styles.headerTitle}>Companion</Text>
-            </View>
-            <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
+        <View style={styles.wrapper}>
+            {/* Ambient Background */}
+            <View style={[styles.blob, { backgroundColor: pet.color || '#6366f1', top: -100, left: -100 }]} />
+            <View style={[styles.blob, { backgroundColor: '#FF6B6B', bottom: -100, right: -100, opacity: 0.2 }]} />
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+
+            <ScrollView
+                style={styles.container}
+                contentContainerStyle={[styles.content, { paddingTop: insets.top }]}
+                contentInsetAdjustmentBehavior="automatic"
+            >
+                <View style={styles.headerRow}>
+                    <Text style={styles.headerTitle}>Companion</Text>
+                </View>
+                <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
+            </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    wrapper: {
         flex: 1,
         backgroundColor: '#000',
     },
+    container: {
+        flex: 1,
+    },
     content: {
+        padding: 20,
         paddingBottom: 100,
+    },
+    headerRow: {
+        marginBottom: 24,
+    },
+    headerTitle: {
+        fontSize: 34,
+        fontWeight: '800',
+        color: '#fff',
+        letterSpacing: -0.5,
     },
     eggContainer: {
         flex: 1,
@@ -138,11 +161,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
     },
-    headerTitle: {
-        fontSize: 34,
-        fontWeight: '800',
-        color: '#fff',
-        letterSpacing: -0.5,
-        marginBottom: 20,
+    blob: {
+        position: 'absolute',
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+        opacity: 0.3,
     },
 });

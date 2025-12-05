@@ -38,57 +38,40 @@ const SettingsStack = createNativeStackNavigator();
 const HomeStackScreen = () => (
     <HomeStack.Navigator
         screenOptions={{
-            headerLargeTitle: false,
-            headerTransparent: true,
-            headerStyle: { backgroundColor: 'transparent' },
-            headerTitleStyle: { color: 'transparent' }, // Hide native title
-            headerLargeTitleStyle: { color: 'transparent' }, // Hide native large title
+            headerShown: false,
         }}
     >
-        <HomeStack.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
+        <HomeStack.Screen name="Home" component={HomeScreen} />
     </HomeStack.Navigator>
 );
 
 const PetStackScreen = () => (
     <PetStack.Navigator
         screenOptions={{
-            headerTransparent: true,
-            headerStyle: { backgroundColor: 'transparent' },
-            headerTitleStyle: { color: 'transparent' }, // Hide title initially? Or keep it.
-            // For PetScreen "Hero" layout, we might want to hide the standard large title or handle it carefully.
-            headerLargeTitle: false,
-            headerTintColor: '#fff',
+            headerShown: false,
         }}
     >
-        <PetStack.Screen name="PetScreen" component={PetScreen} options={{ title: 'Companion' }} />
+        <PetStack.Screen name="PetScreen" component={PetScreen} />
     </PetStack.Navigator>
 );
 
 const TrendsStackScreen = () => (
     <TrendsStack.Navigator
         screenOptions={{
-            headerLargeTitle: false,
-            headerTransparent: true,
-            headerStyle: { backgroundColor: 'transparent' },
-            headerTitleStyle: { color: 'transparent' },
-            headerLargeTitleStyle: { color: 'transparent' },
+            headerShown: false,
         }}
     >
-        <TrendsStack.Screen name="TrendsScreen" component={TrendsScreen} options={{ title: 'Trends' }} />
+        <TrendsStack.Screen name="TrendsScreen" component={TrendsScreen} />
     </TrendsStack.Navigator>
 );
 
 const SettingsStackScreen = () => (
     <SettingsStack.Navigator
         screenOptions={{
-            headerLargeTitle: false,
-            headerTransparent: true,
-            headerStyle: { backgroundColor: 'transparent' },
-            headerTitleStyle: { color: 'transparent' },
-            headerLargeTitleStyle: { color: 'transparent' },
+            headerShown: false,
         }}
     >
-        <SettingsStack.Screen name="SettingsScreen" component={SettingsScreen} options={{ title: 'Settings' }} />
+        <SettingsStack.Screen name="SettingsScreen" component={SettingsScreen} />
     </SettingsStack.Navigator>
 );
 
@@ -113,8 +96,8 @@ const BouncyIcon = ({ focused, icon: Icon, color, size }: { focused: boolean; ic
 const TabNavigator = () => {
     const insets = useSafeAreaInsets();
 
-    // Calculate dynamic bottom position - float slightly above home indicator
-    const bottomPosition = Platform.OS === 'ios' ? insets.bottom + 20 : 20;
+    // iOS 26: Float 16pt above home indicator for floating dock effect
+    const bottomPosition = Platform.OS === 'ios' ? insets.bottom + LiquidGlass.dock.bottomOffset : 16;
 
     return (
         <Tab.Navigator
@@ -202,7 +185,10 @@ export const AppNavigator = () => {
                             component={HabitFormScreen}
                             options={{
                                 presentation: 'modal',
-                                headerShown: true
+                                headerShown: true,
+                                headerStyle: { backgroundColor: '#1c1c1e' },
+                                headerTintColor: '#fff',
+                                contentStyle: { backgroundColor: '#1c1c1e' },
                             }}
                         />
                         <Stack.Screen
@@ -210,7 +196,10 @@ export const AppNavigator = () => {
                             component={PetStyleScreen}
                             options={{
                                 presentation: 'modal',
-                                headerShown: true
+                                headerShown: true,
+                                headerStyle: { backgroundColor: '#1c1c1e' },
+                                headerTintColor: '#fff',
+                                contentStyle: { backgroundColor: '#1c1c1e' },
                             }}
                         />
                         <Stack.Screen
@@ -218,7 +207,10 @@ export const AppNavigator = () => {
                             component={PetWardrobeScreen}
                             options={{
                                 presentation: 'modal',
-                                headerShown: true
+                                headerShown: true,
+                                headerStyle: { backgroundColor: '#1c1c1e' },
+                                headerTintColor: '#fff',
+                                contentStyle: { backgroundColor: '#1c1c1e' },
                             }}
                         />
                     </>

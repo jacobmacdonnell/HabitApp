@@ -9,6 +9,7 @@ import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LiquidGlass } from '../theme/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -109,7 +110,7 @@ export const HomeScreen = () => {
     const insets = useSafeAreaInsets();
 
     const ListHeader = () => (
-        <View style={{ paddingTop: insets.top + 20 }}>
+        <View style={{ paddingTop: insets.top }}>
             {/* Unified Header Row */}
             <View style={styles.headerRow}>
                 <View style={{ flex: 1 }}>
@@ -145,10 +146,12 @@ export const HomeScreen = () => {
 
     // const insets = useSafeAreaInsets(); // Moved up
 
-    // Dock is at bottom: insets.bottom + 20. Height is 68.
-    // Top of dock is at insets.bottom + 20 + 68 = insets.bottom + 88.
-    // We want FAB to be above that. Let's put it at insets.bottom + 105.
-    const fabBottom = Platform.OS === 'ios' ? insets.bottom + 105 : 100;
+    // iOS 26: FAB positioned above floating dock
+    // Dock top = insets.bottom + 16 (offset) + 68 (height) = insets.bottom + 84
+    // FAB should be ~20pt above dock top
+    const fabBottom = Platform.OS === 'ios'
+        ? insets.bottom + LiquidGlass.dock.bottomOffset + LiquidGlass.dock.height + 20
+        : 100;
 
     return (
         <View style={styles.container}>
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        marginBottom: 16,
+        marginBottom: 24,
     },
     petHeaderContainer: {
         marginBottom: 4,
@@ -243,7 +246,8 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     listContent: {
-        paddingBottom: 100, // Space for FAB and TabBar
+        paddingHorizontal: 20,
+        paddingBottom: 100,
     },
     emptyState: {
         padding: 40,

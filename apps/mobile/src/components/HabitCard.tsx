@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Check, Sparkles, Sunrise, Sun, Moon } from 'lucide-react-native';
-
+import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon } from 'lucide-react-native';
+import { Habit } from '@habitapp/shared';
 import * as Haptics from 'expo-haptics';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Trash2, Edit2 } from 'lucide-react-native';
@@ -20,14 +20,14 @@ interface HabitCardProps {
     onEdit?: () => void;
 }
 
-const TimeIcons = {
+const TimeIcons: Record<string, LucideIcon> = {
     anytime: Sparkles,
     morning: Sunrise,
     midday: Sun,
     evening: Moon,
 };
 
-const TimeLabels = {
+const TimeLabels: Record<string, string> = {
     anytime: 'Anytime',
     morning: 'Morning',
     midday: 'Noon',
@@ -103,7 +103,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                 onSwipeableOpen={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
             >
                 <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.touchable}>
-                    <BlurView intensity={20} tint="dark" style={[styles.blur, isCompleted && styles.completedBlur]}>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={[styles.blur, isCompleted && styles.completedBlur]}>
                         {/* Progress Bar Background */}
                         <View style={[styles.progressBar, { width: `${Math.min((currentCount / habit.targetCount) * 100, 100)}%` }]} />
 

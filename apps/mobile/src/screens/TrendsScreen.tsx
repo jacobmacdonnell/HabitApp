@@ -115,7 +115,7 @@ export const TrendsScreen = () => {
             </View>
 
             {habitWeeklyStatus.map(habit => (
-                <BlurView key={habit.id} intensity={10} tint="dark" style={styles.habitRowCard}>
+                <BlurView key={habit.id} intensity={40} tint="systemThickMaterialDark" style={styles.habitRowCard}>
                     <View style={styles.habitInfo}>
                         <Text style={styles.habitTitle} numberOfLines={1}>{habit.title}</Text>
                         <Text style={styles.streakLabel}>{getStreak(habit.id)} day streak</Text>
@@ -146,7 +146,7 @@ export const TrendsScreen = () => {
         <View>
             {/* Stats Overview */}
             <View style={styles.statsGrid}>
-                <BlurView intensity={20} tint="dark" style={styles.statCard}>
+                <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.statCard}>
                     <Text style={styles.statLabel}>Consistency</Text>
                     <Text style={styles.statBigValue}>{consistencyScore}%</Text>
                 </BlurView>
@@ -197,19 +197,26 @@ export const TrendsScreen = () => {
     const insets = useSafeAreaInsets();
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={[styles.content, { paddingTop: insets.top + 20 }]}
-            contentInsetAdjustmentBehavior="automatic"
-        >
-            <View style={styles.headerRow}>
-                <Text style={styles.headerTitle}>Trends</Text>
-            </View>
+        <View style={styles.container}>
+            {/* Ambient Background - iOS 26 style */}
+            <View style={[styles.blob, { backgroundColor: '#22c55e', top: -100, left: -100 }]} />
+            <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
-            {renderToggle()}
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={[styles.content, { paddingTop: insets.top }]}
+                contentInsetAdjustmentBehavior="automatic"
+            >
+                <View style={styles.headerRow}>
+                    <Text style={styles.headerTitle}>Trends</Text>
+                </View>
 
-            {viewMode === 'weekly' ? renderWeeklyView() : renderMonthlyView()}
-        </ScrollView>
+                {renderToggle()}
+
+                {viewMode === 'weekly' ? renderWeeklyView() : renderMonthlyView()}
+            </ScrollView>
+        </View>
     );
 };
 
@@ -223,7 +230,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
     },
     headerRow: {
-        marginBottom: 20,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 34,
@@ -394,11 +401,22 @@ const styles = StyleSheet.create({
         width: 100,
         height: 4,
         borderRadius: 2,
-        backgroundColor: 'rgba(255,255,255,0.2)', // Simplified linear gradient simulation
+        backgroundColor: 'rgba(255,255,255,0.2)',
     },
     legendText: {
         fontSize: 10,
         color: 'rgba(255,255,255,0.5)',
         fontWeight: '600',
+    },
+    // iOS 26 ambient background
+    blob: {
+        position: 'absolute',
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+        opacity: 0.3,
+    },
+    scrollView: {
+        flex: 1,
     },
 });

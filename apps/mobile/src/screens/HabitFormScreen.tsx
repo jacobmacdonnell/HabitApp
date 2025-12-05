@@ -50,10 +50,6 @@ export const HabitFormScreen = () => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: editingHabit ? 'Edit Habit' : 'New Habit',
-            presentation: 'modal',
-            headerShown: true,
-            headerStyle: { backgroundColor: '#1c1c1e' },
-            headerTintColor: '#fff',
             headerLeft: () => (
                 <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 8 }}>
                     <Text style={{ color: '#fff', fontSize: 17 }}>Cancel</Text>
