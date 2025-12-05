@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Check, Trash2, Settings, Sparkles, Sunrise, Sun, Moon } from 'lucide-react';
+import { Plus, Check, Trash2, Settings, Sparkles, Sunrise, Sun, Moon, Clock } from 'lucide-react';
 import { HabitProvider, useHabit } from './context/HabitContext.jsx';
 import { HabitFormModal } from './components/HabitFormModal.jsx';
 import { TrendsView } from './components/TrendsView.jsx';
@@ -15,6 +15,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
     updateHabit,
     deleteHabit,
     logProgress,
+    undoProgress,
     progress,
     getStreak,
     pet,
@@ -27,11 +28,18 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
   const [timeFilter, setTimeFilter] = useState('all');
   const [petName, setPetName] = useState('');
   const [petColor, setPetColor] = useState('#FF6B6B');
+  const [showCompleted, setShowCompleted] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
 
-  const handleLogProgress = (habitId) => {
-    logProgress(habitId, today);
+  const handleLogProgress = (habitId, isCompleted) => {
+    if (isCompleted) {
+      if (confirm('Undo completion for this habit?')) {
+        undoProgress(habitId, today);
+      }
+    } else {
+      logProgress(habitId, today);
+    }
   };
 
   const openAddModal = () => {
@@ -53,6 +61,9 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
   const filteredHabits = habits.filter(habit => {
     if (timeFilter === 'all') return true;
     return habit.timeOfDay === timeFilter || habit.timeOfDay === 'anytime';
+  }).sort((a, b) => {
+    const order = { anytime: 0, morning: 1, midday: 2, evening: 3 };
+    return (order[a.timeOfDay] || 0) - (order[b.timeOfDay] || 0);
   });
 
   // ONBOARDING VIEW
@@ -74,6 +85,96 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
   if (viewMode === 'weekly') {
     return <TrendsView habits={habits} progress={progress} />;
   }
+
+  const renderHabit = (habit) => {
+    const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
+    const current = dayProgress?.currentCount || 0;
+    const isCompleted = current >= habit.targetCount;
+    const streak = getStreak(habit.id);
+    const progressPercent = Math.min((current / habit.targetCount) * 100, 100);
+
+    const timeIcons = {
+      anytime: <Clock size={12} />,
+      morning: <Sunrise size={12} />,
+      midday: <Sun size={12} />,
+      evening: <Moon size={12} />
+    };
+    const timeLabels = {
+      anytime: 'Anytime',
+      morning: 'Morning',
+      midday: 'Noon',
+      evening: 'Evening'
+    };
+
+    return (
+      <div
+        key={habit.id}
+        onClick={(e) => {
+          if (e.target.closest('button')) return;
+          openEditModal(habit);
+        }}
+        className={`glass-card p-4 rounded-[1.5rem] relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all duration-300 ${isCompleted ? 'opacity-80' : 'hover:bg-white/5'}`}
+      >
+        {/* Progress Background Fill */}
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-700 ease-out pointer-events-none"
+          style={{ width: `${progressPercent}%` }}
+        />
+
+        <div className="relative z-10 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div
+              className="w-12 h-12 rounded-xl flex shrink-0 items-center justify-center text-2xl shadow-inner ring-1 ring-white/10 relative overflow-hidden bg-black/20"
+              style={{ color: habit.color }}
+            >
+              <div className="absolute inset-0 opacity-20" style={{ backgroundColor: habit.color }} />
+              {habit.icon}
+              {isCompleted && (
+                <div className="absolute inset-0 bg-white/20 animate-pulse-glow" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h4 className="font-bold text-lg leading-tight text-white group-hover:text-white/90 transition-colors truncate">{habit.title}</h4>
+                {habit.timeOfDay !== 'anytime' && (
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 text-[10px] font-medium text-white/40 uppercase tracking-wider shrink-0">
+                    {timeIcons[habit.timeOfDay]}
+                    <span>{timeLabels[habit.timeOfDay]}</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-3 text-xs font-medium text-white/50">
+                <span>{current} / {habit.targetCount}</span>
+                {streak >= 2 && (
+                  <span className="flex items-center gap-1 text-orange-400 bg-orange-400/10 px-1.5 py-px rounded-full border border-orange-400/20">
+                    🔥 {streak}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLogProgress(habit.id, isCompleted);
+            }}
+            className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center transition-all duration-300 active:scale-90 ${isCompleted
+              ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 ring-0'
+              : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/50 ring-1 ring-white/10'
+              }`}
+          >
+            {isCompleted ? (
+              <Check size={20} strokeWidth={3.5} />
+            ) : (
+              <div className="w-10 h-10" /> // Placeholder to keep size constant if needed, or just Check
+            )}
+            {!isCompleted && <Check size={20} strokeWidth={2.5} className="opacity-0 group-hover:opacity-50 transition-opacity" />}
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6 pb-8 relative">
@@ -151,15 +252,27 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
             const streak = getStreak(habit.id);
             const progressPercent = Math.min((current / habit.targetCount) * 100, 100);
 
+            const timeIcons = {
+              anytime: <Clock size={12} />,
+              morning: <Sunrise size={12} />,
+              midday: <Sun size={12} />,
+              evening: <Moon size={12} />
+            };
+            const timeLabels = {
+              anytime: 'Anytime',
+              morning: 'Morning',
+              midday: 'Noon',
+              evening: 'Evening'
+            };
+
             return (
               <div
                 key={habit.id}
                 onClick={(e) => {
-                  // Don't open modal if clicking the check button
                   if (e.target.closest('button')) return;
                   openEditModal(habit);
                 }}
-                className={`glass-card p-5 rounded-[2rem] relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all duration-300 ${isCompleted ? 'opacity-80' : 'hover:bg-white/5'}`}
+                className={`glass-card p-4 rounded-[1.5rem] relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all duration-300 ${isCompleted ? 'opacity-80' : 'hover:bg-white/5'}`}
               >
                 {/* Progress Background Fill */}
                 <div
@@ -167,10 +280,10 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
                   style={{ width: `${progressPercent}%` }}
                 />
 
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-5">
+                <div className="relative z-10 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
                     <div
-                      className="w-16 h-16 rounded-[1.2rem] flex items-center justify-center text-3xl shadow-inner ring-1 ring-white/10 relative overflow-hidden bg-black/20"
+                      className="w-12 h-12 rounded-xl flex shrink-0 items-center justify-center text-2xl shadow-inner ring-1 ring-white/10 relative overflow-hidden bg-black/20"
                       style={{ color: habit.color }}
                     >
                       <div className="absolute inset-0 opacity-20" style={{ backgroundColor: habit.color }} />
@@ -179,12 +292,20 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
                         <div className="absolute inset-0 bg-white/20 animate-pulse-glow" />
                       )}
                     </div>
-                    <div>
-                      <h4 className="font-bold text-xl tracking-tight text-white group-hover:text-white/90 transition-colors">{habit.title}</h4>
-                      <div className="flex items-center gap-3 text-sm font-medium text-white/50 mt-1">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h4 className="font-bold text-lg leading-tight text-white group-hover:text-white/90 transition-colors truncate">{habit.title}</h4>
+                        {habit.timeOfDay !== 'anytime' && (
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 text-[10px] font-medium text-white/40 uppercase tracking-wider shrink-0">
+                            {timeIcons[habit.timeOfDay]}
+                            <span>{timeLabels[habit.timeOfDay]}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 text-xs font-medium text-white/50">
                         <span>{current} / {habit.targetCount}</span>
                         {streak > 0 && (
-                          <span className="flex items-center gap-1 text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-full border border-orange-400/20 animate-pulse">
+                          <span className="flex items-center gap-1 text-orange-400 bg-orange-400/10 px-1.5 py-px rounded-full border border-orange-400/20 animate-pulse">
                             🔥 {streak}
                           </span>
                         )}
@@ -197,12 +318,12 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
                       e.stopPropagation();
                       handleLogProgress(habit.id);
                     }}
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 active:scale-90 ${isCompleted
-                        ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 ring-0'
-                        : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/50 ring-1 ring-white/10'
+                    className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center transition-all duration-300 active:scale-90 ${isCompleted
+                      ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 ring-0'
+                      : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/50 ring-1 ring-white/10'
                       }`}
                   >
-                    <Check size={28} strokeWidth={isCompleted ? 3.5 : 2.5} className={`transition-all duration-300 ${isCompleted ? 'scale-100' : 'scale-90 opacity-50'}`} />
+                    <Check size={20} strokeWidth={isCompleted ? 3.5 : 2.5} className={`transition-all duration-300 ${isCompleted ? 'scale-100' : 'scale-90 opacity-50'}`} />
                   </button>
                 </div>
               </div>

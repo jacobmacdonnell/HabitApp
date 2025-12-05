@@ -135,6 +135,42 @@ export const HabitProvider = ({ children }) => {
         }
     };
 
+    const undoProgress = (habitId, date) => {
+        const currentProgress = progress.find(p => p.habitId === habitId && p.date === date);
+        if (!currentProgress || currentProgress.currentCount <= 0) return;
+
+        const wasCompleted = currentProgress.completed;
+        // If uncompleting, ensure we don't go below 0
+        const newCount = Math.max(0, currentProgress.currentCount - 1);
+
+        const newProgress = progress.map(p => {
+            if (p.habitId === habitId && p.date === date) {
+                // Always mark as not completed if we decrement
+                return { ...p, currentCount: newCount, completed: false };
+            }
+            return p;
+        });
+
+        setProgress(newProgress);
+        StorageService.saveProgress(newProgress);
+
+        if (pet && wasCompleted) {
+            // Revert XP
+            let newXp = (pet.xp || 0) - 20;
+            let newLevel = pet.level || 1;
+
+            // Handle Level Down
+            if (newXp < 0 && newLevel > 1) {
+                newLevel -= 1;
+                newXp += (newLevel * 100);
+            }
+            // Clamp XP at 0 if Level 1
+            if (newLevel === 1 && newXp < 0) newXp = 0;
+
+            updatePet({ xp: newXp, level: newLevel });
+        }
+    };
+
     const resetPet = (name, color) => {
         const newPet = {
             name,
@@ -221,6 +257,7 @@ export const HabitProvider = ({ children }) => {
             updateHabit,
             deleteHabit,
             logProgress,
+            undoProgress,
             resetPet,
             updatePet,
             getStreak,
