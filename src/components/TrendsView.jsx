@@ -25,25 +25,31 @@ export const TrendsView = ({ habits, progress }) => {
     };
 
     return (
-        <div className="space-y-6">
-            {/* Trends Header & Toggle */}
-            <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-white">Trends</h2>
-                    <div className="flex gap-1 bg-white/5 p-1 rounded-[2rem] border border-white/5 backdrop-blur-md">
-                        <button
-                            onClick={() => setTrendMode('weekly')}
-                            className={`px-6 py-2.5 rounded-[1.5rem] text-xs font-bold transition-all duration-300 active:scale-95 ${trendMode === 'weekly' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/40'}`}
-                        >
-                            Weekly
-                        </button>
-                        <button
-                            onClick={() => setTrendMode('monthly')}
-                            className={`px-6 py-2.5 rounded-[1.5rem] text-xs font-bold transition-all duration-300 active:scale-95 ${trendMode === 'monthly' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/40'}`}
-                        >
-                            Monthly
-                        </button>
-                    </div>
+        <div className="space-y-6 pb-8">
+            {/* Page Title */}
+            <h1 className="text-2xl font-bold text-white">Trends</h1>
+
+            {/* Toggle */}
+            <div className="flex justify-center">
+                <div className="glass-card p-1.5 rounded-[2rem] flex gap-1 border border-white/10">
+                    <button
+                        onClick={() => setTrendMode('weekly')}
+                        className={`px-8 py-2.5 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 relative z-10 active:scale-95 ${trendMode === 'weekly' ? 'text-black' : 'text-white/50'}`}
+                    >
+                        {trendMode === 'weekly' && (
+                            <div className="absolute inset-0 bg-white rounded-full -z-10 shadow-md" />
+                        )}
+                        Weekly
+                    </button>
+                    <button
+                        onClick={() => setTrendMode('monthly')}
+                        className={`px-8 py-2.5 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 relative z-10 active:scale-95 ${trendMode === 'monthly' ? 'text-black' : 'text-white/50'}`}
+                    >
+                        {trendMode === 'monthly' && (
+                            <div className="absolute inset-0 bg-white rounded-full -z-10 shadow-md" />
+                        )}
+                        Monthly
+                    </button>
                 </div>
             </div>
 
@@ -70,7 +76,7 @@ export const TrendsView = ({ habits, progress }) => {
 
                     <div className="space-y-3">
                         {habits.map(habit => (
-                            <div key={habit.id} className="p-5 rounded-[2.5rem] glass-card flex flex-col gap-4">
+                            <div key={habit.id} className="p-5 rounded-[2rem] glass-card flex flex-col gap-4">
                                 <div className="flex items-center gap-3">
                                     <div
                                         className="w-8 h-8 rounded-xl flex items-center justify-center text-lg shadow-inner ring-1 ring-white/10"
@@ -131,7 +137,7 @@ export const TrendsView = ({ habits, progress }) => {
                         const consistency = Math.round((completedCount / 30) * 100);
 
                         return (
-                            <div key={habit.id} className="p-6 rounded-[2.5rem] glass-card space-y-4">
+                            <div key={habit.id} className="p-5 rounded-[2rem] glass-card space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div

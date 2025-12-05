@@ -18,7 +18,7 @@ export const Layout = ({ children, currentView, onNavigate, hideNav = false, mod
                 </div>
 
                 {/* Main Content - Scrollable */}
-                <main className="flex-1 overflow-y-auto p-6 pb-36 scrollbar-hide relative z-10">
+                <main className="flex-1 overflow-y-auto p-6 pb-28 scrollbar-hide relative z-10">
                     {children}
                 </main>
 
@@ -34,17 +34,17 @@ export const Layout = ({ children, currentView, onNavigate, hideNav = false, mod
                             </button>
 
                             <button
-                                onClick={() => onNavigate && onNavigate('weekly')}
-                                className={`p-2.5 rounded-full transition-all duration-200 active:scale-95 ${currentView === 'weekly' ? 'bg-white text-black shadow-md' : 'text-white/50'}`}
-                            >
-                                <Calendar size={18} strokeWidth={2.5} />
-                            </button>
-
-                            <button
                                 onClick={() => onNavigate && onNavigate('pet')}
                                 className={`p-2.5 rounded-full transition-all duration-200 active:scale-95 ${currentView === 'pet' ? 'bg-white text-black shadow-md' : 'text-white/50'}`}
                             >
                                 <User size={18} strokeWidth={2.5} />
+                            </button>
+
+                            <button
+                                onClick={() => onNavigate && onNavigate('weekly')}
+                                className={`p-2.5 rounded-full transition-all duration-200 active:scale-95 ${currentView === 'weekly' ? 'bg-white text-black shadow-md' : 'text-white/50'}`}
+                            >
+                                <Calendar size={18} strokeWidth={2.5} />
                             </button>
 
                             <button

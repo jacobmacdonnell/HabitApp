@@ -61,8 +61,8 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
     // COMPACT HOME VIEW - Pet icon for header
     if (!isFullView) {
         return (
-            <div className="relative w-20 h-20 flex-shrink-0" style={{ filter: `drop-shadow(0 4px 20px ${pet.color}70)` }}>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-xl opacity-50 pointer-events-none" style={{ backgroundColor: pet.color }} />
+            <div className="relative w-20 h-20 flex-shrink-0" style={{ filter: `drop-shadow(0 4px 10px ${pet.color}40)` }}>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-lg opacity-15 pointer-events-none" style={{ backgroundColor: pet.color }} />
                 <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
                     <defs>
                         <radialGradient id="bodyGradSmall" cx="30%" cy="30%" r="80%">
@@ -91,9 +91,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
     return (
         <div className="space-y-6 pb-8">
             {/* Page Title */}
-            <h1 className="text-2xl font-bold text-white">
-                {isEditing ? editName || pet.name : capitalize(pet.name)}
-            </h1>
+            <h1 className="text-2xl font-bold text-white">Pet</h1>
 
             {/* Pet Display */}
             <div className="flex flex-col items-center gap-6">
@@ -134,17 +132,17 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
 
                 <div className="w-full relative">
                     {isEditing ? (
-                        <div className="glass-card rounded-[2.5rem] p-6 w-full space-y-6 border border-white/20 shadow-2xl">
+                        <div className="glass-card rounded-[2rem] p-6 w-full space-y-6 border border-white/20 shadow-2xl">
                             <div className="text-center space-y-1">
                                 <h3 className="text-lg font-bold text-white">Customize</h3>
-                                <p className="text-white/40 text-xs">Make it yours</p>
+                                <p className="text-white/50 text-xs">Make it yours</p>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Name</label>
+                                <label className="text-xs font-bold text-white/50 uppercase tracking-wider ml-1">Name</label>
                                 <input value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-3 text-center text-xl font-bold text-white focus:outline-none focus:border-white/30 transition-all" placeholder="Pet Name" autoFocus />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Color</label>
+                                <label className="text-xs font-bold text-white/50 uppercase tracking-wider ml-1">Color</label>
                                 <div className="flex justify-between bg-black/20 p-2 rounded-2xl">
                                     {['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5', '#FF99CC'].map((color) => (
                                         <button key={color} onClick={() => setEditColor(color)} className={`w-8 h-8 rounded-full border-2 transition-transform active:scale-95 ${editColor === color ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-70'}`} style={{ backgroundColor: color }} />
@@ -152,44 +150,54 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-3 pt-2">
-                                <button onClick={() => setIsEditing(false)} className="py-3 rounded-2xl bg-white/5 text-white/60 font-bold text-sm active:scale-95 transition-all">Cancel</button>
+                                <button onClick={() => setIsEditing(false)} className="py-3 rounded-2xl bg-white/10 text-white/70 font-bold text-sm active:scale-95 transition-all">Cancel</button>
                                 <button onClick={handleSave} className="py-3 rounded-2xl bg-white text-black font-bold text-sm shadow-lg active:scale-95 transition-all">Save Changes</button>
                             </div>
                         </div>
                     ) : (
-                        <div className="glass-card rounded-[2.5rem] border border-white/10 shadow-lg w-full p-5 grid grid-cols-2 gap-3">
-                            <div className="col-span-2 space-y-2">
-                                <div className="flex justify-between text-xs font-bold text-white/80 uppercase tracking-wider px-1">
-                                    <span className="flex items-center gap-1.5"><Heart size={14} className="text-red-400" /> Health</span>
-                                    <span className="text-white">{Math.round(pet.health)}%</span>
-                                </div>
-                                <div className="h-3 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5">
-                                    <div className={`h-full rounded-full ${pet.health < 30 ? 'bg-red-500' : 'bg-green-500'}`} style={{ width: `${pet.health}%` }} />
-                                </div>
+                        <div className="glass-card rounded-[2rem] border border-white/10 shadow-lg w-full p-5 space-y-4">
+                            {/* Pet Name Row */}
+                            <div className="text-center pb-2 border-b border-white/10">
+                                <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-1">Name</p>
+                                <h2 className="text-2xl font-bold text-white">{capitalize(pet.name)}</h2>
                             </div>
-                            <div className="col-span-2 space-y-2">
-                                <div className="flex justify-between text-xs font-bold text-white/80 uppercase tracking-wider px-1">
-                                    <span className="flex items-center gap-1.5"><Zap size={14} className="text-yellow-400" /> XP</span>
-                                    <span className="text-white">Lvl {currentLevel}</span>
+
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* Health Bar */}
+                                <div className="col-span-2 space-y-2">
+                                    <div className="flex justify-between text-xs font-bold text-white/70 uppercase tracking-wider px-1">
+                                        <span className="flex items-center gap-1.5"><Heart size={14} className="text-red-400" /> Health</span>
+                                        <span className="text-white">{Math.round(pet.health)}%</span>
+                                    </div>
+                                    <div className="h-3 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5">
+                                        <div className={`h-full rounded-full ${pet.health < 30 ? 'bg-red-500' : 'bg-green-500'}`} style={{ width: `${pet.health}%` }} />
+                                    </div>
                                 </div>
-                                <div className="h-3 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5">
-                                    <div className="h-full rounded-full bg-yellow-500" style={{ width: `${xpPercentage}%` }} />
+                                <div className="col-span-2 space-y-2">
+                                    <div className="flex justify-between text-xs font-bold text-white/70 uppercase tracking-wider px-1">
+                                        <span className="flex items-center gap-1.5"><Zap size={14} className="text-yellow-400" /> XP</span>
+                                        <span className="text-white">Lvl {currentLevel}</span>
+                                    </div>
+                                    <div className="h-3 bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5">
+                                        <div className="h-full rounded-full bg-yellow-500" style={{ width: `${xpPercentage}%` }} />
+                                    </div>
                                 </div>
+                                <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
+                                    <div className="p-1.5 bg-indigo-500/20 rounded-full text-indigo-300 mb-0.5"><Smile size={18} /></div>
+                                    <span className="text-[10px] font-bold text-white/70 uppercase">Mood</span>
+                                    <span className="text-base font-bold text-white">{capitalize(pet.mood)}</span>
+                                </div>
+                                <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
+                                    <div className="p-1.5 bg-purple-500/20 rounded-full text-purple-300 mb-0.5"><Star size={18} /></div>
+                                    <span className="text-[10px] font-bold text-white/70 uppercase">Level</span>
+                                    <span className="text-base font-bold text-white">{currentLevel}</span>
+                                </div>
+                                <button onClick={() => { setEditName(pet.name); setEditColor(pet.color); setIsEditing(true); }} className="col-span-2 py-3 mt-1 rounded-2xl bg-white/10 border border-white/10 text-white font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                                    <Edit2 size={16} />
+                                    <span>Customize Pet</span>
+                                </button>
                             </div>
-                            <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
-                                <div className="p-1.5 bg-indigo-500/20 rounded-full text-indigo-300 mb-0.5"><Smile size={18} /></div>
-                                <span className="text-[10px] font-bold text-white/70 uppercase">Mood</span>
-                                <span className="text-base font-bold text-white">{capitalize(pet.mood)}</span>
-                            </div>
-                            <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
-                                <div className="p-1.5 bg-purple-500/20 rounded-full text-purple-300 mb-0.5"><Star size={18} /></div>
-                                <span className="text-[10px] font-bold text-white/70 uppercase">Level</span>
-                                <span className="text-base font-bold text-white">{currentLevel}</span>
-                            </div>
-                            <button onClick={() => { setEditName(pet.name); setEditColor(pet.color); setIsEditing(true); }} className="col-span-2 py-3 mt-1 rounded-2xl bg-white/10 border border-white/10 text-white font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                                <Edit2 size={16} />
-                                <span>Customize Pet</span>
-                            </button>
                         </div>
                     )}
                 </div>
