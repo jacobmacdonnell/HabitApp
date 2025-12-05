@@ -4,6 +4,7 @@ import { useHabit } from '@habitapp/shared';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Moon, Sun, Volume2, Bell, Shield, Trash2, ChevronRight, Smartphone } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 
 export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
@@ -57,8 +58,11 @@ export const SettingsScreen = () => {
     };
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Text style={styles.headerTitle}>Settings</Text>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            contentInsetAdjustmentBehavior="automatic"
+        >
 
             {/* Preferences */}
             <View style={styles.section}>
@@ -75,21 +79,15 @@ export const SettingsScreen = () => {
                     </View>
 
                     <View style={styles.segmentContainer}>
-                        {/* Custom Segmented Control for Theme */}
-                        {['auto', 'light', 'dark'].map((t) => (
-                            <TouchableOpacity
-                                key={t}
-                                onPress={() => handleThemeChange(t as any)}
-                                style={[styles.segmentButton, theme === t && styles.segmentActive]}
-                            >
-                                {t === 'auto' && <Smartphone size={16} color={theme === t ? '#fff' : 'rgba(255,255,255,0.5)'} />}
-                                {t === 'light' && <Sun size={16} color={theme === t ? '#fff' : 'rgba(255,255,255,0.5)'} />}
-                                {t === 'dark' && <Moon size={16} color={theme === t ? '#fff' : 'rgba(255,255,255,0.5)'} />}
-                                <Text style={[styles.segmentText, theme === t && styles.segmentTextActive]}>
-                                    {t.charAt(0).toUpperCase() + t.slice(1)}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                        <SegmentedControl
+                            values={['Auto', 'Light', 'Dark']}
+                            selectedIndex={['auto', 'light', 'dark'].indexOf(theme)}
+                            onChange={(event) => {
+                                const index = event.nativeEvent.selectedSegmentIndex;
+                                handleThemeChange(['auto', 'light', 'dark'][index] as any);
+                            }}
+                            appearance="dark"
+                        />
                     </View>
 
                     <View style={styles.separator} />
@@ -215,12 +213,7 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         paddingBottom: 100,
     },
-    headerTitle: {
-        fontSize: 34,
-        fontWeight: '800',
-        color: '#fff',
-        marginBottom: 24,
-    },
+
     section: {
         marginBottom: 24,
     },
@@ -270,31 +263,10 @@ const styles = StyleSheet.create({
     },
     segmentContainer: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(0,0,0,0.3)',
         margin: 16,
         padding: 4,
-        borderRadius: 12,
     },
-    segmentButton: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 8,
-        borderRadius: 8,
-        gap: 6,
-    },
-    segmentActive: {
-        backgroundColor: 'rgba(255,255,255,0.15)',
-    },
-    segmentText: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.5)',
-    },
-    segmentTextActive: {
-        color: '#fff',
-    },
+
     pickerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',

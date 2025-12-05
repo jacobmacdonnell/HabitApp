@@ -55,9 +55,9 @@ export const PetScreen = () => {
     }
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <View style={styles.container}>
             <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
-        </ScrollView>
+        </View>
     );
 };
 

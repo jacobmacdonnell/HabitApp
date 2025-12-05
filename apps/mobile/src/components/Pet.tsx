@@ -4,8 +4,7 @@ import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Text as SvgText, Rect
 import { Pet as PetType } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
 import { Heart, Zap, Smile, Star, Palette, Shirt } from 'lucide-react-native';
-import { PetStyleModal } from './PetStyleModal';
-import { PetWardrobeModal } from './PetWardrobeModal';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -65,8 +64,7 @@ const ZParticle = ({ delay, xOffset }: { delay: number, xOffset: number }) => {
 
 export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
     // State
-    const [isStyleOpen, setStyleOpen] = useState(false);
-    const [isWardrobeOpen, setWardrobeOpen] = useState(false);
+    const navigation = useNavigation();
     const [xpDiff, setXpDiff] = useState(0);
 
     // Track previous values to trigger animations
@@ -248,7 +246,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
 
     return (
         <View style={styles.fullContainer}>
-            <Text style={styles.pageTitle}>Pet</Text>
+
 
             <View style={styles.petDisplay}>
                 {/* Glow Effect using RadialGradient for softness */}
@@ -369,14 +367,14 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                     </View>
 
                     <View style={styles.halfWidth}>
-                        <TouchableOpacity style={styles.actionButton} onPress={() => setStyleOpen(true)}>
+                        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('PetStyle' as never)}>
                             <Palette size={16} color="#fff" />
                             <Text style={styles.actionText} numberOfLines={1}>Style</Text>
                         </TouchableOpacity>
                     </View>
 
                     <View style={styles.halfWidth}>
-                        <TouchableOpacity style={styles.actionButton} onPress={() => setWardrobeOpen(true)}>
+                        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('PetWardrobe' as never)}>
                             <Shirt size={16} color="#fff" />
                             <Text style={styles.actionText} numberOfLines={1}>Wardrobe</Text>
                         </TouchableOpacity>
@@ -384,22 +382,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                 </View>
             </BlurView>
 
-            {onUpdate && (
-                <>
-                    <PetStyleModal
-                        visible={isStyleOpen}
-                        onClose={() => setStyleOpen(false)}
-                        pet={pet}
-                        onUpdate={onUpdate}
-                    />
-                    <PetWardrobeModal
-                        visible={isWardrobeOpen}
-                        onClose={() => setWardrobeOpen(false)}
-                        pet={pet}
-                        onUpdate={onUpdate}
-                    />
-                </>
-            )}
+
         </View>
     );
 };
@@ -416,20 +399,16 @@ const styles = StyleSheet.create({
     fullContainer: {
         flex: 1,
         alignItems: 'center',
-        paddingTop: 60,
+        justifyContent: 'space-between', // Distribute content vertically
+        paddingVertical: 20, // Add some safe padding
+        width: '100%',
     },
-    pageTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginBottom: 20,
-    },
+
     petDisplay: {
+        flex: 1, // Allow pet display to take available space
         width: 250,
-        height: 250,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 40,
     },
     glowContainer: {
         position: 'absolute',
@@ -446,7 +425,7 @@ const styles = StyleSheet.create({
     },
     xpText: {
         fontSize: 24,
-        fontWeight: '900',
+        fontWeight: '800',
         color: '#facc15',
         textShadowColor: 'rgba(0,0,0,0.5)',
         textShadowOffset: { width: 0, height: 2 },
@@ -470,7 +449,7 @@ const styles = StyleSheet.create({
     },
     levelText: {
         fontSize: 20,
-        fontWeight: '900',
+        fontWeight: '800',
         color: '#fff',
         textTransform: 'uppercase',
     },
@@ -481,7 +460,7 @@ const styles = StyleSheet.create({
     },
     zText: {
         fontSize: 24,
-        fontWeight: '900',
+        fontWeight: '800',
         color: 'rgba(255,255,255,0.6)',
     },
     petSvgContainer: {
@@ -510,7 +489,7 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 24,
-        fontWeight: '800',
+        fontWeight: '700',
         color: '#fff',
         marginBottom: 4,
     },

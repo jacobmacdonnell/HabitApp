@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Platform, Alert, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
 import { Pet } from '../components/Pet';
@@ -19,6 +18,28 @@ export const HomeScreen = () => {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const today = new Date().toISOString().split('T')[0];
+
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good morning';
+        if (hour < 17) return 'Good afternoon';
+        return 'Good evening';
+    };
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: getGreeting(),
+            headerRight: () => (
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate('Pet' as never)}
+                    style={{ marginRight: 8 }}
+                >
+                    <Pet pet={pet} isFullView={false} />
+                </TouchableOpacity>
+            ),
+        });
+    }, [navigation, pet]);
 
     const handleSegmentChange = (event: any) => {
         Haptics.selectionAsync();
@@ -90,12 +111,25 @@ export const HomeScreen = () => {
         );
     };
 
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour < 12) return 'Good morning';
-        if (hour < 17) return 'Good afternoon';
-        return 'Good evening';
-    };
+    const ListHeader = () => (
+        <View>
+            <View style={styles.dateHeader}>
+                <Text style={styles.date}>
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </Text>
+            </View>
+            <View style={styles.filterContainer}>
+                <SegmentedControl
+                    values={['All', 'Morning', 'Noon', 'Evening']}
+                    selectedIndex={selectedIndex}
+                    onChange={handleSegmentChange}
+                    appearance="dark"
+                    fontStyle={{ color: 'rgba(255,255,255,0.5)', fontWeight: '600', fontSize: 12 }}
+                    activeFontStyle={{ color: '#fff', fontWeight: '700', fontSize: 12 }}
+                />
+            </View>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
@@ -104,45 +138,20 @@ export const HomeScreen = () => {
             <View style={[styles.blob, { backgroundColor: '#FF6B6B', bottom: -100, right: -100, opacity: 0.2 }]} />
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
-            <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-                <View style={styles.header}>
-                    <View>
-                        <Text style={styles.date}>
-                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </Text>
-                        <Text style={styles.greeting}>{getGreeting()}</Text>
+            <FlatList
+                data={filteredHabits}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={ListHeader}
+                contentInsetAdjustmentBehavior="automatic"
+                ListEmptyComponent={
+                    <View style={styles.emptyState}>
+                        <Text style={styles.emptyText}>No habits found for {timeFilter}</Text>
                     </View>
-                    {/* Pet Widget */}
-                    <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Pet' as never)}>
-                        <Pet pet={pet} isFullView={false} />
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.filterContainer}>
-                    <SegmentedControl
-                        values={['All', 'Morning', 'Noon', 'Evening']}
-                        selectedIndex={selectedIndex}
-                        onChange={handleSegmentChange}
-                        appearance="dark"
-                        backgroundColor="rgba(255,255,255,0.1)"
-                        fontStyle={{ color: 'rgba(255,255,255,0.5)', fontWeight: '600', fontSize: 12 }}
-                        activeFontStyle={{ color: '#fff', fontWeight: '700', fontSize: 12 }}
-                    />
-                </View>
-
-                <FlatList
-                    data={filteredHabits}
-                    renderItem={renderItem}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={styles.listContent}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={
-                        <View style={styles.emptyState}>
-                            <Text style={styles.emptyText}>No habits found for {timeFilter}</Text>
-                        </View>
-                    }
-                />
-            </SafeAreaView>
+                }
+            />
 
             {/* FAB */}
             <TouchableOpacity
@@ -170,16 +179,10 @@ const styles = StyleSheet.create({
         borderRadius: 150,
         opacity: 0.3,
     },
-    safeArea: {
-        flex: 1,
-    },
-    header: {
+    dateHeader: {
         paddingHorizontal: 20,
-        paddingTop: 20,
+        paddingTop: 10,
         paddingBottom: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
     },
     date: {
         color: 'rgba(255,255,255,0.5)',
@@ -187,19 +190,12 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
-        marginBottom: 4,
-    },
-    greeting: {
-        color: '#fff',
-        fontSize: 28,
-        fontWeight: '800',
     },
     filterContainer: {
         paddingHorizontal: 20,
         marginBottom: 16,
     },
     listContent: {
-        paddingHorizontal: 20,
         paddingBottom: 100, // Space for FAB and TabBar
     },
     emptyState: {

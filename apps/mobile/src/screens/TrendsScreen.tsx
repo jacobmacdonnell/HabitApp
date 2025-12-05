@@ -194,10 +194,11 @@ export const TrendsScreen = () => {
     );
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <View style={styles.headerRow}>
-                <Text style={styles.headerTitle}>Trends</Text>
-            </View>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            contentInsetAdjustmentBehavior="automatic"
+        >
 
             {renderToggle()}
 
@@ -216,17 +217,7 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         paddingBottom: 100,
     },
-    headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    headerTitle: {
-        fontSize: 34,
-        fontWeight: '800',
-        color: '#fff',
-    },
+
     // Toggle
     toggleContainer: {
         alignItems: 'center',
@@ -279,7 +270,7 @@ const styles = StyleSheet.create({
         width: 20,
         textAlign: 'center',
         fontSize: 10,
-        fontWeight: '700',
+        fontWeight: '600',
         color: 'rgba(255,255,255,0.3)',
     },
     todayLabel: {

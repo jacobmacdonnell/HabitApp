@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Scroll
 import { useHabit, Habit } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
 import { BlurView } from 'expo-blur';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { ArrowRight, Check, ChevronLeft, Minus, Plus } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
@@ -236,21 +237,21 @@ export const OnboardingScreen = () => {
 
                             <Text style={[styles.label, { marginTop: 24 }]}>TIME OF DAY</Text>
                             <View style={styles.grid}>
-                                {['morning', 'midday', 'evening', 'anytime'].map((t) => (
-                                    <TouchableOpacity
-                                        key={t}
-                                        style={[
-                                            styles.timeButton,
-                                            timeOfDay === t && styles.timeButtonSelected
-                                        ]}
-                                        onPress={() => setTimeOfDay(t as any)}
-                                    >
-                                        <Text style={[
-                                            styles.timeButtonText,
-                                            timeOfDay === t && { color: '#000' }
-                                        ]}>{t}</Text>
-                                    </TouchableOpacity>
-                                ))}
+                                <View style={{ marginTop: 8 }}>
+                                    <SegmentedControl
+                                        values={['Morning', 'Noon', 'Evening', 'Anytime']}
+                                        selectedIndex={['morning', 'midday', 'evening', 'anytime'].indexOf(timeOfDay)}
+                                        onChange={(event) => {
+                                            const index = event.nativeEvent.selectedSegmentIndex;
+                                            const times = ['morning', 'midday', 'evening', 'anytime'] as const;
+                                            setTimeOfDay(times[index]);
+                                        }}
+                                        appearance="dark"
+                                        backgroundColor="rgba(0,0,0,0.2)"
+                                        fontStyle={{ color: 'rgba(255,255,255,0.5)', fontWeight: '600' }}
+                                        activeFontStyle={{ color: '#fff', fontWeight: '700' }}
+                                    />
+                                </View>
                             </View>
                         </View>
 
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 32,
-        fontWeight: '800',
+        fontWeight: '700',
         color: '#fff',
         textAlign: 'center',
     },
@@ -439,14 +440,14 @@ const styles = StyleSheet.create({
     orText: {
         textAlign: 'center',
         fontSize: 10,
-        fontWeight: '800',
+        fontWeight: '700',
         color: 'rgba(255,255,255,0.3)',
         marginTop: 12,
         marginBottom: 12,
     },
     label: {
         fontSize: 12,
-        fontWeight: '800',
+        fontWeight: '700',
         color: 'rgba(255,255,255,0.5)',
         marginBottom: 8,
     },
@@ -468,7 +469,7 @@ const styles = StyleSheet.create({
     },
     counterValue: {
         fontSize: 24,
-        fontWeight: '800',
+        fontWeight: '700',
         color: '#fff',
     },
     helperText: {

@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform, Button } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
-import { BlurView } from 'expo-blur';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { X, Check, Trash2 } from 'lucide-react-native';
+import { Trash2 } from 'lucide-react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
 type ParamList = {
@@ -48,6 +47,26 @@ export const HabitFormScreen = () => {
         navigation.goBack();
     };
 
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: editingHabit ? 'Edit Habit' : 'New Habit',
+            presentation: 'modal',
+            headerShown: true,
+            headerStyle: { backgroundColor: '#1c1c1e' },
+            headerTintColor: '#fff',
+            headerLeft: () => (
+                <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 8 }}>
+                    <Text style={{ color: '#fff', fontSize: 17 }}>Cancel</Text>
+                </TouchableOpacity>
+            ),
+            headerRight: () => (
+                <TouchableOpacity onPress={handleSave} style={{ padding: 8 }}>
+                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600' }}>Save</Text>
+                </TouchableOpacity>
+            ),
+        });
+    }, [navigation, editingHabit, title, color, icon, timeOfDay, frequencyIndex, targetCount]);
+
     const handleDelete = () => {
         if (!editingHabit) return;
         Alert.alert(
@@ -69,18 +88,8 @@ export const HabitFormScreen = () => {
 
     return (
         <View style={styles.container}>
-            <BlurView intensity={80} tint="dark" style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
-                    <X size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>{editingHabit ? 'Edit Habit' : 'New Habit'}</Text>
-                <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                    <Check size={24} color="#000" />
-                </TouchableOpacity>
-            </BlurView>
-
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-                <ScrollView contentContainerStyle={styles.content}>
+                <ScrollView contentContainerStyle={styles.content} contentInsetAdjustmentBehavior="automatic">
 
                     {/* Title Input */}
                     <View style={styles.section}>
@@ -136,7 +145,6 @@ export const HabitFormScreen = () => {
                                 setTimeOfDay(times[index]);
                             }}
                             appearance="dark"
-                            backgroundColor="rgba(255,255,255,0.1)"
                         />
                     </View>
 
@@ -179,35 +187,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#1c1c1e', // Modal background
     },
-    header: {
-        paddingTop: 20,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.1)',
-    },
-    headerTitle: {
-        fontSize: 17,
-        fontWeight: '600',
-        color: '#fff',
-    },
-    closeButton: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-    },
-    saveButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     content: {
         padding: 20,
         paddingBottom: 100,
@@ -231,7 +210,8 @@ const styles = StyleSheet.create({
     },
     colorRow: {
         gap: 12,
-        paddingRight: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10, // Prevent clipping of scaled dots
     },
     colorDot: {
         width: 44,
@@ -246,7 +226,8 @@ const styles = StyleSheet.create({
     },
     iconRow: {
         gap: 12,
-        paddingRight: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 4,
     },
     iconButton: {
         width: 44,
@@ -263,10 +244,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 20,
+        gap: 12, // Reduced from 20
         backgroundColor: 'rgba(255,255,255,0.1)',
         borderRadius: 12,
-        padding: 8,
+        padding: 4, // Reduced from 8
     },
     stepperButton: {
         width: 44,
