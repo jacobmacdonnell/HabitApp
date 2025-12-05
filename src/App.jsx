@@ -90,7 +90,7 @@ const Dashboard = ({ viewMode }) => {
               <button
                 key={color}
                 onClick={() => setPetColor(color)}
-                className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 ${petColor === color ? 'border-white scale-110' : 'border-transparent'}`}
+                className={`w-10 h-10 rounded-full border-2 transition-transform active:scale-95 ${petColor === color ? 'border-white scale-110' : 'border-transparent'}`}
                 style={{ backgroundColor: color }}
               />
             ))}
@@ -121,10 +121,7 @@ const Dashboard = ({ viewMode }) => {
   // PET PAGE VIEW
   if (viewMode === 'pet') {
     return (
-      <div className="h-full flex flex-col pt-24 px-4 animate-fade-in relative">
-        <div className="absolute top-6 left-6">
-          <h2 className="text-3xl font-black text-white tracking-tight">Pet</h2>
-        </div>
+      <div className="h-full flex flex-col justify-center pt-12 px-4 animate-fade-in relative">
         <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
       </div>
     );
@@ -138,11 +135,7 @@ const Dashboard = ({ viewMode }) => {
       <div className="space-y-6">
         {/* Header & Filter */}
         <div className="flex flex-col gap-5 relative">
-          {viewMode === 'today' && (
-            <div className="px-2">
-              <h2 className="text-3xl font-black text-white tracking-tight">Today</h2>
-            </div>
-          )}
+
 
           {/* Time Filters (Only show in Today view) */}
           {viewMode === 'today' && (
@@ -156,9 +149,9 @@ const Dashboard = ({ viewMode }) => {
                 <button
                   key={filter.id}
                   onClick={() => setTimeFilter(filter.id)}
-                  className={`flex-1 py-4 rounded-[1.5rem] text-sm font-bold transition-all duration-300 relative z-10 ${timeFilter === filter.id
+                  className={`flex-1 py-4 rounded-[1.5rem] text-sm font-bold transition-all duration-300 relative z-10 active:scale-95 ${timeFilter === filter.id
                     ? 'text-black scale-105'
-                    : 'text-white/40 hover:text-white/80 hover:scale-105'
+                    : 'text-white/40'
                     }`}
                 >
                   {filter.label}
@@ -176,7 +169,7 @@ const Dashboard = ({ viewMode }) => {
         ) : (
           <div className="space-y-4">
             {filteredHabits.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 px-6 glass-panel rounded-[2.5rem] border border-white/10 text-center space-y-6 mt-4 hover:scale-[1.02] transition-transform duration-500">
+              <div className="flex flex-col items-center justify-center py-16 px-6 glass-panel rounded-[2.5rem] border border-white/10 text-center space-y-6 mt-4 transition-transform duration-500">
                 <div className="space-y-2 max-w-xs">
                   <h3 className="text-xl font-bold text-white">
                     {timeFilter === 'all' ? "No habits yet" : `No ${timeFilter} habits`}
@@ -189,7 +182,7 @@ const Dashboard = ({ viewMode }) => {
                 </div>
                 <button
                   onClick={openAddModal}
-                  className="px-8 py-4 bg-white text-black font-bold rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                  className="px-8 py-4 bg-white text-black font-bold rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.15)] active:scale-95 transition-all flex items-center gap-2"
                 >
                   <Plus size={20} strokeWidth={3} />
                   <span>Create New Habit</span>
@@ -250,13 +243,13 @@ const Dashboard = ({ viewMode }) => {
                           <div className="flex flex-col gap-2">
                             <button
                               onClick={() => openEditModal(habit)}
-                              className="p-2 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-colors"
+                              className="p-2 rounded-xl bg-white/5 text-white/50 active:bg-white/10 active:text-white transition-colors"
                             >
                               <Settings size={16} />
                             </button>
                             <button
                               onClick={() => handleDeleteHabit(habit.id)}
-                              className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                              className="p-2 rounded-xl bg-red-500/10 text-red-400 active:bg-red-500/20 transition-colors"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -270,9 +263,9 @@ const Dashboard = ({ viewMode }) => {
                 {/* Add Button for Non-Empty List */}
                 <button
                   onClick={openAddModal}
-                  className="w-full py-5 rounded-[2.5rem] border-2 border-dashed border-white/10 text-white/30 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg group"
+                  className="w-full py-5 rounded-[2.5rem] border-2 border-dashed border-white/10 text-white/30 active:text-white active:border-white/30 active:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg active:scale-[0.98]"
                 >
-                  <div className="p-1 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors group-hover:scale-110 duration-300">
+                  <div className="p-1 rounded-full bg-white/10 transition-colors duration-300">
                     <Plus size={20} strokeWidth={3} />
                   </div>
                   <span>Add another habit</span>

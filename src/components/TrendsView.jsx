@@ -33,13 +33,13 @@ export const TrendsView = ({ habits, progress }) => {
                     <div className="flex gap-1 bg-white/5 p-1 rounded-[2rem] border border-white/5 backdrop-blur-md">
                         <button
                             onClick={() => setTrendMode('weekly')}
-                            className={`px-6 py-2.5 rounded-[1.5rem] text-xs font-bold transition-all duration-300 ${trendMode === 'weekly' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                            className={`px-6 py-2.5 rounded-[1.5rem] text-xs font-bold transition-all duration-300 active:scale-95 ${trendMode === 'weekly' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/40'}`}
                         >
                             Weekly
                         </button>
                         <button
                             onClick={() => setTrendMode('monthly')}
-                            className={`px-6 py-2.5 rounded-[1.5rem] text-xs font-bold transition-all duration-300 ${trendMode === 'monthly' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                            className={`px-6 py-2.5 rounded-[1.5rem] text-xs font-bold transition-all duration-300 active:scale-95 ${trendMode === 'monthly' ? 'bg-white text-black shadow-lg scale-105' : 'text-white/40'}`}
                         >
                             Monthly
                         </button>

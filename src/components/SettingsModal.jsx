@@ -32,7 +32,7 @@ export const SettingsModal = ({ isOpen, onClose }) => {
                     <h2 className="text-2xl font-bold text-white tracking-tight">Settings</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-all active:scale-95 border border-white/5"
+                        className="p-2 bg-white/5 rounded-full text-white/60 active:text-white active:bg-white/10 transition-all active:scale-95 border border-white/5"
                     >
                         <X size={20} />
                     </button>
@@ -58,7 +58,7 @@ export const SettingsModal = ({ isOpen, onClose }) => {
 
                             <button
                                 onClick={() => setSound(!sound)}
-                                className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+                                className="w-full p-4 flex items-center justify-between active:bg-white/5 transition-colors"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-pink-500/20 rounded-lg text-pink-400">
@@ -73,7 +73,7 @@ export const SettingsModal = ({ isOpen, onClose }) => {
 
                             <button
                                 onClick={() => setNotifications(!notifications)}
-                                className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors border-t border-white/5"
+                                className="w-full p-4 flex items-center justify-between active:bg-white/5 transition-colors border-t border-white/5"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
@@ -93,7 +93,7 @@ export const SettingsModal = ({ isOpen, onClose }) => {
                         <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Data & Privacy</h3>
 
                         <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md">
-                            <button className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors border-b border-white/5">
+                            <button className="w-full p-4 flex items-center justify-between active:bg-white/5 transition-colors border-b border-white/5">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
                                         <Shield size={20} />

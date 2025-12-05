@@ -9,9 +9,7 @@ export const SettingsView = () => {
 
     return (
         <div className="space-y-8 animate-fade-in pb-8">
-            <div className="flex items-center justify-between px-2">
-                <h2 className="text-3xl font-black text-white tracking-tight">Settings</h2>
-            </div>
+
 
             <div className="space-y-8">
                 {/* Preferences Section */}
@@ -33,7 +31,7 @@ export const SettingsView = () => {
 
                         <button
                             onClick={() => setSound(!sound)}
-                            className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors"
+                            className="w-full p-5 flex items-center justify-between active:bg-white/5 transition-colors"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-pink-500/20 rounded-2xl text-pink-400">
@@ -48,7 +46,7 @@ export const SettingsView = () => {
 
                         <button
                             onClick={() => setNotifications(!notifications)}
-                            className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors border-t border-white/5"
+                            className="w-full p-5 flex items-center justify-between active:bg-white/5 transition-colors border-t border-white/5"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-400">
@@ -68,7 +66,7 @@ export const SettingsView = () => {
                     <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Data & Privacy</h3>
 
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-md">
-                        <button className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors border-b border-white/5">
+                        <button className="w-full p-5 flex items-center justify-between active:bg-white/5 transition-colors border-b border-white/5">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-blue-500/20 rounded-2xl text-blue-400">
                                     <Shield size={24} />
@@ -84,9 +82,9 @@ export const SettingsView = () => {
                                     resetData();
                                 }
                             }}
-                            className="w-full p-5 flex items-center gap-4 text-red-400 hover:bg-red-500/10 transition-colors group"
+                            className="w-full p-5 flex items-center gap-4 text-red-400 active:bg-red-500/10 transition-colors"
                         >
-                            <div className="p-3 bg-red-500/10 rounded-2xl group-hover:bg-red-500/20 transition-colors">
+                            <div className="p-3 bg-red-500/10 rounded-2xl transition-colors">
                                 <Trash2 size={24} />
                             </div>
                             <span className="font-bold text-lg">Reset All Data</span>
@@ -97,7 +95,7 @@ export const SettingsView = () => {
                 {/* Footer */}
                 <div className="pt-8 text-center space-y-4">
                     <div className="flex justify-center gap-4">
-                        <a href="#" className="p-4 bg-white/5 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all hover:scale-110">
+                        <a href="#" className="p-4 bg-white/5 rounded-full text-white/40 active:text-white active:bg-white/10 transition-all active:scale-95">
                             <Github size={24} />
                         </a>
                     </div>

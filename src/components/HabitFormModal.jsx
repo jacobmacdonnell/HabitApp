@@ -71,7 +71,7 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-all active:scale-95 border border-white/5"
+                        className="p-2 bg-white/5 rounded-full text-white/60 active:text-white active:bg-white/10 transition-all active:scale-95 border border-white/5"
                     >
                         <X size={20} />
                     </button>
@@ -131,7 +131,7 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, targetCount: Math.max(1, prev.targetCount - 1) }))}
-                                    className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors active:scale-90"
+                                    className="w-10 h-10 flex items-center justify-center rounded-lg text-white/60 active:text-white active:bg-white/10 transition-colors active:scale-90"
                                 >
                                     -
                                 </button>
@@ -139,7 +139,7 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, targetCount: prev.targetCount + 1 }))}
-                                    className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors active:scale-90"
+                                    className="w-10 h-10 flex items-center justify-center rounded-lg text-white/60 active:text-white active:bg-white/10 transition-colors active:scale-90"
                                 >
                                     +
                                 </button>
