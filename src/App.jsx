@@ -52,7 +52,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
   // ONBOARDING VIEW
   if (isOnboarding) {
     return (
-      <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fade-in">
+      <div className="h-full flex flex-col items-center justify-center space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-black text-white tracking-tight">Welcome!</h1>
           <p className="text-white/60 text-lg">Let's meet your new companion.</p>
@@ -109,7 +109,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
   // PET PAGE VIEW
   if (viewMode === 'pet') {
     return (
-      <div className="h-full flex flex-col justify-center pt-12 px-4 animate-fade-in relative">
+      <div className="h-full flex flex-col justify-center pt-12 px-4 relative">
         <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
       </div>
     );

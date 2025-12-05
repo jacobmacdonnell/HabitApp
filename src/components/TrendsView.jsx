@@ -25,7 +25,7 @@ export const TrendsView = ({ habits, progress }) => {
     };
 
     return (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-6">
             {/* Trends Header & Toggle */}
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between px-2 pr-14">

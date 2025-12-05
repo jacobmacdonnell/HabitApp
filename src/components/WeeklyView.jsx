@@ -15,7 +15,7 @@ export const WeeklyView = ({ habits, progress }) => {
     };
 
     return (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-4">
             {/* Header Row */}
             <div className="grid grid-cols-[1.5fr_repeat(7,1fr)] gap-2 items-end mb-2 px-4">
                 <div className="text-xs font-bold text-white/30 uppercase tracking-wider pb-1">Habit</div>
@@ -61,12 +61,12 @@ export const WeeklyView = ({ habits, progress }) => {
                                     <div key={date} className="flex justify-center">
                                         <div
                                             className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted
-                                                    ? 'bg-green-500 text-white shadow-lg shadow-green-500/20 scale-100'
-                                                    : isMissed
-                                                        ? 'bg-white/5 text-white/20'
-                                                        : isFuture
-                                                            ? 'opacity-0'
-                                                            : 'bg-white/5 text-white/20'
+                                                ? 'bg-green-500 text-white shadow-lg shadow-green-500/20 scale-100'
+                                                : isMissed
+                                                    ? 'bg-white/5 text-white/20'
+                                                    : isFuture
+                                                        ? 'opacity-0'
+                                                        : 'bg-white/5 text-white/20'
                                                 }`}
                                             title={`${date}: ${isCompleted ? 'Completed' : 'Incomplete'}`}
                                         >

@@ -8,7 +8,7 @@ export const SettingsView = () => {
     const [sound, setSound] = useState(true);
 
     return (
-        <div className="space-y-8 animate-fade-in pb-8">
+        <div className="space-y-8 pb-8">
 
 
             <div className="space-y-8">

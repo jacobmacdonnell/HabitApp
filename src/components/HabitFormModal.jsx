@@ -10,7 +10,15 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         color: '#6366f1',
         icon: '✨'
     });
-    const [isClosing, setIsClosing] = useState(false);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            requestAnimationFrame(() => setVisible(true));
+        } else {
+            setVisible(false);
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (initialData) {
@@ -25,82 +33,74 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                 icon: '✨'
             });
         }
-        setIsClosing(false);
     }, [initialData, isOpen]);
 
     const handleClose = () => {
-        setIsClosing(true);
-        setTimeout(() => {
-            onClose();
-            setIsClosing(false);
-        }, 250);
+        setVisible(false);
+        setTimeout(onClose, 200);
     };
 
     if (!isOpen) return null;
 
     const colors = [
-        '#6366f1', '#a855f7', '#ec4899', '#f43f5e',
-        '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6',
+        '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
+        '#ec4899', '#f43f5e', '#f97316', '#22c55e', '#14b8a6',
     ];
 
     const icons = ['✨', '💪', '📚', '🧘', '💧', '🏃', '🎯', '💤', '🥗'];
 
     return (
         <>
-            {/* Backdrop - absolute within phone frame */}
+            {/* Backdrop */}
             <div
                 className="absolute inset-0 z-40 bg-black/80 rounded-[3.5rem]"
+                style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.2s ease-out' }}
                 onClick={handleClose}
             />
 
-            {/* Bottom Sheet - slides up within phone frame */}
+            {/* Bottom Sheet */}
             <div
                 className="absolute bottom-0 left-0 right-0 z-50 bg-[#1c1c1e] rounded-t-[2rem] rounded-b-[3.5rem] border-t border-white/10"
-                style={{
-                    transform: isClosing ? 'translateY(100%)' : 'translateY(0)',
-                    transition: 'transform 0.25s ease-out',
-                    animation: isClosing ? 'none' : 'slideUp 0.25s ease-out'
-                }}
+                style={{ transform: visible ? 'translateY(0)' : 'translateY(100%)', transition: 'transform 0.25s ease-out' }}
             >
                 {/* Handle Bar */}
-                <div className="pt-3 pb-2 flex justify-center">
-                    <div className="w-10 h-1 bg-white/20 rounded-full" />
+                <div className="flex justify-center pt-3 pb-1">
+                    <div className="w-9 h-1 bg-white/20 rounded-full" />
                 </div>
 
                 {/* Header */}
-                <div className="px-6 pb-4 flex justify-between items-center">
+                <div className="px-5 pt-2 pb-4 flex items-center justify-between">
                     <div>
-                        <h2 className="text-xl font-bold text-white">
+                        <h2 className="text-xl font-bold text-white tracking-tight">
                             {initialData ? 'Edit Habit' : 'New Habit'}
                         </h2>
-                        <p className="text-white/40 text-sm">
+                        <p className="text-sm text-white/40 mt-0.5">
                             {initialData ? 'Update your goals' : 'Build a new routine'}
                         </p>
                     </div>
                     <button
                         onClick={handleClose}
-                        className="p-2.5 bg-white/10 rounded-full text-white/60 active:bg-white/20"
+                        className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full text-white/50 active:bg-white/20"
                     >
-                        <X size={18} />
+                        <X size={16} strokeWidth={2.5} />
                     </button>
                 </div>
 
-                {/* Form Content */}
-                <div className="px-6 pb-12 overflow-y-auto" style={{ maxHeight: '55vh' }}>
+                {/* Form */}
+                <div className="px-5 pb-10 overflow-y-auto" style={{ maxHeight: '52vh' }}>
                     <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            onSubmit(formData);
-                        }}
-                        className="space-y-5"
+                        onSubmit={(e) => { e.preventDefault(); onSubmit(formData); }}
+                        className="space-y-4"
                     >
                         {/* Habit Name */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider">Habit Name</label>
+                        <div>
+                            <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-2 ml-1">
+                                Name
+                            </label>
                             <input
                                 type="text"
-                                placeholder="e.g., Drink Water"
-                                className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-base text-white placeholder-white/30 focus:outline-none focus:bg-white/10 focus:border-white/20"
+                                placeholder="e.g., Drink 8 glasses of water"
+                                className="w-full h-12 px-4 bg-white/5 border border-white/10 rounded-xl text-[15px] text-white placeholder-white/25 focus:outline-none focus:bg-white/8 focus:border-white/20"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 autoFocus
@@ -108,18 +108,17 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                         </div>
 
                         {/* Icon Picker */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider">Icon</label>
-                            <div className="flex gap-2 flex-wrap">
+                        <div>
+                            <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-2 ml-1">
+                                Icon
+                            </label>
+                            <div className="grid grid-cols-9 gap-1.5">
                                 {icons.map((icon) => (
                                     <button
                                         key={icon}
                                         type="button"
                                         onClick={() => setFormData({ ...formData, icon })}
-                                        className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl transition-all ${formData.icon === icon
-                                            ? 'bg-white/15 ring-2 ring-white/30'
-                                            : 'bg-white/5'
-                                            }`}
+                                        className={`aspect-square rounded-lg flex items-center justify-center text-xl ${formData.icon === icon ? 'bg-white/15 ring-1 ring-white/40' : 'bg-white/5'}`}
                                     >
                                         {icon}
                                     </button>
@@ -127,16 +126,16 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                             </div>
                         </div>
 
-                        {/* Time & Goal Row */}
+                        {/* Time & Goal */}
                         <div className="grid grid-cols-2 gap-3">
-                            {/* Time of Day */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/50 uppercase tracking-wider flex items-center gap-1">
+                            {/* Time */}
+                            <div>
+                                <label className="flex items-center gap-1 text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-2 ml-1">
                                     <Clock size={10} /> Time
                                 </label>
                                 <div className="relative">
                                     <select
-                                        className="w-full px-3 py-3 bg-white/5 border border-white/10 rounded-xl appearance-none text-white text-sm focus:outline-none focus:bg-white/10"
+                                        className="w-full h-11 px-3 bg-white/5 border border-white/10 rounded-xl appearance-none text-white text-sm focus:outline-none"
                                         value={formData.timeOfDay}
                                         onChange={(e) => setFormData({ ...formData, timeOfDay: e.target.value })}
                                     >
@@ -145,73 +144,61 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                         <option value="midday" className="bg-[#1c1c1e]">Midday</option>
                                         <option value="evening" className="bg-[#1c1c1e]">Evening</option>
                                     </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40 text-xs">▼</div>
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 text-[10px] pointer-events-none">▼</span>
                                 </div>
                             </div>
 
-                            {/* Daily Goal */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-white/50 uppercase tracking-wider flex items-center gap-1">
+                            {/* Goal */}
+                            <div>
+                                <label className="flex items-center gap-1 text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-2 ml-1">
                                     <Target size={10} /> Goal
                                 </label>
-                                <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                                <div className="h-11 flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden">
                                     <button
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, targetCount: Math.max(1, prev.targetCount - 1) }))}
-                                        className="w-10 h-10 flex items-center justify-center text-white/60 active:bg-white/10 text-lg font-medium"
-                                    >
-                                        −
-                                    </button>
-                                    <span className="flex-1 text-center font-bold text-white">{formData.targetCount}</span>
+                                        className="w-10 h-full flex items-center justify-center text-white/50 text-lg"
+                                    >−</button>
+                                    <span className="flex-1 text-center text-white font-semibold">{formData.targetCount}</span>
                                     <button
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, targetCount: prev.targetCount + 1 }))}
-                                        className="w-10 h-10 flex items-center justify-center text-white/60 active:bg-white/10 text-lg font-medium"
-                                    >
-                                        +
-                                    </button>
+                                        className="w-10 h-full flex items-center justify-center text-white/50 text-lg"
+                                    >+</button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Color Picker */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-white/50 uppercase tracking-wider">Color</label>
-                            <div className="grid grid-cols-9 gap-2">
+                        <div>
+                            <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-2 ml-1">
+                                Color
+                            </label>
+                            <div className="grid grid-cols-9 gap-1.5">
                                 {colors.map((color) => (
                                     <button
                                         key={color}
                                         type="button"
                                         onClick={() => setFormData({ ...formData, color })}
-                                        className={`aspect-square rounded-full transition-transform ${formData.color === color ? 'ring-2 ring-white ring-offset-2 ring-offset-[#1c1c1e] scale-110' : ''}`}
+                                        className={`aspect-square rounded-lg ${formData.color === color ? 'ring-1 ring-white/40' : ''}`}
                                         style={{ backgroundColor: color }}
                                     />
                                 ))}
                             </div>
                         </div>
 
-                        {/* Submit Button */}
+                        {/* Submit */}
                         <button
                             type="submit"
-                            disabled={!formData.title}
-                            className="w-full py-4 font-bold text-base rounded-2xl disabled:opacity-30 disabled:cursor-not-allowed text-white mt-4"
-                            style={{
-                                backgroundColor: formData.title ? formData.color : '#333'
-                            }}
+                            disabled={!formData.title.trim()}
+                            className="w-full h-12 mt-3 font-semibold text-[15px] rounded-xl text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
+                            style={{ backgroundColor: formData.title.trim() ? formData.color : '#333' }}
                         >
                             {initialData ? 'Save Changes' : 'Create Habit'}
                         </button>
                     </form>
                 </div>
             </div>
-
-            {/* Keyframes */}
-            <style>{`
-                @keyframes slideUp {
-                    from { transform: translateY(100%); }
-                    to { transform: translateY(0); }
-                }
-            `}</style>
         </>
     );
 };
