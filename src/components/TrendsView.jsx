@@ -31,7 +31,7 @@ export const TrendsView = ({ habits, progress }) => {
 
             {/* Toggle */}
             <div className="flex justify-center">
-                <div className="glass-card p-1.5 rounded-[2rem] flex gap-1 border border-white/10">
+                <div className="glass-card p-1.5 rounded-[1.5rem] flex gap-1 border border-white/10">
                     <button
                         onClick={() => setTrendMode('weekly')}
                         className={`px-8 py-2.5 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 relative z-10 active:scale-95 ${trendMode === 'weekly' ? 'text-black' : 'text-white/50'}`}
@@ -76,7 +76,7 @@ export const TrendsView = ({ habits, progress }) => {
 
                     <div className="space-y-3">
                         {habits.map(habit => (
-                            <div key={habit.id} className="p-5 rounded-[2rem] glass-card flex flex-col gap-4">
+                            <div key={habit.id} className="p-5 rounded-[1.5rem] glass-card flex flex-col gap-4">
                                 <div className="flex items-center gap-3">
                                     <div
                                         className="w-8 h-8 rounded-xl flex items-center justify-center text-lg shadow-inner ring-1 ring-white/10"
@@ -137,7 +137,7 @@ export const TrendsView = ({ habits, progress }) => {
                         const consistency = Math.round((completedCount / 30) * 100);
 
                         return (
-                            <div key={habit.id} className="p-5 rounded-[2rem] glass-card space-y-4">
+                            <div key={habit.id} className="p-5 rounded-[1.5rem] glass-card space-y-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div

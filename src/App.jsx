@@ -8,7 +8,7 @@ import { Pet } from './components/Pet.jsx';
 import { SettingsView } from './components/SettingsView.jsx';
 import { OnboardingView } from './components/OnboardingView.jsx';
 
-const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEditingHabit }) => {
+const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEditingHabit, setModalDefaultTime }) => {
   const {
     habits,
     addHabit,
@@ -44,6 +44,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
 
   const openAddModal = () => {
     setEditingHabit(null);
+    setModalDefaultTime(timeFilter === 'all' ? 'anytime' : timeFilter);
     setIsModalOpen(true);
   };
 
@@ -94,7 +95,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
     const progressPercent = Math.min((current / habit.targetCount) * 100, 100);
 
     const timeIcons = {
-      anytime: <Clock size={12} />,
+      anytime: <Sparkles size={12} />,
       morning: <Sunrise size={12} />,
       midday: <Sun size={12} />,
       evening: <Moon size={12} />
@@ -136,15 +137,13 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
             <div className="min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
                 <h4 className="font-bold text-lg leading-tight text-white group-hover:text-white/90 transition-colors truncate">{habit.title}</h4>
-                {habit.timeOfDay !== 'anytime' && (
-                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 text-[10px] font-medium text-white/40 uppercase tracking-wider shrink-0">
-                    {timeIcons[habit.timeOfDay]}
-                    <span>{timeLabels[habit.timeOfDay]}</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 text-[10px] font-medium text-white/40 uppercase tracking-wider shrink-0 h-fit my-auto">
+                  {timeIcons[habit.timeOfDay]}
+                  <span>{timeLabels[habit.timeOfDay]}</span>
+                </div>
               </div>
               <div className="flex items-center gap-3 text-xs font-medium text-white/50">
-                <span>{current} / {habit.targetCount}</span>
+                {habit.targetCount > 1 && <span>{current} / {habit.targetCount}</span>}
                 {streak >= 2 && (
                   <span className="flex items-center gap-1 text-orange-400 bg-orange-400/10 px-1.5 py-px rounded-full border border-orange-400/20">
                     🔥 {streak}
@@ -193,24 +192,27 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
         <div className="w-full">
           <div className="glass-card p-1.5 rounded-[1.5rem] flex gap-1 border border-white/10 w-full overflow-x-auto scrollbar-hide">
             {[
-              { id: 'all', label: 'All', icon: <Sparkles size={14} /> },
-              { id: 'morning', label: 'Morning', icon: <Sunrise size={14} /> },
-              { id: 'midday', label: 'Noon', icon: <Sun size={14} /> },
-              { id: 'evening', label: 'Evening', icon: <Moon size={14} /> }
-            ].map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => setTimeFilter(filter.id)}
-                className={`flex-1 min-w-[80px] py-2.5 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 relative z-10 active:scale-95 ${timeFilter === filter.id ? 'text-black' : 'text-white/50'
-                  }`}
-              >
-                {timeFilter === filter.id && (
-                  <div className="absolute inset-0 bg-white rounded-full -z-10 shadow-md" />
-                )}
-                {filter.icon}
-                {filter.label}
-              </button>
-            ))}
+              { id: 'all', label: 'All', Icon: Sparkles, activeColor: 'text-black' },
+              { id: 'morning', label: 'Morning', Icon: Sunrise, activeColor: 'text-orange-500' },
+              { id: 'midday', label: 'Noon', Icon: Sun, activeColor: 'text-yellow-500' },
+              { id: 'evening', label: 'Evening', Icon: Moon, activeColor: 'text-indigo-500' }
+            ].map(({ id, label, Icon, activeColor }) => {
+              const isActive = timeFilter === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setTimeFilter(id)}
+                  className={`flex-1 min-w-[80px] py-2.5 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 relative z-10 active:scale-95 ${isActive ? 'text-black' : 'text-white/50'
+                    }`}
+                >
+                  {isActive && (
+                    <div className="absolute inset-0 bg-white rounded-full -z-10 shadow-md" />
+                  )}
+                  <Icon size={14} className={isActive ? activeColor : 'text-white/50'} />
+                  {label}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -296,6 +298,7 @@ function App() {
   const [viewMode, setViewMode] = useState('today');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
+  const [modalDefaultTime, setModalDefaultTime] = useState('anytime');
 
   const modalElement = (
     <ModalPortal
@@ -303,6 +306,7 @@ function App() {
       setIsModalOpen={setIsModalOpen}
       editingHabit={editingHabit}
       setEditingHabit={setEditingHabit}
+      defaultTime={modalDefaultTime}
     />
   );
 
@@ -319,6 +323,7 @@ function App() {
           setIsModalOpen={setIsModalOpen}
           editingHabit={editingHabit}
           setEditingHabit={setEditingHabit}
+          setModalDefaultTime={setModalDefaultTime}
         />
       </Layout>
     </HabitProvider>
@@ -326,7 +331,7 @@ function App() {
 }
 
 // Separate component for modal to keep it clean
-const ModalPortal = ({ isModalOpen, setIsModalOpen, editingHabit, setEditingHabit }) => {
+const ModalPortal = ({ isModalOpen, setIsModalOpen, editingHabit, setEditingHabit, defaultTime }) => {
   const { addHabit, updateHabit, deleteHabit } = useHabit();
 
   const handleHabitSubmit = (habitData) => {
@@ -355,6 +360,7 @@ const ModalPortal = ({ isModalOpen, setIsModalOpen, editingHabit, setEditingHabi
       }}
       onSubmit={handleHabitSubmit}
       initialData={editingHabit}
+      defaultTime={defaultTime}
     />
   );
 };

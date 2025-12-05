@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { X, Clock, Target } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Clock, Target, Check, ChevronDown, Sun, Moon, Sunrise, Sparkles } from 'lucide-react';
 
-export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
+export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData, defaultTime }) => {
     const [formData, setFormData] = useState({
         title: '',
         timeOfDay: 'anytime',
@@ -11,6 +11,19 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         icon: '✨'
     });
     const [visible, setVisible] = useState(false);
+    const [showTimeSelect, setShowTimeSelect] = useState(false);
+    const dropdownRef = useRef(null);
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowTimeSelect(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -26,14 +39,14 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         } else {
             setFormData({
                 title: '',
-                timeOfDay: 'anytime',
+                timeOfDay: defaultTime || 'anytime',
                 frequency: 'daily',
                 targetCount: 1,
                 color: '#6366f1',
                 icon: '✨'
             });
         }
-    }, [initialData, isOpen]);
+    }, [initialData, isOpen, defaultTime]);
 
     const handleClose = () => {
         setVisible(false);
@@ -122,7 +135,7 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                         key={icon}
                                         type="button"
                                         onClick={() => setFormData({ ...formData, icon })}
-                                        className={`aspect-square rounded-lg flex items-center justify-center text-xl ${formData.icon === icon ? 'bg-white/15 ring-1 ring-white/40' : 'bg-white/5'}`}
+                                        className={`aspect-square rounded-xl flex items-center justify-center text-xl transition-all active:scale-95 ${formData.icon === icon ? 'bg-white/15 ring-1 ring-white ring-offset-1 ring-offset-[#1c1c1e]' : 'bg-white/5 opacity-70 hover:opacity-100'}`}
                                     >
                                         {icon}
                                     </button>
@@ -137,18 +150,46 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 <label className="flex items-center gap-1 text-[11px] font-semibold text-white/40 uppercase tracking-widest mb-2 ml-1">
                                     <Clock size={10} /> Time
                                 </label>
-                                <div className="relative">
-                                    <select
-                                        className="w-full h-11 px-3 bg-white/5 border border-white/10 rounded-xl appearance-none text-white text-sm focus:outline-none"
-                                        value={formData.timeOfDay}
-                                        onChange={(e) => setFormData({ ...formData, timeOfDay: e.target.value })}
+                                <div className="relative" ref={dropdownRef}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowTimeSelect(!showTimeSelect)}
+                                        className="w-full h-11 px-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between text-white text-sm focus:outline-none focus:bg-white/10 transition-colors"
                                     >
-                                        <option value="anytime" className="bg-[#1c1c1e]">Anytime</option>
-                                        <option value="morning" className="bg-[#1c1c1e]">Morning</option>
-                                        <option value="midday" className="bg-[#1c1c1e]">Midday</option>
-                                        <option value="evening" className="bg-[#1c1c1e]">Evening</option>
-                                    </select>
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 text-[10px] pointer-events-none">▼</span>
+                                        <div className="flex items-center gap-2">
+                                            {formData.timeOfDay === 'anytime' && <Sparkles size={14} className="text-white" />}
+                                            {formData.timeOfDay === 'morning' && <Sunrise size={14} className="text-orange-400" />}
+                                            {formData.timeOfDay === 'midday' && <Sun size={14} className="text-yellow-400" />}
+                                            {formData.timeOfDay === 'evening' && <Moon size={14} className="text-indigo-400" />}
+                                            <span className="capitalize">{formData.timeOfDay === 'anytime' ? 'Anytime' : formData.timeOfDay}</span>
+                                        </div>
+                                        <ChevronDown size={14} className={`text-white/30 transition-transform ${showTimeSelect ? 'rotate-180' : ''}`} />
+                                    </button>
+
+                                    {showTimeSelect && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 p-1.5 bg-[#1c1c1e] border border-white/10 rounded-2xl shadow-xl z-50 animate-fade-in-fast origin-top">
+                                            {[
+                                                { id: 'anytime', label: 'Anytime', icon: <Sparkles size={14} className="text-white" /> },
+                                                { id: 'morning', label: 'Morning', icon: <Sunrise size={14} className="text-orange-400" /> },
+                                                { id: 'midday', label: 'Midday', icon: <Sun size={14} className="text-yellow-400" /> },
+                                                { id: 'evening', label: 'Evening', icon: <Moon size={14} className="text-indigo-400" /> }
+                                            ].map((option) => (
+                                                <button
+                                                    key={option.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFormData({ ...formData, timeOfDay: option.id });
+                                                        setShowTimeSelect(false);
+                                                    }}
+                                                    className={`w-full p-2.5 rounded-xl flex items-center gap-2.5 text-sm font-medium transition-colors ${formData.timeOfDay === option.id ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}
+                                                >
+                                                    {option.icon}
+                                                    <span>{option.label}</span>
+                                                    {formData.timeOfDay === option.id && <Check size={14} className="ml-auto text-white/50" />}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -184,9 +225,11 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                         key={color}
                                         type="button"
                                         onClick={() => setFormData({ ...formData, color })}
-                                        className={`aspect-square rounded-lg ${formData.color === color ? 'ring-1 ring-white/40' : ''}`}
+                                        className={`aspect-square rounded-xl transition-all active:scale-95 flex items-center justify-center ${formData.color === color ? 'ring-1 ring-white ring-offset-1 ring-offset-[#1c1c1e]' : 'opacity-70 hover:opacity-100'}`}
                                         style={{ backgroundColor: color }}
-                                    />
+                                    >
+                                        {formData.color === color && <Check size={16} className="text-white drop-shadow-md" strokeWidth={3} />}
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -196,8 +239,7 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                             <button
                                 type="submit"
                                 disabled={!formData.title.trim()}
-                                className="w-full h-12 font-semibold text-[15px] rounded-xl text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
-                                style={{ backgroundColor: formData.title.trim() ? formData.color : '#333' }}
+                                className="w-full h-12 font-bold text-[15px] rounded-xl text-white bg-white/10 hover:bg-white/15 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-all"
                             >
                                 {initialData ? 'Save Changes' : 'Create Habit'}
                             </button>
