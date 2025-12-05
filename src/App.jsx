@@ -1,42 +1,48 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Check, Trash2, Pencil, Settings } from 'lucide-react';
 import { HabitProvider, useHabit } from './context/HabitContext.jsx';
+import { HabitFormModal } from './components/HabitFormModal.jsx';
+import { WeeklyView } from './components/WeeklyView.jsx';
+import { TrendsView } from './components/TrendsView.jsx';
 import { Layout } from './components/Layout.jsx';
 import { Pet } from './components/Pet.jsx';
-import { HabitFormModal } from './components/HabitFormModal.jsx';
-import { SettingsModal } from './components/SettingsModal.jsx';
-import { TrendsView } from './components/TrendsView.jsx';
-import { Plus, Check, Pencil, Trash2, Sun, Sunset, Clock, Settings } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { SettingsView } from './components/SettingsView.jsx';
 
 const Dashboard = ({ viewMode }) => {
-  const { pet, resetPet, habits, logProgress, progress, updateHabit, deleteHabit, addHabit, getStreak } = useHabit();
-  const [isOnboarding, setIsOnboarding] = useState(!pet);
+  const {
+    habits,
+    addHabit,
+    updateHabit,
+    deleteHabit,
+    logProgress,
+    progress,
+    getStreak,
+    pet,
+    isOnboarding,
+    resetPet,
+    setIsOnboarding
+  } = useHabit();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingHabit, setEditingHabit] = useState(null);
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'morning', 'midday', 'evening'
   const [petName, setPetName] = useState('');
   const [petColor, setPetColor] = useState('#FF6B6B');
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [editingHabit, setEditingHabit] = useState(null);
+  const today = new Date().toISOString().split('T')[0];
 
-  // View State
-
-  // Filter State
-  const [timeFilter, setTimeFilter] = useState('all');
-
-  const filteredHabits = useMemo(() => {
-    if (timeFilter === 'all') return habits;
-    return habits.filter(h => h.timeOfDay === timeFilter || h.timeOfDay === 'anytime');
-  }, [habits, timeFilter]);
-
-  const handleHabitSubmit = (formData) => {
+  const handleHabitSubmit = (habitData) => {
     if (editingHabit) {
-      updateHabit(editingHabit.id, formData);
+      updateHabit(editingHabit.id, habitData);
     } else {
-      addHabit(formData);
+      addHabit(habitData);
     }
     setIsModalOpen(false);
     setEditingHabit(null);
+  };
+
+  const handleLogProgress = (habitId) => {
+    logProgress(habitId, today);
   };
 
   const openAddModal = () => {
@@ -49,38 +55,31 @@ const Dashboard = ({ viewMode }) => {
     setIsModalOpen(true);
   };
 
-  const today = new Date().toISOString().split('T')[0];
+  const filteredHabits = habits.filter(habit => {
+    if (timeFilter === 'all') return true;
+    return habit.timeOfDay === timeFilter || habit.timeOfDay === 'anytime';
+  });
 
-  const handleLogProgress = (habitId) => {
-    logProgress(habitId, today);
-
-    const habit = habits.find(h => h.id === habitId);
-    const dayProgress = progress.find(p => p.habitId === habitId && p.date === today);
-    const current = dayProgress?.currentCount || 0;
-
-    if (habit && current + 1 >= habit.targetCount) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: [habit.color, '#ffffff']
-      });
-    }
-  };
-
-  if (isOnboarding || !pet) {
+  // ONBOARDING VIEW
+  if (isOnboarding) {
     return (
-      <div className="flex flex-col items-center justify-center h-full space-y-8 animate-fade-in">
-        <h1 className="text-4xl font-bold text-center">Meet Your Companion</h1>
-        <div className="w-48 h-48 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner">
-          <div className="w-32 h-32 rounded-full" style={{ backgroundColor: petColor }} />
+      <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fade-in">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-black text-white tracking-tight">Welcome!</h1>
+          <p className="text-white/60 text-lg">Let's meet your new companion.</p>
         </div>
 
-        <div className="space-y-4 w-full max-w-xs">
+        <div className="bg-white/5 p-8 rounded-[2.5rem] backdrop-blur-md border border-white/10 w-full max-w-xs space-y-6">
+          <div className="flex justify-center">
+            <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center text-6xl animate-bounce">
+              🥚
+            </div>
+          </div>
+
           <input
             type="text"
             placeholder="Name your pet..."
-            className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 text-center text-xl"
+            className="w-full px-5 py-4 bg-black/20 border border-white/10 rounded-2xl text-center text-xl font-bold text-white placeholder-white/20 focus:outline-none focus:border-indigo-500 transition-all"
             value={petName}
             onChange={(e) => setPetName(e.target.value)}
           />
@@ -113,10 +112,18 @@ const Dashboard = ({ viewMode }) => {
     );
   }
 
+  // SETTINGS VIEW
+  if (viewMode === 'settings') {
+    return <SettingsView />;
+  }
+
   // PET PAGE VIEW
   if (viewMode === 'pet') {
     return (
-      <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fade-in">
+      <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fade-in relative">
+        <div className="absolute top-0 left-0 w-full px-2">
+          <h2 className="text-3xl font-black text-white tracking-tight">Companion</h2>
+        </div>
         <Pet pet={pet} />
         <div className="text-center space-y-2 max-w-xs">
           <h3 className="text-xl font-bold text-white">Companion Status</h3>
@@ -134,6 +141,11 @@ const Dashboard = ({ viewMode }) => {
       <div className="space-y-6">
         {/* Header & Filter */}
         <div className="flex flex-col gap-5 relative">
+          {viewMode === 'today' && (
+            <div className="px-2">
+              <h2 className="text-3xl font-black text-white tracking-tight">Today</h2>
+            </div>
+          )}
 
           {/* Time Filters (Only show in Today view) */}
           {viewMode === 'today' && (
@@ -288,17 +300,12 @@ const Dashboard = ({ viewMode }) => {
 
 function App() {
   const [viewMode, setViewMode] = useState('today');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <HabitProvider>
-      <Layout currentView={viewMode} onNavigate={setViewMode} onOpenSettings={() => setIsSettingsOpen(true)}>
+      <Layout currentView={viewMode} onNavigate={setViewMode}>
         <Dashboard viewMode={viewMode} />
       </Layout>
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
     </HabitProvider>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Home, Calendar, User, Settings, Battery, Wifi } from 'lucide-react';
 
-export const Layout = ({ children, currentView, onNavigate, onOpenSettings }) => {
+export const Layout = ({ children, currentView, onNavigate }) => {
     return (
         <div className="min-h-screen mesh-bg text-white font-sans selection:bg-pink-500/30 flex items-center justify-center p-4 sm:p-8">
             <div className="w-full max-w-md h-[850px] max-h-[90vh] glass-panel rounded-[3.5rem] shadow-2xl flex flex-col relative overflow-hidden ring-1 ring-white/10 transition-all duration-500">
@@ -49,10 +49,11 @@ export const Layout = ({ children, currentView, onNavigate, onOpenSettings }) =>
                         </button>
 
                         <button
-                            onClick={onOpenSettings}
-                            className="p-4 rounded-full hover:bg-white/10 text-white/50 hover:text-white hover:-translate-y-1 transition-all duration-300 group"
+                            onClick={() => onNavigate && onNavigate('settings')}
+                            className={`p-4 rounded-full transition-all duration-300 group relative ${currentView === 'settings' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'hover:bg-white/10 text-white/50 hover:text-white'}`}
                         >
                             <Settings size={24} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-500" />
+                            {currentView === 'settings' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
                         </button>
                     </nav>
                 </div>
