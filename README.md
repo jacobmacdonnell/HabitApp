@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# 🐾 Habit Companion
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A gamified habit tracking app with a virtual pet companion. By caring for yourself, you care for your digital companion—creating a positive feedback loop that encourages consistency.
 
-Currently, two official plugins are available:
+## ✨ Design Philosophy: "Liquid Glass"
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Built on a futuristic **iOS 26** aesthetic:
+- **Glassmorphism**: Deep blur effects with multi-layered translucency
+- **Vibrant Gradients**: Flowing Indigo/Purple/Pink color schemes
+- **Fluid Motion**: Bouncy, physics-based animations
+- **Clean Typography**: Modern spacing with high readability
 
-## React Compiler
+## 🧩 Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This is a **monorepo** powered by npm workspaces:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+habitapp/
+├── apps/
+│   ├── web/          # React + Vite web application
+│   └── mobile/       # React Native + Expo mobile app
+├── packages/
+│   └── shared/       # Shared types, utils, and context
+└── package.json      # Workspace configuration
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Web App (`apps/web`)
+- **Framework**: React 19 + Vite 7
+- **Styling**: Tailwind CSS v4
+- **Icons**: Lucide React
+- **Animations**: Canvas Confetti
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Mobile App (`apps/mobile`)
+- **Framework**: React Native 0.81 + Expo SDK 54
+- **Navigation**: React Navigation 7
+- **Animations**: React Native Reanimated
+- **Storage**: Async Storage
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- npm 9+
+- (For mobile) Expo CLI / iOS Simulator
+
+### Installation
+
+```bash
+# Clone and install dependencies
+npm install
 ```
+
+### Development
+
+```bash
+# Run web app
+npm run web
+
+# Run mobile app (Expo)
+npm run mobile
+
+# Run mobile on iOS simulator
+npm run mobile:ios
+```
+
+## 📱 Core Features
+
+### Smart Habit Management
+- **Time of Day Buckets**: 🌅 Morning, ☀️ Mid-day, 🌙 Evening, 🕒 Anytime
+- **Flexible Frequency**: Daily, specific days, or custom intervals
+- **Counter-Based Habits**: Track progress with visual progress bars
+
+### The Companion Pet
+- **Health Link**: Pet's health tied directly to habit completion
+- **Visual Feedback**: Pet becomes sick if habits are ignored, recovers when you're consistent
+- **Customization**: Name your pet and choose its color during onboarding
+
+## 📂 Key Files
+
+### Web App Components
+| File | Description |
+|------|-------------|
+| `App.jsx` | Main dashboard with habit list and pet display |
+| `Pet.jsx` | Animated companion with breathing/sleeping states |
+| `HabitFormModal.jsx` | Create/edit habits with color and icon pickers |
+| `OnboardingView.jsx` | Welcome flow for naming pet and first habit |
+| `SettingsView.jsx` | Sleep schedule and app preferences |
+| `TrendsView.jsx` | Weekly progress visualization |
+| `Layout.jsx` | Glass container with dock-style navigation |
+
+## 📋 Data Storage
+
+- **MVP**: LocalStorage for persistence
+- **Future**: Supabase integration for cloud sync
+
+## 📄 License
+
+Private project.
