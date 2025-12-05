@@ -33,4 +33,13 @@ export const StorageService = {
     saveProgress: (progress: DailyProgress[]) => {
         localStorage.setItem(KEYS.PROGRESS, JSON.stringify(progress));
     },
+
+    getSettings: () => {
+        const data = localStorage.getItem('habit-app-settings');
+        return data ? JSON.parse(data) : { sleepStart: '22:00', sleepEnd: '06:00' };
+    },
+
+    saveSettings: (settings: any) => {
+        localStorage.setItem('habit-app-settings', JSON.stringify(settings));
+    },
 };

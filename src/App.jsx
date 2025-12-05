@@ -294,7 +294,8 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
   );
 };
 
-function App() {
+const MainApp = () => {
+  const { isOnboarding } = useHabit();
   const [viewMode, setViewMode] = useState('today');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
@@ -311,21 +312,28 @@ function App() {
   );
 
   return (
+    <Layout
+      currentView={viewMode}
+      onNavigate={setViewMode}
+      hideNav={isOnboarding}
+      modal={modalElement}
+    >
+      <Dashboard
+        viewMode={viewMode}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        editingHabit={editingHabit}
+        setEditingHabit={setEditingHabit}
+        setModalDefaultTime={setModalDefaultTime}
+      />
+    </Layout>
+  );
+};
+
+function App() {
+  return (
     <HabitProvider>
-      <Layout
-        currentView={viewMode}
-        onNavigate={setViewMode}
-        modal={modalElement}
-      >
-        <Dashboard
-          viewMode={viewMode}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          editingHabit={editingHabit}
-          setEditingHabit={setEditingHabit}
-          setModalDefaultTime={setModalDefaultTime}
-        />
-      </Layout>
+      <MainApp />
     </HabitProvider>
   );
 }

@@ -8,6 +8,7 @@ export const HabitProvider = ({ children }) => {
     const [pet, setPet] = useState(null);
     const [progress, setProgress] = useState([]);
     const [isOnboarding, setIsOnboarding] = useState(true);
+    const [settings, setSettings] = useState({ sleepStart: '22:00', sleepEnd: '06:00' });
 
     useEffect(() => {
         const loadData = () => {
@@ -34,6 +35,7 @@ export const HabitProvider = ({ children }) => {
                 setPet(loadedPet);
                 setIsOnboarding(!loadedPet);
                 setProgress(StorageService.getProgress() || []);
+                setSettings(StorageService.getSettings());
             } catch (error) {
                 console.error("Failed to load data from storage:", error);
                 setHabits([]);
@@ -42,7 +44,55 @@ export const HabitProvider = ({ children }) => {
             }
         };
         loadData();
+        loadData();
     }, []);
+
+    // Check for sleep state every second for precision
+    useEffect(() => {
+        if (!pet) return;
+
+        const checkSleepState = () => {
+            const sleeping = isSleepingTime();
+            if (sleeping && pet.mood !== 'sleeping') {
+                updatePet({ mood: 'sleeping' });
+            } else if (!sleeping && pet.mood === 'sleeping') {
+                // Wake up! Set mood to happy to greet the user
+                updatePet({ mood: 'happy' });
+            }
+        };
+
+        const interval = setInterval(checkSleepState, 1000); // Check every second
+        checkSleepState(); // Check immediately
+
+        return () => clearInterval(interval);
+    }, [pet, settings]);
+
+    const updateSettings = (newSettings) => {
+        const updated = { ...settings, ...newSettings };
+        setSettings(updated);
+        StorageService.saveSettings(updated);
+    };
+
+    const isSleepingTime = () => {
+        if (!settings.sleepStart || !settings.sleepEnd) return false;
+
+        const now = new Date();
+        const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        if (settings.sleepStart > settings.sleepEnd) {
+            // Span across midnight (e.g. 22:00 to 06:00)
+            return currentTime >= settings.sleepStart || currentTime < settings.sleepEnd;
+        } else {
+            // Same day (e.g. 01:00 to 09:00 - rare for sleep but possible)
+            return currentTime >= settings.sleepStart && currentTime < settings.sleepEnd;
+        }
+    };
+
+    const getMood = (health) => {
+        if (health < 30) return 'sick';
+        if (health < 60) return 'sad';
+        return 'happy';
+    };
 
     const addHabit = (habit) => {
         const newHabit = { ...habit, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
@@ -236,9 +286,15 @@ export const HabitProvider = ({ children }) => {
         const newHealth = updates.health !== undefined ? updates.health : pet.health;
 
         if (!updates.mood) {
-            if (newHealth < 30) newMood = 'sick';
-            else if (newHealth < 60) newMood = 'sad';
-            else if (newHealth >= 80) newMood = 'happy';
+            // If we are currently sleeping, stay sleeping unless explicitly changed?
+            // Actually, if we interact, we might want to wake them up briefly or keep them asleep.
+            // For now, let's enforce sleep if it's sleep time, UNLESS the update explicitly sets a mood.
+
+            if (isSleepingTime()) {
+                newMood = 'sleeping';
+            } else {
+                newMood = getMood(newHealth);
+            }
         }
 
         const updatedPet = { ...pet, ...updates, mood: newMood };
@@ -261,7 +317,9 @@ export const HabitProvider = ({ children }) => {
             resetPet,
             updatePet,
             getStreak,
-            resetData
+            resetData,
+            settings,
+            updateSettings
         }}>
             {children}
         </HabitContext.Provider>
