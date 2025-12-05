@@ -8,6 +8,7 @@ import { Plus } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -28,18 +29,12 @@ export const HomeScreen = () => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: getGreeting(),
-            headerRight: () => (
-                <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => navigation.navigate('Pet' as never)}
-                    style={{ marginRight: 8 }}
-                >
-                    <Pet pet={pet} isFullView={false} />
-                </TouchableOpacity>
-            ),
+            headerTitle: '',
+            title: '',
+            headerRight: () => null,
+            headerTransparent: true,
         });
-    }, [navigation, pet]);
+    }, [navigation]);
 
     const handleSegmentChange = (event: any) => {
         Haptics.selectionAsync();
@@ -111,13 +106,30 @@ export const HomeScreen = () => {
         );
     };
 
+    const insets = useSafeAreaInsets();
+
     const ListHeader = () => (
-        <View>
-            <View style={styles.dateHeader}>
-                <Text style={styles.date}>
-                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                </Text>
+        <View style={{ paddingTop: insets.top + 20 }}>
+            {/* Unified Header Row */}
+            <View style={styles.headerRow}>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.date}>
+                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    </Text>
+                    <Text style={styles.greeting}>{getGreeting()}</Text>
+                </View>
+
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate('Pet' as never)}
+                    style={styles.petHeaderContainer}
+                >
+                    <BlurView intensity={20} tint="light" style={styles.petGlass}>
+                        <Pet pet={pet} isFullView={false} />
+                    </BlurView>
+                </TouchableOpacity>
             </View>
+
             <View style={styles.filterContainer}>
                 <SegmentedControl
                     values={['All', 'Morning', 'Noon', 'Evening']}
@@ -131,6 +143,13 @@ export const HomeScreen = () => {
         </View>
     );
 
+    // const insets = useSafeAreaInsets(); // Moved up
+
+    // Dock is at bottom: insets.bottom + 20. Height is 68.
+    // Top of dock is at insets.bottom + 20 + 68 = insets.bottom + 88.
+    // We want FAB to be above that. Let's put it at insets.bottom + 105.
+    const fabBottom = Platform.OS === 'ios' ? insets.bottom + 105 : 100;
+
     return (
         <View style={styles.container}>
             {/* Ambient Background Blobs */}
@@ -142,7 +161,7 @@ export const HomeScreen = () => {
                 data={filteredHabits}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
-                contentContainerStyle={styles.listContent}
+                contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]} // Ensure enough scroll space
                 showsVerticalScrollIndicator={false}
                 ListHeaderComponent={ListHeader}
                 contentInsetAdjustmentBehavior="automatic"
@@ -155,7 +174,7 @@ export const HomeScreen = () => {
 
             {/* FAB */}
             <TouchableOpacity
-                style={styles.fab}
+                style={[styles.fab, { bottom: fabBottom }]}
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('HabitForm' as never)}
             >
@@ -185,11 +204,39 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     date: {
-        color: 'rgba(255,255,255,0.5)',
+        color: 'rgba(255,255,255,0.6)',
         fontSize: 13,
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
+        marginBottom: 4,
+    },
+    greeting: {
+        fontSize: 34,
+        fontWeight: '800',
+        color: '#fff',
+        letterSpacing: -0.5,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        marginBottom: 16,
+    },
+    petHeaderContainer: {
+        marginBottom: 4,
+    },
+    petGlass: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        overflow: 'hidden',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
     filterContainer: {
         paddingHorizontal: 20,
@@ -208,7 +255,11 @@ const styles = StyleSheet.create({
     },
     fab: {
         position: 'absolute',
-        bottom: 100, // Above tab bar
+        // Dynamic bottom to clear the TabBar which is at (insets.bottom + 10) + 85 height
+        // We want it slightly above that. Let's say + 20 spacing.
+        // But since we can't use dynamic insets in stylesheet, we'll use inline styles or a memoized style.
+        // For now, let's just set a safe default high enough or handle it in the component.
+        // Actually, best practice is to pass it via style prop.
         right: 20,
         width: 56,
         height: 56,
@@ -219,6 +270,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
+        zIndex: 100, // Ensure it's above everything
     },
     fabBlur: {
         flex: 1,

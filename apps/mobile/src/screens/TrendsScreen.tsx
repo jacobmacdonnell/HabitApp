@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from
 import { useHabit } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
 import { TrendingUp, Award, Calendar, Check, X, Grid, List as ListIcon } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -193,12 +194,17 @@ export const TrendsScreen = () => {
         </View>
     );
 
+    const insets = useSafeAreaInsets();
+
     return (
         <ScrollView
             style={styles.container}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[styles.content, { paddingTop: insets.top + 20 }]}
             contentInsetAdjustmentBehavior="automatic"
         >
+            <View style={styles.headerRow}>
+                <Text style={styles.headerTitle}>Trends</Text>
+            </View>
 
             {renderToggle()}
 
@@ -214,8 +220,16 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
-        paddingTop: 60,
         paddingBottom: 100,
+    },
+    headerRow: {
+        marginBottom: 20,
+    },
+    headerTitle: {
+        fontSize: 34,
+        fontWeight: '800',
+        color: '#fff',
+        letterSpacing: -0.5,
     },
 
     // Toggle

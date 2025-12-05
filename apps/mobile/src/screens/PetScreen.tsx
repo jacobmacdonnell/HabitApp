@@ -4,6 +4,7 @@ import { useHabit } from '@habitapp/shared';
 import { Pet } from '../components/Pet';
 import { BlurView } from 'expo-blur';
 import { Egg } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const PetScreen = () => {
     const { pet, resetPet, updatePet } = useHabit();
@@ -54,8 +55,13 @@ export const PetScreen = () => {
         );
     }
 
+    const insets = useSafeAreaInsets();
+
     return (
         <View style={styles.container}>
+            <View style={{ paddingTop: insets.top + 20, paddingHorizontal: 20 }}>
+                <Text style={styles.headerTitle}>Companion</Text>
+            </View>
             <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
         </View>
     );
@@ -74,7 +80,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
-        paddingTop: 100,
     },
     eggTitle: {
         fontSize: 28,
@@ -132,5 +137,12 @@ const styles = StyleSheet.create({
         color: '#000',
         fontSize: 16,
         fontWeight: '700',
+    },
+    headerTitle: {
+        fontSize: 34,
+        fontWeight: '800',
+        color: '#fff',
+        letterSpacing: -0.5,
+        marginBottom: 20,
     },
 });

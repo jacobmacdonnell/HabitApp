@@ -5,6 +5,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Moon, Sun, Volume2, Bell, Shield, Trash2, ChevronRight, Smartphone } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
@@ -57,12 +59,17 @@ export const SettingsScreen = () => {
         updateSettings({ sound: val });
     };
 
+    const insets = useSafeAreaInsets();
+
     return (
         <ScrollView
             style={styles.container}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[styles.content, { paddingTop: insets.top + 20 }]}
             contentInsetAdjustmentBehavior="automatic"
         >
+            <View style={styles.headerRow}>
+                <Text style={styles.headerTitle}>Settings</Text>
+            </View>
 
             {/* Preferences */}
             <View style={styles.section}>
@@ -210,8 +217,17 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
-        paddingTop: 60,
         paddingBottom: 100,
+    },
+    headerRow: {
+        marginBottom: 24,
+    },
+    headerTitle: {
+        fontSize: 34,
+        fontWeight: '800',
+        color: '#fff',
+        letterSpacing: -0.5,
+        marginLeft: 12, // Align with section headers
     },
 
     section: {

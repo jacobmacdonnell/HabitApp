@@ -14,10 +14,10 @@ export const LiquidGlass = {
     },
     // Floating Dock Specs
     dock: {
-        bottom: 30,
+        bottom: 20,
         horizontalPadding: 20,
-        borderRadius: 40,
-        height: 85,
+        borderRadius: 34,
+        height: 68,
         shadow: {
             shadowColor: '#000',
             shadowOffset: {
