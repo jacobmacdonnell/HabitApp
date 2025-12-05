@@ -139,7 +139,7 @@ const Dashboard = ({ viewMode }) => {
 
           {/* Time Filters (Only show in Today view) */}
           {viewMode === 'today' && (
-            <div className="bg-white/5 p-1.5 rounded-[2rem] flex justify-between items-center backdrop-blur-md border border-white/5 relative shadow-lg">
+            <div className="bg-white/5 p-1 rounded-full flex justify-between items-center backdrop-blur-md border border-white/5 relative shadow-lg">
               {[
                 { id: 'all', label: 'All' },
                 { id: 'morning', label: 'Morning' },
@@ -149,14 +149,14 @@ const Dashboard = ({ viewMode }) => {
                 <button
                   key={filter.id}
                   onClick={() => setTimeFilter(filter.id)}
-                  className={`flex-1 py-4 rounded-[1.5rem] text-sm font-bold transition-all duration-300 relative z-10 active:scale-95 ${timeFilter === filter.id
+                  className={`flex-1 py-2.5 rounded-full text-xs font-bold transition-all duration-300 relative z-10 active:scale-95 ${timeFilter === filter.id
                     ? 'text-black scale-105'
                     : 'text-white/40'
                     }`}
                 >
                   {filter.label}
                   {timeFilter === filter.id && (
-                    <div className="absolute inset-0 bg-white rounded-[1.5rem] -z-10 animate-fade-in shadow-md" />
+                    <div className="absolute inset-0 bg-white rounded-full -z-10 animate-fade-in shadow-md" />
                   )}
                 </button>
               ))}
@@ -182,7 +182,7 @@ const Dashboard = ({ viewMode }) => {
                 </div>
                 <button
                   onClick={openAddModal}
-                  className="px-8 py-4 bg-white text-black font-bold rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.15)] active:scale-95 transition-all flex items-center gap-2"
+                  className="px-8 py-4 bg-white text-black font-bold rounded-[2.5rem] shadow-[0_0_20px_rgba(255,255,255,0.15)] active:scale-95 transition-all flex items-center gap-2"
                 >
                   <Plus size={20} strokeWidth={3} />
                   <span>Create New Habit</span>
@@ -263,7 +263,7 @@ const Dashboard = ({ viewMode }) => {
                 {/* Add Button for Non-Empty List */}
                 <button
                   onClick={openAddModal}
-                  className="w-full py-5 rounded-[2.5rem] border-2 border-dashed border-white/10 text-white/30 active:text-white active:border-white/30 active:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg active:scale-[0.98]"
+                  className="w-full py-5 rounded-[2.5rem] border-2 border-dashed border-white/10 text-white/30 active:text-white active:border-white/30 active:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg active:scale-95"
                 >
                   <div className="p-1 rounded-full bg-white/10 transition-colors duration-300">
                     <Plus size={20} strokeWidth={3} />

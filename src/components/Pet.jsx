@@ -64,34 +64,17 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
     return (
-        <div className={`flex flex-col items-center justify-center relative z-10 ${isFullView ? 'gap-6 w-full' : 'gap-6 py-4'}`}>
+        <div className={`flex flex-col items-center justify-center relative z-10 ${isFullView ? 'gap-8 w-full' : 'gap-6 py-4'}`}>
 
             {/* Header / Name Section */}
-            <div className="relative flex items-center justify-center w-full">
-                {isEditing ? (
-                    <div className="flex items-center gap-2 bg-white/10 p-2 rounded-2xl backdrop-blur-md border border-white/10 animate-fade-in">
-                        <input
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="bg-transparent text-2xl font-bold text-white text-center w-40 focus:outline-none border-b-2 border-white/20 focus:border-white"
-                            autoFocus
-                        />
-                        <button onClick={handleSave} className="p-2 bg-green-500/20 text-green-400 rounded-xl active:scale-95 transition-transform">
-                            <Save size={20} />
-                        </button>
-                        <button onClick={() => setIsEditing(false)} className="p-2 bg-red-500/20 text-red-400 rounded-xl active:scale-95 transition-transform">
-                            <X size={20} />
-                        </button>
-                    </div>
-                ) : (
-                    <h2 className={`font-semibold text-white tracking-tight drop-shadow-md flex items-center justify-center ${isFullView ? 'text-3xl' : 'text-2xl'}`}>
-                        {capitalize(pet.name)}
-                    </h2>
-                )}
+            <div className={`relative flex items-center justify-center w-full transition-opacity duration-300 ${isEditing ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <h2 className={`font-semibold text-white tracking-tight drop-shadow-md flex items-center justify-center ${isFullView ? 'text-3xl' : 'text-2xl'}`}>
+                    {capitalize(pet.name)}
+                </h2>
             </div>
 
             {/* Pet Container */}
-            <div className="relative flex flex-col items-center gap-6">
+            <div className={`relative flex flex-col items-center transition-all duration-500 ${isEditing ? 'scale-110 translate-y-4' : ''}`}>
                 {/* Soul Glow */}
                 <div
                     className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl opacity-30 pointer-events-none animate-pulse-glow ${isFullView ? 'w-64 h-64' : 'w-48 h-48'}`}
@@ -99,7 +82,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
                 />
 
                 <div
-                    className={`relative transition-all duration-500 ${isFullView ? 'w-48 h-48' : 'w-40 h-40'}`}
+                    className={`relative ${isFullView ? 'w-48 h-48' : 'w-40 h-40'}`}
                     style={{ filter: `drop-shadow(0 10px 30px ${isEditing ? editColor : pet.color}50)` }}
                 >
                     <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
@@ -157,84 +140,126 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
                         )}
                     </svg>
                 </div>
-
-                {/* Color Picker (Only in Edit Mode) */}
-                {isEditing && (
-                    <div className="flex gap-3 bg-black/20 p-2 rounded-full backdrop-blur-md animate-slide-up">
-                        {['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5', '#FF99CC'].map((color) => (
-                            <button
-                                key={color}
-                                onClick={() => setEditColor(color)}
-                                className={`w-8 h-8 rounded-full border-2 transition-transform active:scale-95 ${editColor === color ? 'border-white scale-110' : 'border-transparent'}`}
-                                style={{ backgroundColor: color }}
-                            />
-                        ))}
-                    </div>
-                )}
             </div>
 
-            {/* Stats Panel */}
-            <div className={`glass-card rounded-[2.5rem] border border-white/10 shadow-lg transition-all duration-500 ${isFullView ? 'w-full p-5 grid grid-cols-2 gap-3' : 'w-full max-w-[280px] p-5 space-y-4'}`}>
-
-                {/* Health Bar */}
-                <div className={`${isFullView ? 'col-span-2 space-y-2' : 'space-y-1.5'}`}>
-                    <div className="flex justify-between text-xs font-bold text-white/60 uppercase tracking-wider px-1">
-                        <span className="flex items-center gap-1.5"><Heart size={14} className="text-red-400 fill-red-400/20" /> Health</span>
-                        <span>{Math.round(pet.health)}%</span>
-                    </div>
-                    <div className={`bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5 p-[1px] ${isFullView ? 'h-3' : 'h-2.5'}`}>
-                        <div
-                            className={`h-full rounded-full transition-all duration-700 ease-out ${pet.health < 30 ? 'bg-gradient-to-r from-red-500 to-red-400' : 'bg-gradient-to-r from-green-400 to-emerald-500'}`}
-                            style={{ width: `${pet.health}%` }}
-                        />
-                    </div>
-                </div>
-
-                {/* XP Bar */}
-                <div className={`${isFullView ? 'col-span-2 space-y-2' : 'space-y-1.5'}`}>
-                    <div className="flex justify-between text-xs font-bold text-white/60 uppercase tracking-wider px-1">
-                        <span className="flex items-center gap-1.5"><Zap size={14} className="text-yellow-400 fill-yellow-400/20" /> XP</span>
-                        <span>Lvl {currentLevel}</span>
-                    </div>
-                    <div className={`bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5 p-[1px] ${isFullView ? 'h-3' : 'h-2.5'}`}>
-                        <div
-                            className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-700 ease-out"
-                            style={{ width: `${xpPercentage}%` }}
-                        />
-                    </div>
-                </div>
-
-                {/* Extra Stats (Full View Only) */}
-                {isFullView && (
-                    <>
-                        <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
-                            <div className="p-1.5 bg-indigo-500/20 rounded-full text-indigo-300 mb-0.5">
-                                <Smile size={18} />
-                            </div>
-                            <span className="text-[10px] font-bold text-white/40 uppercase">Mood</span>
-                            <span className="text-base font-bold text-white">{capitalize(pet.mood)}</span>
-                        </div>
-                        <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
-                            <div className="p-1.5 bg-purple-500/20 rounded-full text-purple-300 mb-0.5">
-                                <Star size={18} />
-                            </div>
-                            <span className="text-[10px] font-bold text-white/40 uppercase">Level</span>
-                            <span className="text-base font-bold text-white">{currentLevel}</span>
+            {/* Bottom Panel Area */}
+            <div className="w-full relative">
+                {isEditing ? (
+                    /* EDIT SHEET */
+                    <div className="glass-card rounded-[2.5rem] p-6 w-full animate-slide-up space-y-6 border border-white/20 shadow-2xl">
+                        <div className="text-center space-y-1">
+                            <h3 className="text-lg font-bold text-white">Customize</h3>
+                            <p className="text-white/40 text-xs">Make it yours</p>
                         </div>
 
-                        {/* Edit Button */}
-                        <button
-                            onClick={() => {
-                                setEditName(pet.name);
-                                setEditColor(pet.color);
-                                setIsEditing(true);
-                            }}
-                            className="col-span-2 py-3 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                        >
-                            <Edit2 size={16} />
-                            <span>Customize Pet</span>
-                        </button>
-                    </>
+                        {/* Name Input */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Name</label>
+                            <input
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-3 text-center text-xl font-bold text-white focus:outline-none focus:border-white/30 transition-all"
+                                placeholder="Pet Name"
+                                autoFocus
+                            />
+                        </div>
+
+                        {/* Color Picker */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Color</label>
+                            <div className="flex justify-between bg-black/20 p-2 rounded-2xl">
+                                {['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5', '#FF99CC'].map((color) => (
+                                    <button
+                                        key={color}
+                                        onClick={() => setEditColor(color)}
+                                        className={`w-8 h-8 rounded-full border-2 transition-transform active:scale-95 ${editColor === color ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                                        style={{ backgroundColor: color }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="grid grid-cols-2 gap-3 pt-2">
+                            <button
+                                onClick={() => setIsEditing(false)}
+                                className="py-3 rounded-2xl bg-white/5 text-white/60 font-bold text-sm active:scale-95 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                className="py-3 rounded-2xl bg-white text-black font-bold text-sm shadow-lg active:scale-95 transition-all"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    /* STATS PANEL */
+                    <div className={`glass-card rounded-[2.5rem] border border-white/10 shadow-lg transition-all duration-500 animate-fade-in ${isFullView ? 'w-full p-5 grid grid-cols-2 gap-3' : 'w-full max-w-[280px] p-5 space-y-4'}`}>
+
+                        {/* Health Bar */}
+                        <div className={`${isFullView ? 'col-span-2 space-y-2' : 'space-y-1.5'}`}>
+                            <div className="flex justify-between text-xs font-bold text-white/60 uppercase tracking-wider px-1">
+                                <span className="flex items-center gap-1.5"><Heart size={14} className="text-red-400 fill-red-400/20" /> Health</span>
+                                <span>{Math.round(pet.health)}%</span>
+                            </div>
+                            <div className={`bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5 p-[1px] ${isFullView ? 'h-3' : 'h-2.5'}`}>
+                                <div
+                                    className={`h-full rounded-full transition-all duration-700 ease-out ${pet.health < 30 ? 'bg-gradient-to-r from-red-500 to-red-400' : 'bg-gradient-to-r from-green-400 to-emerald-500'}`}
+                                    style={{ width: `${pet.health}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* XP Bar */}
+                        <div className={`${isFullView ? 'col-span-2 space-y-2' : 'space-y-1.5'}`}>
+                            <div className="flex justify-between text-xs font-bold text-white/60 uppercase tracking-wider px-1">
+                                <span className="flex items-center gap-1.5"><Zap size={14} className="text-yellow-400 fill-yellow-400/20" /> XP</span>
+                                <span>Lvl {currentLevel}</span>
+                            </div>
+                            <div className={`bg-black/20 rounded-full overflow-hidden ring-1 ring-white/5 p-[1px] ${isFullView ? 'h-3' : 'h-2.5'}`}>
+                                <div
+                                    className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-700 ease-out"
+                                    style={{ width: `${xpPercentage}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Extra Stats (Full View Only) */}
+                        {isFullView && (
+                            <>
+                                <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
+                                    <div className="p-1.5 bg-indigo-500/20 rounded-full text-indigo-300 mb-0.5">
+                                        <Smile size={18} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase">Mood</span>
+                                    <span className="text-base font-bold text-white">{capitalize(pet.mood)}</span>
+                                </div>
+                                <div className="bg-white/5 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 border border-white/5">
+                                    <div className="p-1.5 bg-purple-500/20 rounded-full text-purple-300 mb-0.5">
+                                        <Star size={18} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase">Level</span>
+                                    <span className="text-base font-bold text-white">{currentLevel}</span>
+                                </div>
+
+                                {/* Edit Button */}
+                                <button
+                                    onClick={() => {
+                                        setEditName(pet.name);
+                                        setEditColor(pet.color);
+                                        setIsEditing(true);
+                                    }}
+                                    className="col-span-2 py-3 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                                >
+                                    <Edit2 size={16} />
+                                    <span>Customize Pet</span>
+                                </button>
+                            </>
+                        )}
+                    </div>
                 )}
             </div>
         </div>

@@ -23,37 +23,33 @@ export const Layout = ({ children, currentView, onNavigate }) => {
 
                 {/* Floating Dock Navigation */}
                 <div className="absolute bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none">
-                    <nav className="glass-panel px-3 py-3 rounded-full flex gap-3 items-center shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 pointer-events-auto backdrop-blur-xl bg-black/20 transition-transform duration-300">
+                    <nav className="bg-black/80 px-1.5 py-1.5 rounded-full flex gap-1.5 items-center shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/10 pointer-events-auto transition-transform duration-300">
                         <button
                             onClick={() => onNavigate && onNavigate('today')}
-                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'today' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
+                            className={`p-2.5 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'today' ? 'bg-white text-black shadow-md' : 'text-white/50'}`}
                         >
-                            <Home size={24} strokeWidth={3} />
-                            {currentView === 'today' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
+                            <Home size={18} strokeWidth={2.5} />
                         </button>
 
                         <button
                             onClick={() => onNavigate && onNavigate('weekly')}
-                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'weekly' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
+                            className={`p-2.5 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'weekly' ? 'bg-white text-black shadow-md' : 'text-white/50'}`}
                         >
-                            <Calendar size={24} strokeWidth={3} />
-                            {currentView === 'weekly' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
+                            <Calendar size={18} strokeWidth={2.5} />
                         </button>
 
                         <button
                             onClick={() => onNavigate && onNavigate('pet')}
-                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'pet' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
+                            className={`p-2.5 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'pet' ? 'bg-white text-black shadow-md' : 'text-white/50'}`}
                         >
-                            <User size={24} strokeWidth={3} />
-                            {currentView === 'pet' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
+                            <User size={18} strokeWidth={2.5} />
                         </button>
 
                         <button
                             onClick={() => onNavigate && onNavigate('settings')}
-                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'settings' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
+                            className={`p-2.5 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'settings' ? 'bg-white text-black shadow-md' : 'text-white/50'}`}
                         >
-                            <Settings size={24} strokeWidth={3} />
-                            {currentView === 'settings' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
+                            <Settings size={18} strokeWidth={2.5} />
                         </button>
                     </nav>
                 </div>
