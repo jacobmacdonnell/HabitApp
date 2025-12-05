@@ -123,7 +123,7 @@ const Dashboard = ({ viewMode }) => {
     return (
       <div className="h-full flex flex-col pt-24 px-4 animate-fade-in relative">
         <div className="absolute top-6 left-6">
-          <h2 className="text-3xl font-black text-white tracking-tight">Companion</h2>
+          <h2 className="text-3xl font-black text-white tracking-tight">Pet</h2>
         </div>
         <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
       </div>

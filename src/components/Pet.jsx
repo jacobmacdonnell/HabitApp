@@ -76,28 +76,16 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
                             className="bg-transparent text-2xl font-bold text-white text-center w-40 focus:outline-none border-b-2 border-white/20 focus:border-white"
                             autoFocus
                         />
-                        <button onClick={handleSave} className="p-2 bg-green-500/20 text-green-400 rounded-xl hover:bg-green-500/30 transition-colors">
+                        <button onClick={handleSave} className="p-2 bg-green-500/20 text-green-400 rounded-xl active:scale-95 transition-transform">
                             <Save size={20} />
                         </button>
-                        <button onClick={() => setIsEditing(false)} className="p-2 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition-colors">
+                        <button onClick={() => setIsEditing(false)} className="p-2 bg-red-500/20 text-red-400 rounded-xl active:scale-95 transition-transform">
                             <X size={20} />
                         </button>
                     </div>
                 ) : (
-                    <h2 className={`font-semibold text-white tracking-tight drop-shadow-md flex items-center justify-center gap-3 ${isFullView ? 'text-3xl' : 'text-2xl'}`}>
+                    <h2 className={`font-semibold text-white tracking-tight drop-shadow-md flex items-center justify-center ${isFullView ? 'text-3xl' : 'text-2xl'}`}>
                         {capitalize(pet.name)}
-                        {isFullView && (
-                            <button
-                                onClick={() => {
-                                    setEditName(pet.name);
-                                    setEditColor(pet.color);
-                                    setIsEditing(true);
-                                }}
-                                className="p-2 text-white/30 hover:text-white hover:bg-white/10 rounded-full transition-all"
-                            >
-                                <Edit2 size={16} />
-                            </button>
-                        )}
                     </h2>
                 )}
             </div>
@@ -233,6 +221,19 @@ export const Pet = ({ pet, isFullView = false, onUpdate }) => {
                             <span className="text-[10px] font-bold text-white/40 uppercase">Level</span>
                             <span className="text-base font-bold text-white">{currentLevel}</span>
                         </div>
+
+                        {/* Edit Button */}
+                        <button
+                            onClick={() => {
+                                setEditName(pet.name);
+                                setEditColor(pet.color);
+                                setIsEditing(true);
+                            }}
+                            className="col-span-2 py-3 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                        >
+                            <Edit2 size={16} />
+                            <span>Customize Pet</span>
+                        </button>
                     </>
                 )}
             </div>
