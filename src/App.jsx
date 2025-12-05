@@ -20,6 +20,7 @@ const Dashboard = ({ viewMode }) => {
     pet,
     isOnboarding,
     resetPet,
+    updatePet,
     setIsOnboarding
   } = useHabit();
 
@@ -120,15 +121,11 @@ const Dashboard = ({ viewMode }) => {
   // PET PAGE VIEW
   if (viewMode === 'pet') {
     return (
-      <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fade-in relative">
-        <div className="absolute top-0 left-0 w-full px-2">
+      <div className="h-full flex flex-col pt-24 px-4 animate-fade-in relative">
+        <div className="absolute top-6 left-6">
           <h2 className="text-3xl font-black text-white tracking-tight">Companion</h2>
         </div>
-        <Pet pet={pet} />
-        <div className="text-center space-y-2 max-w-xs">
-          <h3 className="text-xl font-bold text-white">Companion Status</h3>
-          <p className="text-white/50 text-sm">Keep up your habits to keep {pet.name} happy and healthy!</p>
-        </div>
+        <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
       </div>
     );
   }
@@ -210,7 +207,7 @@ const Dashboard = ({ viewMode }) => {
                   return (
                     <div
                       key={habit.id}
-                      className={`glass-card p-5 rounded-[2.5rem] relative overflow-hidden group ${isCompleted ? 'opacity-80' : ''}`}
+                      className={`glass-card p-5 rounded-[2.5rem] relative overflow-hidden ${isCompleted ? 'opacity-80' : ''}`}
                     >
                       {/* Progress Background Fill */}
                       <div
@@ -221,7 +218,7 @@ const Dashboard = ({ viewMode }) => {
                       <div className="relative z-10 flex items-center justify-between">
                         <div className="flex items-center gap-5">
                           <div
-                            className="w-16 h-16 rounded-[1.2rem] flex items-center justify-center text-3xl shadow-inner ring-1 ring-white/10 relative overflow-hidden transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                            className="w-16 h-16 rounded-[1.2rem] flex items-center justify-center text-3xl shadow-inner ring-1 ring-white/10 relative overflow-hidden"
                             style={{ backgroundColor: `${habit.color}25`, color: habit.color }}
                           >
                             {habit.icon}
@@ -230,7 +227,7 @@ const Dashboard = ({ viewMode }) => {
                             )}
                           </div>
                           <div>
-                            <h4 className="font-bold text-xl tracking-tight text-white group-hover:text-indigo-200 transition-colors">{habit.title}</h4>
+                            <h4 className="font-bold text-xl tracking-tight text-white">{habit.title}</h4>
                             <div className="flex items-center gap-3 text-sm font-medium text-white/50 mt-1">
                               <span>{current} / {habit.targetCount}</span>
                               {streak > 0 && (
@@ -245,25 +242,23 @@ const Dashboard = ({ viewMode }) => {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => handleLogProgress(habit.id)}
-                            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg active:scale-90 hover:scale-110 ${isCompleted ? 'bg-green-500 text-white shadow-green-500/40' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'}`}
+                            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg active:scale-90 ${isCompleted ? 'bg-green-500 text-white shadow-green-500/40' : 'bg-white/10 text-white border border-white/10'}`}
                           >
                             <Check size={28} strokeWidth={3.5} />
                           </button>
 
-                          <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 absolute right-24 top-1/2 -translate-y-1/2 bg-[#1c1c1e]/90 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 shadow-2xl translate-x-8 group-hover:translate-x-0">
+                          <div className="flex flex-col gap-2">
                             <button
                               onClick={() => openEditModal(habit)}
-                              className="p-2.5 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors hover:scale-110"
+                              className="p-2 rounded-xl bg-white/5 text-white/50 hover:bg-white/10 hover:text-white transition-colors"
                             >
-                              <Pencil size={18} />
+                              <Settings size={16} />
                             </button>
                             <button
-                              onClick={() => {
-                                if (confirm('Delete this habit?')) deleteHabit(habit.id);
-                              }}
-                              className="p-2.5 hover:bg-red-500/20 rounded-xl text-white/70 hover:text-red-400 transition-colors hover:scale-110"
+                              onClick={() => handleDeleteHabit(habit.id)}
+                              className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
                             >
-                              <Trash2 size={18} />
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         </div>

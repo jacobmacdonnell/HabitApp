@@ -23,36 +23,36 @@ export const Layout = ({ children, currentView, onNavigate }) => {
 
                 {/* Floating Dock Navigation */}
                 <div className="absolute bottom-8 left-0 right-0 flex justify-center z-50 pointer-events-none">
-                    <nav className="glass-panel px-3 py-3 rounded-full flex gap-3 items-center shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 pointer-events-auto backdrop-blur-xl bg-black/20 hover:scale-105 transition-transform duration-300">
+                    <nav className="glass-panel px-3 py-3 rounded-full flex gap-3 items-center shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 pointer-events-auto backdrop-blur-xl bg-black/20 transition-transform duration-300">
                         <button
                             onClick={() => onNavigate && onNavigate('today')}
-                            className={`p-4 rounded-full transition-all duration-300 group relative ${currentView === 'today' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'hover:bg-white/10 text-white/50 hover:text-white'}`}
+                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'today' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
                         >
-                            <Home size={24} strokeWidth={3} className="group-hover:-translate-y-1 transition-transform duration-300" />
+                            <Home size={24} strokeWidth={3} />
                             {currentView === 'today' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
                         </button>
 
                         <button
                             onClick={() => onNavigate && onNavigate('weekly')}
-                            className={`p-4 rounded-full transition-all duration-300 group relative ${currentView === 'weekly' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'hover:bg-white/10 text-white/50 hover:text-white'}`}
+                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'weekly' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
                         >
-                            <Calendar size={24} strokeWidth={3} className="group-hover:-translate-y-1 transition-transform duration-300" />
+                            <Calendar size={24} strokeWidth={3} />
                             {currentView === 'weekly' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
                         </button>
 
                         <button
                             onClick={() => onNavigate && onNavigate('pet')}
-                            className={`p-4 rounded-full transition-all duration-300 group relative ${currentView === 'pet' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'hover:bg-white/10 text-white/50 hover:text-white'}`}
+                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'pet' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
                         >
-                            <User size={24} strokeWidth={3} className="group-hover:-translate-y-1 transition-transform duration-300" />
+                            <User size={24} strokeWidth={3} />
                             {currentView === 'pet' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
                         </button>
 
                         <button
                             onClick={() => onNavigate && onNavigate('settings')}
-                            className={`p-4 rounded-full transition-all duration-300 group relative ${currentView === 'settings' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'hover:bg-white/10 text-white/50 hover:text-white'}`}
+                            className={`p-4 rounded-full transition-all duration-300 relative active:scale-95 ${currentView === 'settings' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-110' : 'text-white/50'}`}
                         >
-                            <Settings size={24} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-500" />
+                            <Settings size={24} strokeWidth={3} />
                             {currentView === 'settings' && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full opacity-50" />}
                         </button>
                     </nav>
