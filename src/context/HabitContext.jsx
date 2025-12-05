@@ -7,6 +7,7 @@ export const HabitProvider = ({ children }) => {
     const [habits, setHabits] = useState([]);
     const [pet, setPet] = useState(null);
     const [progress, setProgress] = useState([]);
+    const [isOnboarding, setIsOnboarding] = useState(true);
 
     useEffect(() => {
         const loadData = () => {
@@ -31,6 +32,7 @@ export const HabitProvider = ({ children }) => {
                 }
 
                 setPet(loadedPet);
+                setIsOnboarding(!loadedPet);
                 setProgress(StorageService.getProgress() || []);
             } catch (error) {
                 console.error("Failed to load data from storage:", error);
@@ -213,6 +215,8 @@ export const HabitProvider = ({ children }) => {
             habits,
             pet,
             progress,
+            isOnboarding,
+            setIsOnboarding,
             addHabit,
             updateHabit,
             deleteHabit,

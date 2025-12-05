@@ -50,18 +50,22 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     const icons = ['✨', '💪', '📚', '🧘', '💧', '🏃', '🎯', '💤', '🥗'];
 
     return (
-        <>
+        <div className="absolute inset-0 z-50 overflow-hidden pointer-events-none" style={{ isolation: 'isolate' }}>
             {/* Backdrop */}
             <div
-                className="absolute inset-0 z-40 bg-black/80 rounded-[3.5rem]"
+                className="absolute inset-0 bg-black/80 rounded-[3.5rem] pointer-events-auto"
                 style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.2s ease-out' }}
                 onClick={handleClose}
             />
 
             {/* Bottom Sheet */}
             <div
-                className="absolute bottom-0 left-0 right-0 z-50 bg-[#1c1c1e] rounded-t-[2rem] rounded-b-[3.5rem] border-t border-white/10"
-                style={{ transform: visible ? 'translateY(0)' : 'translateY(100%)', transition: 'transform 0.25s ease-out' }}
+                className="absolute bottom-0 left-0 right-0 bg-[#1c1c1e] rounded-t-[2rem] rounded-b-[3.5rem] border-t border-white/10 pointer-events-auto"
+                style={{
+                    transform: visible ? 'translateY(0)' : 'translateY(100%)',
+                    transition: 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)',
+                    willChange: 'transform'
+                }}
             >
                 {/* Handle Bar */}
                 <div className="flex justify-center pt-3 pb-1">
@@ -199,6 +203,6 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                     </form>
                 </div>
             </div>
-        </>
+        </div>
     );
 };

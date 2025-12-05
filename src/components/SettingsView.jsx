@@ -1,31 +1,64 @@
 import React, { useState } from 'react';
-import { Trash2, Github, Moon, Volume2, ChevronRight, Shield, Bell } from 'lucide-react';
+import { Trash2, Moon, Sun, Volume2, ChevronRight, Shield, Bell, Monitor } from 'lucide-react';
 import { useHabit } from '../context/HabitContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 
 export const SettingsView = () => {
     const { resetData } = useHabit();
+    const { themeSetting, setThemeSetting } = useTheme();
     const [notifications, setNotifications] = useState(true);
     const [sound, setSound] = useState(true);
 
     return (
-        <div className="space-y-8 pb-8">
+        <div className="space-y-6 pb-8">
+            {/* Page Title */}
+            <h1 className="text-2xl font-bold text-white">Settings</h1>
 
-
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {/* Preferences Section */}
                 <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Preferences</h3>
+                    <h3 className="text-xs font-bold text-white/50 uppercase tracking-wider ml-1">Preferences</h3>
 
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-md">
-                        <div className="p-5 flex items-center justify-between border-b border-white/5">
-                            <div className="flex items-center gap-4">
+                        <div className="p-5 border-b border-white/5">
+                            <div className="flex items-center gap-4 mb-4">
                                 <div className="p-3 bg-indigo-500/20 rounded-2xl text-indigo-400">
                                     <Moon size={24} />
                                 </div>
-                                <span className="font-bold text-lg text-white/90">Dark Mode</span>
+                                <span className="font-bold text-lg text-white/90">Appearance</span>
                             </div>
-                            <div className="text-xs font-bold text-white/40 uppercase tracking-wider bg-white/10 px-3 py-1.5 rounded-lg">
-                                Always On
+                            {/* iOS-style Segmented Control */}
+                            <div className="flex bg-black/30 rounded-2xl p-1.5 gap-1">
+                                <button
+                                    onClick={() => setThemeSetting('auto')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 ${themeSetting === 'auto'
+                                        ? 'bg-white/15 text-white shadow-sm'
+                                        : 'text-white/50 active:bg-white/5'
+                                        }`}
+                                >
+                                    <Monitor size={18} />
+                                    Auto
+                                </button>
+                                <button
+                                    onClick={() => setThemeSetting('light')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 ${themeSetting === 'light'
+                                        ? 'bg-white/15 text-white shadow-sm'
+                                        : 'text-white/50 active:bg-white/5'
+                                        }`}
+                                >
+                                    <Sun size={18} />
+                                    Light
+                                </button>
+                                <button
+                                    onClick={() => setThemeSetting('dark')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 ${themeSetting === 'dark'
+                                        ? 'bg-white/15 text-white shadow-sm'
+                                        : 'text-white/50 active:bg-white/5'
+                                        }`}
+                                >
+                                    <Moon size={18} />
+                                    Dark
+                                </button>
                             </div>
                         </div>
 
@@ -63,7 +96,7 @@ export const SettingsView = () => {
 
                 {/* Data Section */}
                 <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider ml-1">Data & Privacy</h3>
+                    <h3 className="text-xs font-bold text-white/50 uppercase tracking-wider ml-1">Data & Privacy</h3>
 
                     <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-md">
                         <button className="w-full p-5 flex items-center justify-between active:bg-white/5 transition-colors border-b border-white/5">
@@ -93,12 +126,7 @@ export const SettingsView = () => {
                 </div>
 
                 {/* Footer */}
-                <div className="pt-8 text-center space-y-4">
-                    <div className="flex justify-center gap-4">
-                        <a href="#" className="p-4 bg-white/5 rounded-full text-white/40 active:text-white active:bg-white/10 transition-all active:scale-95">
-                            <Github size={24} />
-                        </a>
-                    </div>
+                <div className="pt-6 text-center">
                     <p className="text-white/20 text-sm font-medium">Habit Companion v1.0.2</p>
                 </div>
             </div>

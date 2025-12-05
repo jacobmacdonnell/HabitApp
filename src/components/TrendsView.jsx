@@ -28,8 +28,8 @@ export const TrendsView = ({ habits, progress }) => {
         <div className="space-y-6">
             {/* Trends Header & Toggle */}
             <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between px-2 pr-14">
-                    <h2 className="text-3xl font-black text-white tracking-tight">Trends</h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-white">Trends</h2>
                     <div className="flex gap-1 bg-white/5 p-1 rounded-[2rem] border border-white/5 backdrop-blur-md">
                         <button
                             onClick={() => setTrendMode('weekly')}

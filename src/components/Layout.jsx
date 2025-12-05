@@ -61,7 +61,7 @@ export const Layout = ({ children, currentView, onNavigate, hideNav = false, mod
                 <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-indigo-500/20 to-transparent pointer-events-none mix-blend-screen z-0" />
                 <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-purple-500/20 to-transparent pointer-events-none mix-blend-screen z-0" />
 
-                {/* Modal Slot - Renders on top of everything inside phone */}
+                {/* Modal Slot */}
                 {modal}
             </div>
         </div>

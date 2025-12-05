@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Check, Trash2, Pencil, Settings } from 'lucide-react';
+import { Plus, Check, Trash2, Settings } from 'lucide-react';
 import { HabitProvider, useHabit } from './context/HabitContext.jsx';
 import { HabitFormModal } from './components/HabitFormModal.jsx';
-import { WeeklyView } from './components/WeeklyView.jsx';
 import { TrendsView } from './components/TrendsView.jsx';
 import { Layout } from './components/Layout.jsx';
 import { Pet } from './components/Pet.jsx';
@@ -42,6 +41,12 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
   const openEditModal = (habit) => {
     setEditingHabit(habit);
     setIsModalOpen(true);
+  };
+
+  const handleDeleteHabit = (habitId) => {
+    if (confirm('Delete this habit?')) {
+      deleteHabit(habitId);
+    }
   };
 
   const filteredHabits = habits.filter(habit => {
@@ -108,11 +113,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
 
   // PET PAGE VIEW
   if (viewMode === 'pet') {
-    return (
-      <div className="h-full flex flex-col justify-center pt-12 px-4 relative">
-        <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
-      </div>
-    );
+    return <Pet pet={pet} isFullView={true} onUpdate={updatePet} />;
   }
 
   return (
@@ -300,7 +301,6 @@ function App() {
       <Layout
         currentView={viewMode}
         onNavigate={setViewMode}
-        hideNav={isModalOpen}
         modal={modalElement}
       >
         <Dashboard

@@ -2,14 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-
-// function App() {
-//     return (
-//         <div style={{ background: 'purple', color: 'white', padding: 20 }}>
-//             <h1>INLINED APP COMPONENT</h1>
-//         </div>
-//     )
-// }
+import { ThemeProvider } from './context/ThemeContext.jsx'
 
 console.log('DEBUG.JSX importing App.jsx...');
 const root = document.getElementById('root');
@@ -17,7 +10,9 @@ const root = document.getElementById('root');
 if (root) {
     createRoot(root).render(
         <StrictMode>
-            <App />
+            <ThemeProvider>
+                <App />
+            </ThemeProvider>
         </StrictMode>
     );
 } else {
