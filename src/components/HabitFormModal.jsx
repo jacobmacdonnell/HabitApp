@@ -192,14 +192,26 @@ export const HabitFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                         </div>
 
                         {/* Submit */}
-                        <button
-                            type="submit"
-                            disabled={!formData.title.trim()}
-                            className="w-full h-12 mt-3 font-semibold text-[15px] rounded-xl text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
-                            style={{ backgroundColor: formData.title.trim() ? formData.color : '#333' }}
-                        >
-                            {initialData ? 'Save Changes' : 'Create Habit'}
-                        </button>
+                        <div className="space-y-3 mt-3">
+                            <button
+                                type="submit"
+                                disabled={!formData.title.trim()}
+                                className="w-full h-12 font-semibold text-[15px] rounded-xl text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
+                                style={{ backgroundColor: formData.title.trim() ? formData.color : '#333' }}
+                            >
+                                {initialData ? 'Save Changes' : 'Create Habit'}
+                            </button>
+
+                            {initialData && (
+                                <button
+                                    type="button"
+                                    onClick={() => onClose('delete')}
+                                    className="w-full h-12 font-semibold text-[15px] rounded-xl text-red-500 bg-red-500/10 active:bg-red-500/20 active:scale-[0.98] transition-all"
+                                >
+                                    Delete Habit
+                                </button>
+                            )}
+                        </div>
                     </form>
                 </div>
             </div>
