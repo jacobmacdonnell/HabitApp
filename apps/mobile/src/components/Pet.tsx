@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-native';
 import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Rect, Text as SvgText } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing, withSequence } from 'react-native-reanimated';
+// import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing, withSequence } from 'react-native-reanimated';
 import { Pet as PetType } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
 import { Heart, Zap, Smile, Star, Palette, Shirt, Lock } from 'lucide-react-native';
@@ -14,31 +14,23 @@ interface PetProps {
     onUpdate?: (updates: Partial<PetType>) => void;
 }
 
-const AnimatedSvg = Animated.createAnimatedComponent(Svg);
-const AnimatedView = Animated.createAnimatedComponent(View);
+// AR: Remove Animated wrappers for now
+// const AnimatedSvg = Animated.createAnimatedComponent(Svg);
+// const AnimatedView = Animated.createAnimatedComponent(View);
+// const AnimatedText = Animated.createAnimatedComponent(Text);
+
+// Z Particle - Disabled
+// const ZParticle = ...
 
 export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
     if (!pet) return null;
 
-    const scale = useSharedValue(1);
-    const translateY = useSharedValue(0);
+    // AR: Disable hooks
+    // const scale = useSharedValue(1);
+    // ...
 
-    useEffect(() => {
-        if (pet.mood === 'sleeping') {
-            scale.value = withRepeat(withTiming(1.05, { duration: 2000, easing: Easing.inOut(Easing.ease) }), -1, true);
-        } else {
-            scale.value = withTiming(1);
-            // Gentle bounce/float
-            translateY.value = withRepeat(withSequence(
-                withTiming(-5, { duration: 1500, easing: Easing.inOut(Easing.quad) }),
-                withTiming(0, { duration: 1500, easing: Easing.inOut(Easing.quad) })
-            ), -1, true);
-        }
-    }, [pet.mood]);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }, { translateY: translateY.value }],
-    }));
+    // AR: No useAnimatedStyle
+    // const animatedStyle = ...
 
     const isHappy = pet.mood === 'happy';
     const isSad = pet.mood === 'sad';
@@ -74,7 +66,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
     // Compact View (Header)
     if (!isFullView) {
         return (
-            <AnimatedView style={[styles.compactContainer, animatedStyle]}>
+            <View style={[styles.compactContainer]}>
                 <Svg viewBox="0 0 200 200" style={styles.svg}>
                     <Defs>
                         <RadialGradient id="bodyGrad" cx="30%" cy="30%" r="80%">
@@ -89,7 +81,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                         {renderMouth()}
                     </G>
                 </Svg>
-            </AnimatedView>
+            </View>
         );
     }
 
@@ -107,7 +99,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                 {/* Glow */}
                 <View style={[styles.glow, { backgroundColor: pet.color }]} />
 
-                <AnimatedView style={[styles.petSvgContainer, animatedStyle]}>
+                <View style={[styles.petSvgContainer]}>
                     <Svg viewBox="0 0 200 200" style={styles.svg}>
                         <Defs>
                             <RadialGradient id="bodyGradFull" cx="30%" cy="30%" r="80%">
@@ -128,7 +120,16 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                             )}
                         </G>
                     </Svg>
-                </AnimatedView>
+                </View>
+
+                {/* ZZZ Particles - Only show when sleeping */}
+                {/* {isSleeping && (
+                    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+                        <ZParticle delay={0} xOffset={40} />
+                        <ZParticle delay={1500} xOffset={80} />
+                        <ZParticle delay={3000} xOffset={60} />
+                    </View>
+                )} */}
             </View>
 
             {/* Stats Card */}
@@ -233,7 +234,12 @@ const styles = StyleSheet.create({
         height: 200,
         borderRadius: 100,
         opacity: 0.3,
-        transform: [{ scale: 1.5 }],
+        // scale handled by animated style
+    },
+    zText: {
+        fontSize: 24,
+        fontWeight: '900',
+        color: 'rgba(255,255,255,0.6)',
     },
     petSvgContainer: {
         width: 200,

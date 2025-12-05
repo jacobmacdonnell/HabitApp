@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Image 
 import { useHabit } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
 import { ArrowRight, Check } from 'lucide-react-native';
-import Animated, { FadeIn, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
+// import Animated, { FadeIn, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -32,16 +32,16 @@ export const OnboardingScreen = () => {
 
             <View style={styles.content}>
                 {step === 0 ? (
-                    <Animated.View entering={FadeIn} exiting={SlideOutLeft} style={styles.stepContainer}>
+                    <View style={styles.stepContainer}>
                         <Text style={styles.title}>Welcome to HabitApp</Text>
                         <Text style={styles.subtitle}>Your personal companion for building better habits.</Text>
                         <TouchableOpacity style={styles.button} onPress={handleNext}>
                             <Text style={styles.buttonText}>Get Started</Text>
                             <ArrowRight size={20} color="#000" />
                         </TouchableOpacity>
-                    </Animated.View>
+                    </View>
                 ) : (
-                    <Animated.View entering={SlideInRight} style={styles.stepContainer}>
+                    <View style={styles.stepContainer}>
                         <Text style={styles.title}>Meet Your Companion</Text>
                         <Text style={styles.subtitle}>Name your pet and choose a color.</Text>
 
@@ -74,7 +74,7 @@ export const OnboardingScreen = () => {
                             <Text style={styles.buttonText}>Start Journey</Text>
                             <Check size={20} color="#000" />
                         </TouchableOpacity>
-                    </Animated.View>
+                    </View>
                 )}
             </View>
         </View>

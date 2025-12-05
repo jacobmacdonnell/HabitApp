@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import { BlurView } from 'expo-blur';
 import { Check, Sparkles, Sunrise, Sun, Moon } from 'lucide-react-native';
 import { Habit } from '@habitapp/shared';
-import Animated, { useAnimatedStyle, withSpring, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+// import Animated, { useAnimatedStyle, withSpring, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -32,19 +32,19 @@ const TimeLabels = {
 
 export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, onPress }: HabitCardProps) => {
     const Icon = TimeIcons[habit.timeOfDay] || Sparkles;
-    const scale = useSharedValue(1);
+    //     const scale = useSharedValue(1);
 
     const handlePress = () => {
-        scale.value = withSequence(withTiming(0.95, { duration: 100 }), withTiming(1, { duration: 100 }));
+        // scale.value = withSequence(withTiming(0.95, { duration: 100 }), withTiming(1, { duration: 100 }));
         onToggle();
     };
 
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-    }));
+    // const animatedStyle = useAnimatedStyle(() => ({
+    //     transform: [{ scale: scale.value }],
+    // }));
 
     return (
-        <Animated.View style={[styles.container, animatedStyle]}>
+        <View style={[styles.container]}>
             <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.touchable}>
                 <BlurView intensity={20} tint="dark" style={[styles.blur, isCompleted && styles.completedBlur]}>
                     {/* Progress Bar Background */}
@@ -86,7 +86,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                     </View>
                 </BlurView>
             </TouchableOpacity>
-        </Animated.View>
+        </View>
     );
 };
 
