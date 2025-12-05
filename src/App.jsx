@@ -161,15 +161,10 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
             }}
             className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center transition-all duration-300 active:scale-90 ${isCompleted
               ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 ring-0'
-              : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/50 ring-1 ring-white/10'
+              : 'bg-green-500 text-white shadow-lg shadow-green-500/30 ring-0 hover:scale-105'
               }`}
           >
-            {isCompleted ? (
-              <Check size={20} strokeWidth={3.5} />
-            ) : (
-              <div className="w-10 h-10" /> // Placeholder to keep size constant if needed, or just Check
-            )}
-            {!isCompleted && <Check size={20} strokeWidth={2.5} className="opacity-0 group-hover:opacity-50 transition-opacity" />}
+            <Check size={20} strokeWidth={3.5} />
           </button>
         </div>
       </div>
@@ -192,8 +187,6 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
           <Pet pet={pet} />
         </div>
       )}
-
-
 
       {/* Filter Bar */}
       {viewMode === 'today' && (
@@ -245,101 +238,54 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
         </div >
       ) : (
         <>
-          {filteredHabits.map((habit) => {
-            const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
-            const current = dayProgress?.currentCount || 0;
-            const isCompleted = current >= habit.targetCount;
-            const streak = getStreak(habit.id);
-            const progressPercent = Math.min((current / habit.targetCount) * 100, 100);
+          {(() => {
+            const activeHabits = filteredHabits.filter(habit => {
+              const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
+              const current = dayProgress?.currentCount || 0;
+              return current < habit.targetCount;
+            });
 
-            const timeIcons = {
-              anytime: <Clock size={12} />,
-              morning: <Sunrise size={12} />,
-              midday: <Sun size={12} />,
-              evening: <Moon size={12} />
-            };
-            const timeLabels = {
-              anytime: 'Anytime',
-              morning: 'Morning',
-              midday: 'Noon',
-              evening: 'Evening'
-            };
+            const completedHabits = filteredHabits.filter(habit => {
+              const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
+              const current = dayProgress?.currentCount || 0;
+              return current >= habit.targetCount;
+            });
 
             return (
-              <div
-                key={habit.id}
-                onClick={(e) => {
-                  if (e.target.closest('button')) return;
-                  openEditModal(habit);
-                }}
-                className={`glass-card p-4 rounded-[1.5rem] relative overflow-hidden group cursor-pointer active:scale-[0.98] transition-all duration-300 ${isCompleted ? 'opacity-80' : 'hover:bg-white/5'}`}
-              >
-                {/* Progress Background Fill */}
-                <div
-                  className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-700 ease-out pointer-events-none"
-                  style={{ width: `${progressPercent}%` }}
-                />
+              <>
+                {activeHabits.map(renderHabit)}
 
-                <div className="relative z-10 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div
-                      className="w-12 h-12 rounded-xl flex shrink-0 items-center justify-center text-2xl shadow-inner ring-1 ring-white/10 relative overflow-hidden bg-black/20"
-                      style={{ color: habit.color }}
+                {completedHabits.length > 0 && (
+                  <div className="mt-8">
+                    <button
+                      onClick={() => setShowCompleted(!showCompleted)}
+                      className="w-full py-3 rounded-2xl bg-white/5 text-white/40 text-sm font-medium hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center gap-2"
                     >
-                      <div className="absolute inset-0 opacity-20" style={{ backgroundColor: habit.color }} />
-                      {habit.icon}
-                      {isCompleted && (
-                        <div className="absolute inset-0 bg-white/20 animate-pulse-glow" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h4 className="font-bold text-lg leading-tight text-white group-hover:text-white/90 transition-colors truncate">{habit.title}</h4>
-                        {habit.timeOfDay !== 'anytime' && (
-                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-white/5 text-[10px] font-medium text-white/40 uppercase tracking-wider shrink-0">
-                            {timeIcons[habit.timeOfDay]}
-                            <span>{timeLabels[habit.timeOfDay]}</span>
-                          </div>
-                        )}
+                      <span>{showCompleted ? 'Hide' : 'Show'} Completed ({completedHabits.length})</span>
+                      <Check size={14} />
+                    </button>
+
+                    {showCompleted && (
+                      <div className="mt-4 space-y-4 opacity-70 scale-95 origin-top transition-all">
+                        {completedHabits.map(renderHabit)}
                       </div>
-                      <div className="flex items-center gap-3 text-xs font-medium text-white/50">
-                        <span>{current} / {habit.targetCount}</span>
-                        {streak > 0 && (
-                          <span className="flex items-center gap-1 text-orange-400 bg-orange-400/10 px-1.5 py-px rounded-full border border-orange-400/20 animate-pulse">
-                            🔥 {streak}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                    )}
                   </div>
+                )}
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleLogProgress(habit.id);
-                    }}
-                    className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center transition-all duration-300 active:scale-90 ${isCompleted
-                      ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 ring-0'
-                      : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/50 ring-1 ring-white/10'
-                      }`}
-                  >
-                    <Check size={20} strokeWidth={isCompleted ? 3.5 : 2.5} className={`transition-all duration-300 ${isCompleted ? 'scale-100' : 'scale-90 opacity-50'}`} />
-                  </button>
-                </div>
-              </div>
+                {/* Add Button for Non-Empty List */}
+                <button
+                  onClick={openAddModal}
+                  className="w-full py-5 rounded-[2rem] border-2 border-dashed border-white/10 text-white/30 active:text-white active:border-white/30 active:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg active:scale-95 mt-8"
+                >
+                  <div className="p-1 rounded-full bg-white/10 transition-colors duration-300">
+                    <Plus size={20} strokeWidth={3} />
+                  </div>
+                  <span>Add another habit</span>
+                </button>
+              </>
             );
-          })}
-
-          {/* Add Button for Non-Empty List */}
-          <button
-            onClick={openAddModal}
-            className="w-full py-5 rounded-[2rem] border-2 border-dashed border-white/10 text-white/30 active:text-white active:border-white/30 active:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg active:scale-95"
-          >
-            <div className="p-1 rounded-full bg-white/10 transition-colors duration-300">
-              <Plus size={20} strokeWidth={3} />
-            </div>
-            <span>Add another habit</span>
-          </button>
+          })()}
         </>
       )}
     </div>
@@ -398,12 +344,13 @@ const ModalPortal = ({ isModalOpen, setIsModalOpen, editingHabit, setEditingHabi
       isOpen={isModalOpen}
       onClose={(action) => {
         if (action === 'delete' && editingHabit) {
-          // Small confirm? Or just delete? User wants "clean". Immediate delete is risky but "clean".
-          // But actually typical iOS is ActionSheet.
-          // For now, assume simple delete because there is a specific Delete button in modal.
-          deleteHabit(editingHabit.id);
+          if (confirm('Permanently delete this habit?')) {
+            deleteHabit(editingHabit.id);
+            setIsModalOpen(false);
+          }
+        } else {
+          setIsModalOpen(false);
         }
-        setIsModalOpen(false);
         setEditingHabit(null);
       }}
       onSubmit={handleHabitSubmit}
