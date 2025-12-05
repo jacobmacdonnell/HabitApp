@@ -190,8 +190,8 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
 
       {/* Filter Bar */}
       {viewMode === 'today' && (
-        <div className="flex justify-center">
-          <div className="glass-card p-1.5 rounded-[2rem] flex gap-1 border border-white/10 w-full max-w-sm overflow-x-auto scrollbar-hide">
+        <div className="w-full">
+          <div className="glass-card p-1.5 rounded-[1.5rem] flex gap-1 border border-white/10 w-full overflow-x-auto scrollbar-hide">
             {[
               { id: 'all', label: 'All', icon: <Sparkles size={14} /> },
               { id: 'morning', label: 'Morning', icon: <Sunrise size={14} /> },
@@ -259,7 +259,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
                   <div className="mt-8">
                     <button
                       onClick={() => setShowCompleted(!showCompleted)}
-                      className="w-full py-3 rounded-2xl bg-white/5 text-white/40 text-sm font-medium hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-[1.5rem] bg-white/5 text-white/40 text-sm font-medium hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center gap-2"
                     >
                       <span>{showCompleted ? 'Hide' : 'Show'} Completed ({completedHabits.length})</span>
                       <Check size={14} />
@@ -276,7 +276,7 @@ const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEdi
                 {/* Add Button for Non-Empty List */}
                 <button
                   onClick={openAddModal}
-                  className="w-full py-5 rounded-[2rem] border-2 border-dashed border-white/10 text-white/30 active:text-white active:border-white/30 active:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg active:scale-95 mt-8"
+                  className="w-full py-5 rounded-[1.5rem] border-2 border-dashed border-white/10 text-white/30 active:text-white active:border-white/30 active:bg-white/5 transition-all flex items-center justify-center gap-2 font-bold text-lg active:scale-95 mt-8"
                 >
                   <div className="p-1 rounded-full bg-white/10 transition-colors duration-300">
                     <Plus size={20} strokeWidth={3} />
