@@ -5,6 +5,7 @@ import { Pet as PetType } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
 import { Heart, Zap, Smile, Star, Palette, Shirt } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 
 const { width } = Dimensions.get('window');
 
@@ -80,6 +81,15 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
     const xpFadeAnim = useRef(new Animated.Value(0)).current;
     const levelScaleAnim = useRef(new Animated.Value(0)).current;
     const levelFadeAnim = useRef(new Animated.Value(0)).current;
+    const interactionScale = useRef(new Animated.Value(1)).current;
+
+    const handlePetPress = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        Animated.sequence([
+            Animated.timing(interactionScale, { toValue: 0.9, duration: 100, useNativeDriver: true }),
+            Animated.spring(interactionScale, { toValue: 1, friction: 4, tension: 40, useNativeDriver: true })
+        ]).start();
+    };
 
     useEffect(() => {
         if (!pet) return;
@@ -262,29 +272,37 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                     </Svg>
                 </Animated.View>
 
-                <Animated.View style={[styles.petSvgContainer, { transform: [{ translateY: petFloatY }, { scale: petScale }] }]}>
-                    <Svg viewBox="0 0 200 200" style={styles.svg}>
-                        <Defs>
-                            <RadialGradient id="bodyGradFull" cx="30%" cy="30%" r="80%">
-                                <Stop offset="0%" stopColor={pet.color} stopOpacity="1" />
-                                <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
-                            </RadialGradient>
-                        </Defs>
-                        <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGradFull)" stroke={pet.color} strokeWidth="2" />
-                        <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
-                        <G transform="translate(0, 10)">
-                            {renderEyes()}
-                            {renderMouth()}
-                            {!isSick && (
-                                <G>
-                                    <Circle cx="60" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
-                                    <Circle cx="140" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
-                                </G>
-                            )}
-                            {renderHat()}
-                        </G>
-                    </Svg>
-                </Animated.View>
+                <TouchableOpacity activeOpacity={1} onPress={handlePetPress}>
+                    <Animated.View style={[styles.petSvgContainer, {
+                        transform: [
+                            { translateY: petFloatY },
+                            { scale: petScale },
+                            { scale: interactionScale }
+                        ]
+                    }]}>
+                        <Svg viewBox="0 0 200 200" style={styles.svg}>
+                            <Defs>
+                                <RadialGradient id="bodyGradFull" cx="30%" cy="30%" r="80%">
+                                    <Stop offset="0%" stopColor={pet.color} stopOpacity="1" />
+                                    <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
+                                </RadialGradient>
+                            </Defs>
+                            <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGradFull)" stroke={pet.color} strokeWidth="2" />
+                            <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
+                            <G transform="translate(0, 10)">
+                                {renderEyes()}
+                                {renderMouth()}
+                                {!isSick && (
+                                    <G>
+                                        <Circle cx="60" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
+                                        <Circle cx="140" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
+                                    </G>
+                                )}
+                                {renderHat()}
+                            </G>
+                        </Svg>
+                    </Animated.View>
+                </TouchableOpacity>
 
                 {isSleeping && (
                     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
