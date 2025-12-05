@@ -8,7 +8,7 @@ import { Layout } from './components/Layout.jsx';
 import { Pet } from './components/Pet.jsx';
 import { SettingsView } from './components/SettingsView.jsx';
 
-const Dashboard = ({ viewMode }) => {
+const Dashboard = ({ viewMode, isModalOpen, setIsModalOpen, editingHabit, setEditingHabit }) => {
   const {
     habits,
     addHabit,
@@ -24,23 +24,11 @@ const Dashboard = ({ viewMode }) => {
     setIsOnboarding
   } = useHabit();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingHabit, setEditingHabit] = useState(null);
-  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'morning', 'midday', 'evening'
+  const [timeFilter, setTimeFilter] = useState('all');
   const [petName, setPetName] = useState('');
   const [petColor, setPetColor] = useState('#FF6B6B');
 
   const today = new Date().toISOString().split('T')[0];
-
-  const handleHabitSubmit = (habitData) => {
-    if (editingHabit) {
-      updateHabit(editingHabit.id, habitData);
-    } else {
-      addHabit(habitData);
-    }
-    setIsModalOpen(false);
-    setEditingHabit(null);
-  };
 
   const handleLogProgress = (habitId) => {
     logProgress(habitId, today);
@@ -128,35 +116,48 @@ const Dashboard = ({ viewMode }) => {
   }
 
   return (
-    <div className="space-y-8 pb-8 relative">
-      {/* Show Pet ONLY on Today View */}
-      {viewMode === 'today' && <Pet pet={pet} />}
+    <div className="space-y-6 pb-8 relative">
+      {/* Header Row - Date + Pet */}
+      {viewMode === 'today' && (
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-white/40 text-sm font-medium">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
+            <h1 className="text-2xl font-bold text-white">
+              {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening'}
+            </h1>
+          </div>
+          <Pet pet={pet} />
+        </div>
+      )}
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Header & Filter */}
-        <div className="flex flex-col gap-5 relative">
+        <div className="flex flex-col gap-4 relative">
 
 
           {/* Time Filters (Only show in Today view) */}
           {viewMode === 'today' && (
-            <div className="bg-white/5 p-1 rounded-full flex justify-between items-center backdrop-blur-md border border-white/5 relative shadow-lg">
+            <div className="bg-white/5 p-1.5 rounded-[2rem] flex justify-between backdrop-blur-md border border-white/5 shadow-lg">
               {[
-                { id: 'all', label: 'All' },
-                { id: 'morning', label: 'Morning' },
-                { id: 'midday', label: 'Noon' },
-                { id: 'evening', label: 'Evening' },
+                { id: 'all', label: 'All', icon: '✦' },
+                { id: 'morning', label: 'Morning', icon: '🌅' },
+                { id: 'midday', label: 'Noon', icon: '☀️' },
+                { id: 'evening', label: 'Evening', icon: '🌙' },
               ].map((filter) => (
                 <button
                   key={filter.id}
                   onClick={() => setTimeFilter(filter.id)}
-                  className={`flex-1 py-2.5 rounded-full text-xs font-bold transition-all duration-300 relative z-10 active:scale-95 ${timeFilter === filter.id
-                    ? 'text-black scale-105'
-                    : 'text-white/40'
+                  className={`flex-1 py-2 rounded-full text-xs font-semibold flex items-center justify-center gap-1 relative z-10 active:scale-95 transition-transform ${timeFilter === filter.id
+                    ? 'text-black'
+                    : 'text-white/50'
                     }`}
                 >
-                  {filter.label}
+                  <span>{filter.icon}</span>
+                  <span>{filter.label}</span>
                   {timeFilter === filter.id && (
-                    <div className="absolute inset-0 bg-white rounded-full -z-10 animate-fade-in shadow-md" />
+                    <div className="absolute inset-0 bg-white rounded-full -z-10 shadow-md" />
                   )}
                 </button>
               ))}
@@ -274,28 +275,71 @@ const Dashboard = ({ viewMode }) => {
             )}
           </div>
         )}
-      </div>
 
-      <HabitFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleHabitSubmit}
-        initialData={editingHabit}
-      />
+      </div>
     </div>
   );
 };
 
 function App() {
   const [viewMode, setViewMode] = useState('today');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingHabit, setEditingHabit] = useState(null);
+
+  const modalElement = (
+    <ModalPortal
+      isModalOpen={isModalOpen}
+      setIsModalOpen={setIsModalOpen}
+      editingHabit={editingHabit}
+      setEditingHabit={setEditingHabit}
+    />
+  );
 
   return (
     <HabitProvider>
-      <Layout currentView={viewMode} onNavigate={setViewMode}>
-        <Dashboard viewMode={viewMode} />
+      <Layout
+        currentView={viewMode}
+        onNavigate={setViewMode}
+        hideNav={isModalOpen}
+        modal={modalElement}
+      >
+        <Dashboard
+          viewMode={viewMode}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          editingHabit={editingHabit}
+          setEditingHabit={setEditingHabit}
+        />
       </Layout>
     </HabitProvider>
   );
 }
+
+// Separate component for modal to keep it clean
+const ModalPortal = ({ isModalOpen, setIsModalOpen, editingHabit, setEditingHabit }) => {
+  const { addHabit, updateHabit } = useHabit();
+
+  const handleHabitSubmit = (habitData) => {
+    if (editingHabit) {
+      updateHabit(editingHabit.id, habitData);
+    } else {
+      addHabit(habitData);
+    }
+    setIsModalOpen(false);
+    setEditingHabit(null);
+  };
+
+  return (
+    <HabitFormModal
+      isOpen={isModalOpen}
+      onClose={() => {
+        setIsModalOpen(false);
+        setEditingHabit(null);
+      }}
+      onSubmit={handleHabitSubmit}
+      initialData={editingHabit}
+    />
+  );
+};
 
 export default App;
