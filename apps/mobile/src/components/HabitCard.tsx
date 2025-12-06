@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon, Trash2, Edit2, Zap, Undo2 } from 'lucide-react-native';
+import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon, Trash2, Edit2, Undo2, Zap } from 'lucide-react-native';
 import { Habit } from '@habitapp/shared';
 import * as Haptics from 'expo-haptics';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import type { Swipeable as SwipeableType } from 'react-native-gesture-handler';
+import { useXPNotification } from '../context/XPNotificationContext';
 
 interface HabitCardProps {
     habit: Habit;
@@ -14,7 +15,6 @@ interface HabitCardProps {
     streak: number;
     onToggle: () => void;
     onDecrement?: () => void;
-    onPress: () => void;
     onDelete?: () => void;
     onEdit?: () => void;
 }
@@ -38,23 +38,36 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const checkboxScaleAnim = useRef(new Animated.Value(1)).current;
     const swipeableRef = useRef<SwipeableType>(null);
+    const { showXP } = useXPNotification();
 
     // --- INTERACTION HANDLERS ---
 
     const handleCheckboxTap = () => {
-        // Prevent incrementing if already complete (for multi-count habits)
-        if (habit.targetCount > 1 && isCompleted) {
+        // Prevent tapping if already complete - use swipe undo instead
+        if (isCompleted) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
             return;
         }
 
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-        // Animate checkbox bounce
+        // Animate card + checkbox bounce together
+        Animated.sequence([
+            Animated.timing(scaleAnim, { toValue: 0.95, duration: 80, useNativeDriver: true }),
+            Animated.spring(scaleAnim, { toValue: 1, friction: 4, tension: 200, useNativeDriver: true })
+        ]).start();
         Animated.sequence([
             Animated.timing(checkboxScaleAnim, { toValue: 0.8, duration: 80, useNativeDriver: true }),
             Animated.spring(checkboxScaleAnim, { toValue: 1, friction: 4, tension: 200, useNativeDriver: true })
         ]).start();
+
+        // Check if this will complete the habit (show XP popup)
+        const willComplete = (habit.targetCount === 1 && !isCompleted) ||
+            (habit.targetCount > 1 && currentCount + 1 >= habit.targetCount);
+
+        if (willComplete) {
+            showXP(20);
+        }
 
         onToggle();
     };
@@ -96,7 +109,10 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                     </TouchableOpacity>
                 )}
                 <TouchableOpacity
-                    onPress={() => onEdit && onEdit()}
+                    onPress={() => {
+                        swipeableRef.current?.close();
+                        onEdit && onEdit();
+                    }}
                     style={styles.actionButton}
                     activeOpacity={0.7}
                 >
@@ -105,7 +121,10 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={onDelete}
+                    onPress={() => {
+                        swipeableRef.current?.close();
+                        onDelete && onDelete();
+                    }}
                     style={styles.actionButton}
                     activeOpacity={0.7}
                 >
@@ -135,7 +154,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                     <BlurView
                         intensity={40}
                         tint="systemThickMaterialDark"
-                        style={styles.blur}
+                        style={[styles.blur, isCompleted && styles.completedCard]}
                     >
                         <View style={styles.content}>
                             {/* Left: Icon */}
@@ -159,16 +178,18 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                                         <Icon size={10} color="rgba(255,255,255,0.5)" />
                                         <Text style={styles.badgeText}>{TimeLabels[habit.timeOfDay]}</Text>
                                     </View>
-                                    {streak >= 2 && (
+                                    {streak >= 1 && (
                                         <View style={styles.streakBadge}>
                                             <Text style={styles.streakText}>🔥 {streak}</Text>
                                         </View>
                                     )}
-                                    {/* XP Badge */}
-                                    <View style={styles.xpBadge}>
-                                        <Zap size={10} color="#facc15" fill="#facc15" />
-                                        <Text style={styles.xpText}>+20 XP</Text>
-                                    </View>
+                                    {/* XP Badge - only show when not completed */}
+                                    {!isCompleted && (
+                                        <View style={styles.xpBadge}>
+                                            <Zap size={10} color="#facc15" fill="#facc15" />
+                                            <Text style={styles.xpText}>+20 XP</Text>
+                                        </View>
+                                    )}
                                 </View>
                             </View>
 
@@ -189,12 +210,9 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                                 >
                                     <Animated.View style={[
                                         styles.checkbox,
-                                        isCompleted && styles.checkboxCompleted,
                                         { transform: [{ scale: checkboxScaleAnim }] }
                                     ]}>
-                                        {isCompleted && (
-                                            <Check size={20} color="#fff" strokeWidth={3.5} />
-                                        )}
+                                        <Check size={24} color="#fff" strokeWidth={3.5} />
                                     </Animated.View>
                                 </TouchableOpacity>
                             </View>
@@ -276,6 +294,9 @@ const styles = StyleSheet.create({
         color: '#fb923c',
         fontWeight: '700',
     },
+    completedCard: {
+        opacity: 0.6,
+    },
     xpBadge: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -297,20 +318,18 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     countText: {
-        fontSize: 20,
+        fontSize: 16,
         color: '#34C759',
-        fontWeight: '700',
+        fontWeight: '600',
         fontVariant: ['tabular-nums'],
     },
     checkbox: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        borderWidth: 2.5,
-        borderColor: 'rgba(255,255,255,0.3)',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#34C759',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'transparent',
     },
     checkboxCompleted: {
         backgroundColor: '#34C759',

@@ -5,6 +5,8 @@ import { BlurView } from 'expo-blur';
 import { GlassView } from 'expo-glass-effect';
 import { TrendingUp, Award, Calendar, Check, X, Grid, List as ListIcon } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LiquidGlass } from '../theme/theme';
+import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 
 const { width } = Dimensions.get('window');
 
@@ -214,8 +216,7 @@ export const TrendsScreen = () => {
 
             <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={[styles.content, { paddingTop: insets.top }]}
-                contentInsetAdjustmentBehavior="automatic"
+                contentContainerStyle={[styles.content, { paddingTop: insets.top + LiquidGlass.header.contentTopPadding }]}
             >
                 <View style={styles.headerRow}>
                     <Text style={styles.headerTitle}>Trends</Text>
@@ -235,17 +236,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#1c1c1e',
     },
     content: {
-        padding: 20,
+        paddingHorizontal: LiquidGlass.screenPadding,
         paddingBottom: 100,
     },
     headerRow: {
-        marginBottom: 24,
+        marginBottom: LiquidGlass.header.marginBottom,
     },
     headerTitle: {
-        fontSize: 34,
-        fontWeight: '800',
-        color: '#fff',
-        letterSpacing: -0.5,
+        fontSize: LiquidGlass.header.titleSize,
+        fontWeight: LiquidGlass.header.titleWeight,
+        color: LiquidGlass.header.titleColor,
+        letterSpacing: LiquidGlass.header.titleLetterSpacing,
     },
 
     // Toggle

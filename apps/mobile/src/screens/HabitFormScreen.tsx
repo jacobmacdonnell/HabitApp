@@ -2,7 +2,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
-import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { Trash2, Minus, Plus, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -11,6 +11,7 @@ import { RootStackParamList } from '../navigation/types';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { GlassInput } from '../components/GlassInput';
 import { GlassButton } from '../components/GlassButton';
+import { LiquidGlass } from '../theme/theme';
 
 export const HabitFormScreen = () => {
     const { addHabit, updateHabit, deleteHabit } = useHabit();
@@ -135,7 +136,7 @@ export const HabitFormScreen = () => {
             {/* Time of Day */}
             <View style={styles.section}>
                 <Text style={styles.label}>TIME OF DAY</Text>
-                <SegmentedControl
+                <GlassSegmentedControl
                     values={['Anytime', 'Morning', 'Noon', 'Evening']}
                     selectedIndex={['anytime', 'morning', 'midday', 'evening'].indexOf(timeOfDay)}
                     onChange={(event) => {
@@ -144,7 +145,6 @@ export const HabitFormScreen = () => {
                         setTimeOfDay(times[index]);
                         Haptics.selectionAsync();
                     }}
-                    appearance="dark"
                 />
             </View>
 
@@ -255,7 +255,9 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 44,
         height: 44,
-        borderRadius: 12,
+        borderRadius: LiquidGlass.radius.lg,
+        // @ts-ignore
+        cornerCurve: 'continuous',
         backgroundColor: 'rgba(255,255,255,0.1)',
         justifyContent: 'center',
         alignItems: 'center',
@@ -272,7 +274,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: 'rgba(255,255,255,0.1)', // Uniform background
-        borderRadius: 12,
+        borderRadius: LiquidGlass.radius.lg,
+        // @ts-ignore
+        cornerCurve: 'continuous',
         padding: 4, // Tight padding for buttons
     },
     targetValue: {

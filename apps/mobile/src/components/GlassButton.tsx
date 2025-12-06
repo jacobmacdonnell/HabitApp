@@ -1,7 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, StyleProp, ViewStyle, TextStyle } from 'react-native';
-import { RectButton } from 'react-native-gesture-handler';
-import { GlassView } from 'expo-glass-effect';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LiquidGlass } from '../theme/theme';
 
@@ -28,88 +26,62 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
 }) => {
     const handlePress = () => {
         if (disabled || loading) return;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        Haptics.selectionAsync();
         onPress();
     };
 
-    const isPrimary = variant === 'primary';
-    const isDanger = variant === 'danger';
+    const getVariantStyle = () => {
+        switch (variant) {
+            case 'secondary':
+                return styles.secondary;
+            case 'danger':
+                return styles.danger;
+            default:
+                return styles.primary;
+        }
+    };
 
-    // Primary uses solid white, secondary/danger use glass effect
-    if (isPrimary) {
-        return (
-            <View style={[styles.buttonContainer, disabled && styles.disabled, style]}>
-                <RectButton
-                    onPress={handlePress}
-                    enabled={!disabled && !loading}
-                    style={[styles.button, styles.primary]}
-                    activeOpacity={0.8}
-                    accessibilityRole="button"
-                    accessibilityLabel={title}
-                >
-                    {loading ? (
-                        <ActivityIndicator color={LiquidGlass.colors.black} />
-                    ) : (
-                        <View style={styles.content}>
-                            {icon}
-                            <Text style={[styles.text, styles.primaryText, textStyle, icon ? { marginLeft: 8 } : null]}>
-                                {title}
-                            </Text>
-                        </View>
-                    )}
-                </RectButton>
-            </View>
-        );
-    }
+    const getTextStyle = () => {
+        switch (variant) {
+            case 'primary':
+                return styles.primaryText;
+            case 'danger':
+                return styles.dangerText;
+            default:
+                return styles.secondaryText;
+        }
+    };
 
-    // Secondary and Danger variants use native glass effect
     return (
-        <View style={[styles.buttonContainer, disabled && styles.disabled, style]}>
-            <RectButton
-                onPress={handlePress}
-                enabled={!disabled && !loading}
-                style={styles.rectButton}
-                activeOpacity={0.8}
-                accessibilityRole="button"
-                accessibilityLabel={title}
-            >
-                <GlassView
-                    glassEffectStyle="regular"
-                    style={[
-                        styles.button,
-                        isDanger ? styles.danger : styles.secondary
-                    ]}
-                >
-                    {loading ? (
-                        <ActivityIndicator color={LiquidGlass.colors.white} />
-                    ) : (
-                        <View style={styles.content}>
-                            {icon}
-                            <Text style={[
-                                styles.text,
-                                isDanger ? styles.dangerText : styles.secondaryText,
-                                textStyle,
-                                icon ? { marginLeft: 8 } : null
-                            ]}>
-                                {title}
-                            </Text>
-                        </View>
-                    )}
-                </GlassView>
-            </RectButton>
-        </View>
+        <TouchableOpacity
+            style={[
+                styles.button,
+                getVariantStyle(),
+                disabled && styles.disabled,
+                style
+            ]}
+            onPress={handlePress}
+            activeOpacity={0.8}
+            disabled={disabled || loading}
+            accessibilityRole="button"
+            accessibilityLabel={title}
+            accessibilityState={{ disabled: disabled || loading }}
+        >
+            {loading ? (
+                <ActivityIndicator color={variant === 'primary' ? LiquidGlass.colors.black : LiquidGlass.colors.white} />
+            ) : (
+                <>
+                    {icon}
+                    <Text style={[styles.text, getTextStyle(), textStyle, icon ? { marginLeft: 8 } : null]}>
+                        {title}
+                    </Text>
+                </>
+            )}
+        </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
-    buttonContainer: {
-        borderRadius: LiquidGlass.radius.xxl,
-        overflow: 'hidden',
-    },
-    rectButton: {
-        borderRadius: LiquidGlass.radius.xxl,
-        overflow: 'hidden',
-    },
     button: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -118,12 +90,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: LiquidGlass.spacing.xxl,
         borderRadius: LiquidGlass.radius.xxl,
         minHeight: 56,
-        overflow: 'hidden',
-    },
-    content: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     disabled: {
         opacity: 0.5,
@@ -137,12 +103,12 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     secondary: {
+        backgroundColor: LiquidGlass.colors.glassBackground,
         borderWidth: 1,
         borderColor: LiquidGlass.colors.glassBorder,
     },
     danger: {
-        borderWidth: 1,
-        borderColor: 'rgba(239, 68, 68, 0.3)',
+        backgroundColor: 'rgba(239, 68, 68, 0.15)',
     },
     text: {
         fontSize: LiquidGlass.typography.size.body,
@@ -159,4 +125,3 @@ const styles = StyleSheet.create({
         color: LiquidGlass.colors.danger,
     }
 });
-

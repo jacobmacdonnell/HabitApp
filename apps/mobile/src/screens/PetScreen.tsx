@@ -6,6 +6,7 @@ import { BlurView } from 'expo-blur';
 import { GlassView } from 'expo-glass-effect';
 import { Egg } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LiquidGlass } from '../theme/theme';
 
 export const PetScreen = () => {
     const { pet, resetPet, updatePet } = useHabit();
@@ -66,8 +67,7 @@ export const PetScreen = () => {
 
             <ScrollView
                 style={styles.container}
-                contentContainerStyle={[styles.content, { paddingTop: insets.top }]}
-                contentInsetAdjustmentBehavior="automatic"
+                contentContainerStyle={[styles.content, { paddingTop: insets.top + LiquidGlass.header.contentTopPadding }]}
             >
                 <View style={styles.headerRow}>
                     <Text style={styles.headerTitle}>{pet.name}</Text>
@@ -87,17 +87,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
-        padding: 20,
+        paddingHorizontal: LiquidGlass.screenPadding,
         paddingBottom: 100,
     },
     headerRow: {
-        marginBottom: 24,
+        marginBottom: LiquidGlass.header.marginBottom,
     },
     headerTitle: {
-        fontSize: 34,
-        fontWeight: '800',
-        color: '#fff',
-        letterSpacing: -0.5,
+        fontSize: LiquidGlass.header.titleSize,
+        fontWeight: LiquidGlass.header.titleWeight,
+        color: LiquidGlass.header.titleColor,
+        letterSpacing: LiquidGlass.header.titleLetterSpacing,
     },
     eggContainer: {
         flex: 1,

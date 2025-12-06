@@ -4,8 +4,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BorderlessButton } from 'react-native-gesture-handler';
-import * as Haptics from 'expo-haptics';
 import { HomeScreen } from '../screens/HomeScreen';
 import { PetScreen } from '../screens/PetScreen';
 import { TrendsScreen } from '../screens/TrendsScreen';
@@ -16,7 +14,7 @@ import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { useHabit, Habit } from '@habitapp/shared';
 import { GlassView } from 'expo-glass-effect';
 import { BlurView } from 'expo-blur';
-import { StyleSheet, Animated, Platform, Dimensions } from 'react-native';
+import { StyleSheet, Animated, Platform, Dimensions, TouchableOpacity } from 'react-native';
 import { LiquidGlass } from '../theme/theme';
 
 import { Home, User, TrendingUp, Settings, Plus } from 'lucide-react-native';
@@ -93,7 +91,7 @@ const BouncyIcon = ({ focused, icon: Icon, color, size }: { focused: boolean; ic
 // Custom Tab Bar with Sliding Glass Indicator
 const CustomTabBar = ({ state, descriptors, navigation }: any) => {
     const insets = useSafeAreaInsets();
-    const bottomPosition = Platform.OS === 'ios' ? insets.bottom + 16 : 16;
+    const bottomPosition = Platform.OS === 'ios' ? insets.bottom + LiquidGlass.dock.bottomOffset : 16;
     const toolbarHeight = 68;
     const tabCount = state.routes.length;
 
@@ -132,7 +130,7 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
                 glassEffectStyle="regular"
             />
 
-            {/* Sliding Glass Indicator - iOS 26 style */}
+            {/* Sliding Indicator */}
             <Animated.View
                 style={{
                     position: 'absolute',
@@ -148,20 +146,10 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
                             ),
                         })
                     }],
+                    backgroundColor: 'rgba(255,255,255,0.15)',
                     borderRadius: 26,
-                    overflow: 'hidden',
                 }}
-            >
-                <GlassView
-                    glassEffectStyle="regular"
-                    style={{
-                        flex: 1,
-                        borderRadius: 26,
-                        borderWidth: 1,
-                        borderColor: 'rgba(255,255,255,0.2)',
-                    }}
-                />
-            </Animated.View>
+            />
 
             {/* Tab Items */}
             <View style={{
@@ -176,7 +164,6 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
                     const isFocused = state.index === index;
 
                     const onPress = () => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         const event = navigation.emit({
                             type: 'tabPress',
                             target: route.key,
@@ -196,8 +183,10 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
                     } as Record<string, any>)[route.name] || Home;
 
                     return (
-                        <BorderlessButton
+                        <TouchableOpacity
                             key={route.key}
+                            accessibilityRole="button"
+                            accessibilityState={isFocused ? { selected: true } : {}}
                             onPress={onPress}
                             style={{
                                 flex: 1,
@@ -205,7 +194,6 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
                                 justifyContent: 'center',
                                 height: toolbarHeight,
                             }}
-                            accessibilityRole="button"
                         >
                             <BouncyIcon
                                 focused={isFocused}
@@ -213,7 +201,7 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
                                 color={isFocused ? '#fff' : 'rgba(255,255,255,0.4)'}
                                 size={24}
                             />
-                        </BorderlessButton>
+                        </TouchableOpacity>
                     );
                 })}
             </View>

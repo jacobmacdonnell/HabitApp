@@ -48,6 +48,8 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'rgba(255,255,255,0.05)',
         borderRadius: LiquidGlass.radius.lg,
+        // @ts-ignore
+        cornerCurve: 'continuous',
         padding: LiquidGlass.spacing.lg,
         fontSize: LiquidGlass.typography.size.body,
         fontWeight: LiquidGlass.typography.weight.semibold,

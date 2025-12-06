@@ -18,7 +18,7 @@ export const LiquidGlass = {
 
     // Floating Dock Specs - iOS 26 HIG aligned
     dock: {
-        bottomOffset: 16, // Float 16pt above home indicator (iOS 26)
+        bottomOffset: 8, // Float 8pt above home indicator (iOS 26)
         horizontalPadding: 20,
         borderRadius: 34,
         height: 68,
@@ -101,8 +101,18 @@ export const LiquidGlass = {
         xxxl: 32,
     },
 
-    // Screen padding
+    // Screen padding (unified across all screens)
     screenPadding: 20,
+
+    // Header constants (unified across all screens)
+    header: {
+        marginBottom: 24,        // Space below header title
+        titleSize: 34,           // Header title font size
+        titleWeight: '800' as const,
+        titleColor: '#fff',
+        titleLetterSpacing: -0.5,
+        contentTopPadding: 24,   // Extra padding above content after safe area (increased for more breathability)
+    },
 
     // Text Colors
     text: {
@@ -127,6 +137,21 @@ export const LiquidGlass = {
         levelUp: '#a855f7',      // Purple for level up
         sleep: '#c084fc',        // Light purple for sleep
         health: '#f87171',       // Health red
+    },
+
+    segmentedControl: {
+        backgroundColor: 'transparent', // Fully invisible track
+        height: 40,
+        fontStyle: {
+            color: 'rgba(255,255,255,0.5)',
+            fontWeight: '600' as const,
+            fontSize: 15,
+        },
+        activeFontStyle: {
+            color: '#fff',
+            fontWeight: '700' as const,
+            fontSize: 15,
+        }
     }
 } as const;
 

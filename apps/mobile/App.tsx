@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { XPNotificationProvider } from './src/context/XPNotificationContext';
 
 // Initialize notification handler
 Notifications.setNotificationHandler({
@@ -44,7 +45,9 @@ export default function App() {
       <SafeAreaProvider>
         <ErrorBoundary>
           <HabitProvider storage={MobileStorageService}>
-            <ThemedApp />
+            <XPNotificationProvider>
+              <ThemedApp />
+            </XPNotificationProvider>
           </HabitProvider>
         </ErrorBoundary>
       </SafeAreaProvider>

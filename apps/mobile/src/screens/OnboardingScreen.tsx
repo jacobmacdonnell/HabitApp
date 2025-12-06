@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Anima
 import { useHabit } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
 import { BlurView } from 'expo-blur';
-import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { ArrowRight, Check, Minus, Plus } from 'lucide-react-native';
 import { GlassInput } from '../components/GlassInput';
 import { GlassButton } from '../components/GlassButton';
@@ -244,18 +244,14 @@ export const OnboardingScreen = () => {
                             <Text style={[styles.label, { marginTop: 24 }]}>TIME OF DAY</Text>
                             <View style={styles.grid}>
                                 <View style={{ marginTop: 8, width: '100%' }}>
-                                    <SegmentedControl
+                                    <GlassSegmentedControl
                                         values={['Morning', 'Noon', 'Evening', 'Anytime']}
                                         selectedIndex={['morning', 'midday', 'evening', 'anytime'].indexOf(timeOfDay)}
-                                        onChange={(event) => {
+                                        onChange={(event: any) => {
                                             const index = event.nativeEvent.selectedSegmentIndex;
                                             const times = ['morning', 'midday', 'evening', 'anytime'] as const;
                                             setTimeOfDay(times[index]);
                                         }}
-                                        appearance="dark"
-                                        backgroundColor="rgba(0,0,0,0.2)"
-                                        fontStyle={{ color: 'rgba(255,255,255,0.5)', fontWeight: '600' }}
-                                        activeFontStyle={{ color: '#fff', fontWeight: '700' }}
                                     />
                                 </View>
                             </View>
