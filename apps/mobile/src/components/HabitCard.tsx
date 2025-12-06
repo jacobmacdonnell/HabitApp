@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon, Trash2, Edit2 } from 'lucide-react-native';
+import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon, Trash2, Edit2, Zap, Undo2 } from 'lucide-react-native';
 import { Habit } from '@habitapp/shared';
 import * as Haptics from 'expo-haptics';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import type { Swipeable as SwipeableType } from 'react-native-gesture-handler';
 
 interface HabitCardProps {
     habit: Habit;
@@ -13,7 +14,7 @@ interface HabitCardProps {
     streak: number;
     onToggle: () => void;
     onDecrement?: () => void;
-    onPress: () => void; // Kept for API compatibility, but primary interaction is now on the card itself
+    onPress: () => void;
     onDelete?: () => void;
     onEdit?: () => void;
 }
@@ -34,30 +35,13 @@ const TimeLabels: Record<string, string> = {
 
 export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, onDecrement, onDelete, onEdit }: HabitCardProps) => {
     const Icon = TimeIcons[habit.timeOfDay] || Sparkles;
-
-    // 1. Progress Animation: 0 -> 100%
-    const progressAnim = useRef(new Animated.Value(
-        isCompleted ? 1 : Math.min(currentCount / habit.targetCount, 1)
-    )).current;
-
-    // 2. Scale Animation: Click feedback
     const scaleAnim = useRef(new Animated.Value(1)).current;
-
-    // Sync progress bar
-    useEffect(() => {
-        const targetValue = isCompleted ? 1 : Math.min(currentCount / habit.targetCount, 1);
-
-        Animated.spring(progressAnim, {
-            toValue: targetValue,
-            friction: 8,
-            tension: 40,
-            useNativeDriver: false,
-        }).start();
-    }, [currentCount, habit.targetCount, isCompleted]);
+    const checkboxScaleAnim = useRef(new Animated.Value(1)).current;
+    const swipeableRef = useRef<SwipeableType>(null);
 
     // --- INTERACTION HANDLERS ---
 
-    const handleTap = () => {
+    const handleCheckboxTap = () => {
         // Prevent incrementing if already complete (for multi-count habits)
         if (habit.targetCount > 1 && isCompleted) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -66,60 +50,69 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
 
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-        // Animate: Press down
+        // Animate checkbox bounce
         Animated.sequence([
-            Animated.timing(scaleAnim, { toValue: 0.95, duration: 80, useNativeDriver: true }),
-            Animated.spring(scaleAnim, { toValue: 1, friction: 6, tension: 150, useNativeDriver: true })
+            Animated.timing(checkboxScaleAnim, { toValue: 0.8, duration: 80, useNativeDriver: true }),
+            Animated.spring(checkboxScaleAnim, { toValue: 1, friction: 4, tension: 200, useNativeDriver: true })
         ]).start();
 
         onToggle();
     };
 
-    const handleLongPress = () => {
+    const handleUndo = () => {
         if (currentCount <= 0) return;
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-
-        // Animate: Subtle shrink to indicate "backing off"
-        Animated.sequence([
-            Animated.timing(scaleAnim, { toValue: 0.97, duration: 100, useNativeDriver: true }),
-            Animated.spring(scaleAnim, { toValue: 1, friction: 8, tension: 120, useNativeDriver: true })
-        ]).start();
+        // If this will be the last undo (going to 0), close the swipe menu
+        if (currentCount === 1) {
+            swipeableRef.current?.close();
+        }
 
         onDecrement?.();
     };
 
     // --- SWIPE ACTIONS ---
 
-    const renderRightActions = (progress: any, dragX: any) => {
-        const trans = dragX.interpolate({
-            inputRange: [-160, 0],
-            outputRange: [0, 160],
+    const renderRightActions = (progress: Animated.AnimatedInterpolation<number>) => {
+        // Fade in the actions as the swipe progresses
+        const opacity = progress.interpolate({
+            inputRange: [0, 0.2, 1],
+            outputRange: [0, 0, 1],
             extrapolate: 'clamp',
         });
 
         return (
-            <Animated.View style={{ width: 160, flexDirection: 'row', transform: [{ translateX: trans }] }}>
-                <BlurView
-                    intensity={20}
-                    tint="systemThickMaterialDark"
-                    style={styles.rightActionEdit}
-                >
-                    <TouchableOpacity onPress={() => onEdit && onEdit()} style={styles.actionButtonContent}>
-                        <Edit2 size={22} color="#fff" />
-                        <Text style={styles.actionLabel}>Edit</Text>
+            <Animated.View style={[styles.actionsContainer, { opacity }]}>
+                {/* Undo - only show if there's progress to undo */}
+                {currentCount > 0 && (
+                    <TouchableOpacity
+                        onPress={handleUndo}
+                        style={styles.actionButton}
+                        activeOpacity={0.7}
+                    >
+                        <View style={[styles.actionIconCircle, styles.undoCircle]}>
+                            <Undo2 size={18} color="#fff" />
+                        </View>
                     </TouchableOpacity>
-                </BlurView>
-                <BlurView
-                    intensity={20}
-                    tint="systemThickMaterialDark"
-                    style={styles.rightActionDelete}
+                )}
+                <TouchableOpacity
+                    onPress={() => onEdit && onEdit()}
+                    style={styles.actionButton}
+                    activeOpacity={0.7}
                 >
-                    <TouchableOpacity onPress={onDelete} style={styles.actionButtonContent}>
-                        <Trash2 size={22} color="#ff3b30" />
-                        <Text style={styles.actionLabel}>Delete</Text>
-                    </TouchableOpacity>
-                </BlurView>
+                    <View style={styles.actionIconCircle}>
+                        <Edit2 size={18} color="#fff" />
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={onDelete}
+                    style={styles.actionButton}
+                    activeOpacity={0.7}
+                >
+                    <View style={[styles.actionIconCircle, styles.deleteCircle]}>
+                        <Trash2 size={18} color="#fff" />
+                    </View>
+                </TouchableOpacity>
             </Animated.View>
         );
     };
@@ -127,51 +120,41 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
     return (
         <Animated.View style={[
             styles.container,
-            { transform: [{ scale: scaleAnim }] },
-            isCompleted && { opacity: 0.8 } // Slight opacity when complete, but keep readable
+            { transform: [{ scale: scaleAnim }] }
         ]}>
             <Swipeable
+                ref={swipeableRef}
                 renderRightActions={renderRightActions}
                 overshootRight={false}
-                friction={2}
+                friction={1}
+                rightThreshold={40}
             >
                 <TouchableOpacity
-                    activeOpacity={0.9}
-                    onPress={handleTap}
-                    onLongPress={handleLongPress}
-                    delayLongPress={500}
+                    activeOpacity={0.95}
                 >
                     <BlurView
                         intensity={40}
                         tint="systemThickMaterialDark"
                         style={styles.blur}
                     >
-                        {/* 1. Progress Bar Background */}
-                        <Animated.View
-                            style={[
-                                styles.progressBar,
-                                {
-                                    width: progressAnim.interpolate({
-                                        inputRange: [0, 1],
-                                        outputRange: ['0%', '100%']
-                                    }),
-                                    backgroundColor: 'rgba(255, 255, 255, 0.08)' // Always white/subtle
-                                }
-                            ]}
-                        />
-
                         <View style={styles.content}>
-                            {/* Icon Identity */}
+                            {/* Left: Icon */}
                             <View style={[
                                 styles.iconContainer,
-                                { backgroundColor: habit.color, opacity: isCompleted ? 0.5 : 1 }
+                                { backgroundColor: habit.color }
                             ]}>
-                                <Text style={{ fontSize: 24 }}>{habit.icon}</Text>
+                                <Text style={{ fontSize: 26 }}>{habit.icon}</Text>
                             </View>
 
-                            {/* Main Info */}
+                            {/* Center: Info */}
                             <View style={styles.textContainer}>
-                                <View style={styles.headerRow}>
+                                {/* Title Row */}
+                                <Text style={styles.title} numberOfLines={1}>
+                                    {habit.title}
+                                </Text>
+
+                                {/* Meta Row */}
+                                <View style={styles.metaRow}>
                                     <View style={styles.badge}>
                                         <Icon size={10} color="rgba(255,255,255,0.5)" />
                                         <Text style={styles.badgeText}>{TimeLabels[habit.timeOfDay]}</Text>
@@ -181,36 +164,39 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                                             <Text style={styles.streakText}>🔥 {streak}</Text>
                                         </View>
                                     )}
+                                    {/* XP Badge */}
+                                    <View style={styles.xpBadge}>
+                                        <Zap size={10} color="#facc15" fill="#facc15" />
+                                        <Text style={styles.xpText}>+20 XP</Text>
+                                    </View>
                                 </View>
+                            </View>
 
-                                <View style={styles.titleRow}>
-                                    <Text style={[
-                                        styles.title,
-                                        isCompleted && { opacity: 0.5 }
-                                    ]} numberOfLines={1}>
-                                        {habit.title}
+                            {/* Right: Counter (for multi-step) or Checkbox */}
+                            <View style={styles.rightSection}>
+                                {/* Counter for multi-step habits */}
+                                {habit.targetCount > 1 && !isCompleted && (
+                                    <Text style={styles.countText}>
+                                        {currentCount}/{habit.targetCount}
                                     </Text>
+                                )}
 
-                                    {/* Status: Solid Green Check or Count */}
-                                    {isCompleted ? (
-                                        <View style={{
-                                            backgroundColor: '#34C759',
-                                            borderRadius: 20,
-                                            width: 28,
-                                            height: 28,
-                                            justifyContent: 'center',
-                                            alignItems: 'center'
-                                        }}>
-                                            <Check size={16} color="#fff" strokeWidth={4} />
-                                        </View>
-                                    ) : (
-                                        habit.targetCount > 1 && (
-                                            <Text style={styles.countText}>
-                                                {currentCount}/{habit.targetCount}
-                                            </Text>
-                                        )
-                                    )}
-                                </View>
+                                {/* Checkbox */}
+                                <TouchableOpacity
+                                    onPress={handleCheckboxTap}
+                                    activeOpacity={0.7}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                >
+                                    <Animated.View style={[
+                                        styles.checkbox,
+                                        isCompleted && styles.checkboxCompleted,
+                                        { transform: [{ scale: checkboxScaleAnim }] }
+                                    ]}>
+                                        {isCompleted && (
+                                            <Check size={20} color="#fff" strokeWidth={3.5} />
+                                        )}
+                                    </Animated.View>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </BlurView>
@@ -225,31 +211,24 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         borderRadius: 24,
         overflow: 'hidden',
-        // No external border, let BlurView handle it cleanly
     },
     blur: {
-        padding: 16,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+        backgroundColor: '#2c2c2e', // Solid dark background so swipe doesn't show through
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 0.5,
         borderColor: 'rgba(255,255,255,0.1)',
-    },
-    progressBar: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        // No border radius needed on container as parent clips it
     },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     iconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 24, // Circle
+        width: 52,
+        height: 52,
+        borderRadius: 26,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 14,
@@ -258,11 +237,17 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
-    headerRow: {
+    title: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#fff',
+        marginBottom: 6,
+    },
+    metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 4,
         gap: 8,
+        flexWrap: 'wrap',
     },
     badge: {
         flexDirection: 'row',
@@ -291,47 +276,71 @@ const styles = StyleSheet.create({
         color: '#fb923c',
         fontWeight: '700',
     },
-    titleRow: {
+    xpBadge: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        backgroundColor: 'rgba(250, 204, 21, 0.15)',
+        paddingHorizontal: 6,
+        paddingVertical: 3,
+        borderRadius: 6,
+        gap: 3,
     },
-    title: {
-        fontSize: 17,
-        fontWeight: '600',
-        color: '#fff',
-        flex: 1,
-        marginRight: 8,
+    xpText: {
+        fontSize: 10,
+        color: '#facc15',
+        fontWeight: '700',
+    },
+    rightSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginLeft: 8,
     },
     countText: {
-        fontSize: 16,
-        color: 'rgba(255,255,255,0.6)',
-        fontWeight: '600',
+        fontSize: 20,
+        color: '#34C759',
+        fontWeight: '700',
         fontVariant: ['tabular-nums'],
     },
-    // Actions
-    rightActionEdit: {
-        backgroundColor: 'rgba(142, 142, 147, 0.3)', // System Gray
+    checkbox: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        borderWidth: 2.5,
+        borderColor: 'rgba(255,255,255,0.3)',
         justifyContent: 'center',
         alignItems: 'center',
-        width: 80,
+        backgroundColor: 'transparent',
     },
-    rightActionDelete: {
-        backgroundColor: 'rgba(255, 59, 48, 0.3)', // System Red
+    checkboxCompleted: {
+        backgroundColor: '#34C759',
+        borderColor: '#34C759',
+    },
+    // Actions - Clean integrated swipe design
+    actionsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        paddingRight: 12,
+        paddingLeft: 8,
+        gap: 8,
+        backgroundColor: '#1c1c1e', // Match app background so buttons don't peek through
+    },
+    actionButton: {
+        padding: 4,
+    },
+    actionIconCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(142, 142, 147, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        width: 80,
     },
-    actionLabel: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: '600',
-        marginTop: 4,
+    deleteCircle: {
+        backgroundColor: 'rgba(255, 59, 48, 0.8)',
     },
-    actionButtonContent: {
-        width: 80,
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
+    undoCircle: {
+        backgroundColor: 'rgba(251, 146, 60, 0.8)',
     },
 });
