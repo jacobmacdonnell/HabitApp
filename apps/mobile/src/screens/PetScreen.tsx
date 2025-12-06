@@ -29,7 +29,7 @@ export const PetScreen = () => {
                     <Text style={styles.eggTitle}>Hatch Your Companion</Text>
                     <Text style={styles.eggSubtitle}>Complete habits to help them grow!</Text>
 
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.formCard}>
+                    <GlassView glassEffectStyle="regular" style={styles.formCard}>
                         <TextInput
                             style={styles.input}
                             placeholder="Name your pet..."
@@ -51,7 +51,7 @@ export const PetScreen = () => {
                         <TouchableOpacity style={styles.hatchButton} onPress={handleHatch}>
                             <Text style={styles.hatchText}>Hatch Egg</Text>
                         </TouchableOpacity>
-                    </BlurView>
+                    </GlassView>
                 </View>
             </View>
         );

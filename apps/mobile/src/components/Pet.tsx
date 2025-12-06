@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Animated, Easing,
 import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Text as SvgText, Rect } from 'react-native-svg';
 import { Pet as PetType } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
+import { GlassView } from 'expo-glass-effect';
 import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -344,7 +345,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
                 </Animated.View>
             </View>
 
-            <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.statsCard}>
+            <GlassView glassEffectStyle="regular" style={styles.statsCard}>
                 {/* Level & Mood Header */}
                 <View style={styles.headerRow}>
                     <View style={styles.levelBadge}>
@@ -393,7 +394,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
                     <Palette size={18} color="#fff" />
                     <Text style={styles.customizeText}>Customize</Text>
                 </TouchableOpacity>
-            </BlurView>
+            </GlassView>
 
 
         </View>
@@ -490,8 +491,8 @@ const styles = StyleSheet.create({
     },
     statsCard: {
         width: width - 40,
-        borderRadius: 20,
-        padding: 16,
+        borderRadius: 24,
+        padding: 24,
         backgroundColor: 'rgba(255,255,255,0.05)',
         overflow: 'hidden',
         marginTop: 20,

@@ -84,7 +84,6 @@ export const SettingsScreen = () => {
             <DateTimePicker
                 value={parseTime(time)}
                 mode="time"
-                is24Hour={true}
                 display="compact"
                 onChange={(e, d) => onTimeChange(type, e, d)}
                 themeVariant="dark"
@@ -110,7 +109,7 @@ export const SettingsScreen = () => {
                 {/* Preferences */}
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>PREFERENCES</Text>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
+                    <GlassView glassEffectStyle="regular" style={styles.card}>
                         {/* Sound */}
                         <View style={styles.row}>
                             <View style={styles.iconLabel}>
@@ -144,23 +143,23 @@ export const SettingsScreen = () => {
                                 ios_backgroundColor="#3e3e3e"
                             />
                         </View>
-                    </BlurView>
+                    </GlassView>
                 </View>
 
                 {/* Sleep Schedule */}
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>SLEEP SCHEDULE</Text>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
+                    <GlassView glassEffectStyle="regular" style={styles.card}>
                         {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color="#c084fc" />, '#c084fc', 'rgba(168, 85, 247, 0.2)')}
                         <View style={styles.separator} />
                         {renderTimePicker('Wake Up', settings.sleepEnd || '07:00', 'wakeup', <Sun size={20} color="#fbbf24" />, '#fbbf24', 'rgba(251, 191, 36, 0.2)')}
-                    </BlurView>
+                    </GlassView>
                 </View>
 
                 {/* Data & Privacy */}
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>DATA & PRIVACY</Text>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
+                    <GlassView glassEffectStyle="regular" style={styles.card}>
                         <TouchableOpacity style={styles.row}>
                             <View style={styles.iconLabel}>
                                 <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
@@ -181,7 +180,7 @@ export const SettingsScreen = () => {
                                 <Text style={[styles.label, { color: '#ef4444' }]}>Reset All Data</Text>
                             </View>
                         </TouchableOpacity>
-                    </BlurView>
+                    </GlassView>
                 </View>
 
                 <Text style={styles.footer}>Habit Companion v1.0.2 (iOS)</Text>
@@ -246,7 +245,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 36,
         height: 36,
-        borderRadius: 10,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
     },

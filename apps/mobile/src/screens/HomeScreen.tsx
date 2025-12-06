@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, SectionList, TouchableOpacity, LayoutAnimation, Platform, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
 import { Pet } from '../components/Pet';
@@ -62,41 +62,17 @@ export const HomeScreen = () => {
             if (timeFilter === 'all') return true;
             return habit.timeOfDay === timeFilter || habit.timeOfDay === 'anytime';
         }).sort((a, b) => {
+            // 1. Sort by Completion (Active first, Completed last)
+            const isACompleted = (progress.find(p => p.habitId === a.id && p.date === today)?.currentCount || 0) >= a.targetCount;
+            const isBCompleted = (progress.find(p => p.habitId === b.id && p.date === today)?.currentCount || 0) >= b.targetCount;
+
+            if (isACompleted !== isBCompleted) return isACompleted ? 1 : -1;
+
+            // 2. Sort by Time of Day precedence
             const order: Record<string, number> = { anytime: 0, morning: 1, midday: 2, evening: 3 };
             return (order[a.timeOfDay] || 0) - (order[b.timeOfDay] || 0);
         });
-    }, [habits, timeFilter]);
-
-    // Separate into pending and completed
-    const { pendingHabits, completedHabits } = useMemo(() => {
-        const pending: Habit[] = [];
-        const completed: Habit[] = [];
-
-        filteredHabits.forEach(habit => {
-            const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
-            const current = dayProgress?.currentCount || 0;
-            const isCompleted = current >= habit.targetCount;
-
-            if (isCompleted) {
-                completed.push(habit);
-            } else {
-                pending.push(habit);
-            }
-        });
-
-        return { pendingHabits: pending, completedHabits: completed };
-    }, [filteredHabits, progress, today]);
-
-    const sections = useMemo(() => {
-        const result = [];
-        if (pendingHabits.length > 0) {
-            result.push({ title: 'To Do', data: pendingHabits });
-        }
-        if (completedHabits.length > 0) {
-            result.push({ title: 'Completed', data: completedHabits });
-        }
-        return result;
-    }, [pendingHabits, completedHabits]);
+    }, [habits, timeFilter, progress, today]);
 
     const handleToggle = useCallback((habit: Habit) => {
         const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
@@ -144,7 +120,8 @@ export const HomeScreen = () => {
                 currentCount={current}
                 streak={streak}
                 onToggle={() => handleToggle(item)}
-                onPress={() => navigation.navigate('HabitForm', { habit: item })}
+                onDecrement={() => undoProgress(item.id, today)}
+                onPress={() => { }} // No action on tap - only swipe to edit
                 onEdit={() => navigation.navigate('HabitForm', { habit: item })}
                 onDelete={() => handleDelete(item)}
             />
@@ -200,21 +177,14 @@ export const HomeScreen = () => {
             {/* Ambient Background - Clean Dark Theme */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
 
-            <SectionList
-                sections={sections}
+            <FlatList
+                data={filteredHabits}
                 renderItem={renderItem}
-                renderSectionHeader={({ section }) => (
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>{section.title}</Text>
-                        <Text style={styles.sectionCount}>{section.data.length}</Text>
-                    </View>
-                )}
                 keyExtractor={item => item.id}
                 contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]}
                 showsVerticalScrollIndicator={false}
                 ListHeaderComponent={ListHeader}
                 contentInsetAdjustmentBehavior="automatic"
-                stickySectionHeadersEnabled={false}
                 ListEmptyComponent={
                     <View style={styles.emptyState}>
                         <Text style={styles.emptyText}>No habits found for {timeFilter}</Text>
@@ -299,30 +269,6 @@ const styles = StyleSheet.create({
     emptyText: {
         color: 'rgba(255,255,255,0.3)',
         fontSize: 16,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 4,
-        paddingVertical: 12,
-        marginTop: 8,
-    },
-    sectionTitle: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.6)',
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
-    sectionCount: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.4)',
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 12,
     },
     fab: {
         position: 'absolute',

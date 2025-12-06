@@ -15,6 +15,7 @@ export const LiquidGlass = {
     },
     // Global App Background
     backgroundColor: '#1c1c1e',
+
     // Floating Dock Specs - iOS 26 HIG aligned
     dock: {
         bottomOffset: 16, // Float 16pt above home indicator (iOS 26)
@@ -32,13 +33,27 @@ export const LiquidGlass = {
             elevation: 10,
         }
     },
+
+    // Border Radius Scale - iOS 26 Standard
+    radius: {
+        xs: 4,      // Progress bars, tiny elements
+        sm: 8,      // Small chips
+        md: 12,     // Buttons
+        lg: 16,     // Inputs, small cards
+        xl: 20,     // Pills, badges
+        xxl: 24,    // Cards, sheets
+        pill: 28,   // FAB (half of 56pt)
+        dock: 34,   // Navbar (half of 68pt)
+        full: 9999, // Circular
+    },
+
     // Card Specs - iOS 26 standard
     card: {
         borderRadius: 24,
         padding: 24,
         backgroundColor: 'rgba(255,255,255,0.08)',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)', // Slightly more visible in iOS 26
+        borderColor: 'rgba(255,255,255,0.15)',
         shadow: {
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 4 },
@@ -47,22 +62,57 @@ export const LiquidGlass = {
             elevation: 5,
         }
     },
-    // Typography - iOS 26 SF Pro aligned
+
+    // Typography Scale - iOS SF Pro aligned
     typography: {
-        weights: {
-            heavy: '800',
-            bold: '700',
-            semibold: '600',
-            regular: '400',
+        // Sizes
+        size: {
+            largeTitle: 34,
+            title1: 28,
+            title2: 22,
+            title3: 20,
+            headline: 17,
+            body: 16,
+            callout: 15,
+            subheadline: 14,
+            footnote: 13,
+            caption1: 12,
+            caption2: 11,
+            micro: 10,
+        },
+        // Weights
+        weight: {
+            heavy: '800' as const,
+            bold: '700' as const,
+            semibold: '600' as const,
+            medium: '500' as const,
+            regular: '400' as const,
         }
     },
-    // Colors & Text
+
+    // Spacing Scale
+    spacing: {
+        xs: 4,
+        sm: 8,
+        md: 12,
+        lg: 16,
+        xl: 20,
+        xxl: 24,
+        xxxl: 32,
+    },
+
+    // Screen padding
+    screenPadding: 20,
+
+    // Text Colors
     text: {
         primary: '#fff',
         secondary: 'rgba(255,255,255,0.6)',
         tertiary: 'rgba(255,255,255,0.3)',
         label: 'rgba(255,255,255,0.5)',
     },
+
+    // Colors
     colors: {
         white: '#ffffff',
         black: '#000000',
@@ -72,6 +122,11 @@ export const LiquidGlass = {
         info: '#3b82f6',
         glassBorder: 'rgba(255,255,255,0.1)',
         glassBackground: 'rgba(255,255,255,0.1)',
+        // Additional app-specific colors
+        xp: '#facc15',           // XP/gold
+        levelUp: '#a855f7',      // Purple for level up
+        sleep: '#c084fc',        // Light purple for sleep
+        health: '#f87171',       // Health red
     }
 } as const;
 

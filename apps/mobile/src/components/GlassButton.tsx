@@ -86,9 +86,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 16,
-        paddingHorizontal: 24,
-        borderRadius: 24,
+        paddingVertical: LiquidGlass.spacing.lg,
+        paddingHorizontal: LiquidGlass.spacing.xxl,
+        borderRadius: LiquidGlass.radius.xxl,
         minHeight: 56,
     },
     disabled: {
@@ -108,11 +108,11 @@ const styles = StyleSheet.create({
         borderColor: LiquidGlass.colors.glassBorder,
     },
     danger: {
-        backgroundColor: 'rgba(239, 68, 68, 0.15)', // Custom opacity for danger bg, keep or add token?
+        backgroundColor: 'rgba(239, 68, 68, 0.15)',
     },
     text: {
-        fontSize: 16,
-        fontWeight: '700',
+        fontSize: LiquidGlass.typography.size.body,
+        fontWeight: LiquidGlass.typography.weight.bold,
         textAlign: 'center',
     },
     primaryText: {
