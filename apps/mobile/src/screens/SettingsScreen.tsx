@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useHabit } from '@habitapp/shared';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Moon, Sun, Volume2, Bell, Shield, Trash2, ChevronRight, Smartphone } from 'lucide-react-native';
+import { Moon, Sun, Volume2, Bell, Shield, Trash2, ChevronRight } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
-
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import { NotificationService } from '../services/notifications';
 
 export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
@@ -36,6 +35,7 @@ export const SettingsScreen = () => {
     };
 
     const parseTime = (timeString: string) => {
+        if (!timeString) return new Date();
         const [hours, minutes] = timeString.split(':').map(Number);
         const date = new Date();
         date.setHours(hours);
@@ -43,9 +43,24 @@ export const SettingsScreen = () => {
         return date;
     };
 
+    const handleNotificationChange = async (val: boolean) => {
+        if (val) {
+            const granted = await NotificationService.registerForPushNotificationsAsync();
+            if (!granted) {
+                Alert.alert(
+                    'Permissions Required',
+                    'Please enable notifications in your phone settings to receive updates.',
+                    [{ text: 'OK' }]
+                );
+                setNotifications(false);
+                updateSettings({ notifications: false });
+                return;
+            }
+        } else {
+            // Optional: Cancel all notifications if turned off
+            await NotificationService.cancelAllNotifications();
+        }
 
-
-    const handleNotificationChange = (val: boolean) => {
         setNotifications(val);
         updateSettings({ notifications: val });
     };
@@ -57,9 +72,29 @@ export const SettingsScreen = () => {
 
     const insets = useSafeAreaInsets();
 
+    const renderTimePicker = (label: string, time: string, type: 'bedtime' | 'wakeup', icon: any, color: string, bg: string) => (
+        <View style={styles.timeRow}>
+            <View style={styles.iconLabel}>
+                <View style={[styles.iconContainer, { backgroundColor: bg }]}>
+                    {icon}
+                </View>
+                <Text style={styles.label}>{label}</Text>
+            </View>
+            <DateTimePicker
+                value={parseTime(time)}
+                mode="time"
+                is24Hour={true}
+                display="compact"
+                onChange={(e, d) => onTimeChange(type, e, d)}
+                themeVariant="dark"
+                style={{ height: 34 }}
+            />
+        </View>
+    );
+
     return (
         <View style={styles.wrapper}>
-            {/* Ambient Background - Clean Dark Theme */}
+            {/* Ambient Background */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
             <ScrollView
@@ -75,10 +110,6 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>PREFERENCES</Text>
                     <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
-
-
-
-
                         {/* Sound */}
                         <View style={styles.row}>
                             <View style={styles.iconLabel}>
@@ -119,42 +150,9 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>SLEEP SCHEDULE</Text>
                     <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
-                        <View style={styles.row}>
-                            <View style={styles.iconLabel}>
-                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(168, 85, 247, 0.2)' }]}>
-                                    <Moon size={20} color="#c084fc" />
-                                </View>
-                                <View>
-                                    <Text style={styles.label}>Pet Sleep Schedule</Text>
-                                    <Text style={styles.subLabel}>Your pet will sleep during these hours</Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={styles.pickerRow}>
-                            <View style={styles.pickerContainer}>
-                                <Text style={styles.pickerLabel}>BEDTIME</Text>
-                                <DateTimePicker
-                                    value={parseTime(settings.sleepStart)}
-                                    mode="time"
-                                    display="compact"
-                                    onChange={(e, date) => onTimeChange('bedtime', e, date)}
-                                    themeVariant="dark"
-                                    style={{ width: 100 }}
-                                />
-                            </View>
-                            <View style={styles.pickerContainer}>
-                                <Text style={styles.pickerLabel}>WAKE UP</Text>
-                                <DateTimePicker
-                                    value={parseTime(settings.sleepEnd)}
-                                    mode="time"
-                                    display="compact"
-                                    onChange={(e, date) => onTimeChange('wakeup', e, date)}
-                                    themeVariant="dark"
-                                    style={{ width: 100 }}
-                                />
-                            </View>
-                        </View>
+                        {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color="#c084fc" />, '#c084fc', 'rgba(168, 85, 247, 0.2)')}
+                        <View style={styles.separator} />
+                        {renderTimePicker('Wake Up', settings.sleepEnd || '07:00', 'wakeup', <Sun size={20} color="#fbbf24" />, '#fbbf24', 'rgba(251, 191, 36, 0.2)')}
                     </BlurView>
                 </View>
 
@@ -212,7 +210,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         letterSpacing: -0.5,
     },
-
     section: {
         marginBottom: 24,
     },
@@ -229,6 +226,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.05)',
     },
     row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 16,
+    },
+    timeRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -251,35 +254,10 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#fff',
     },
-    subLabel: {
-        fontSize: 12,
-        color: 'rgba(255,255,255,0.5)',
-    },
     separator: {
         height: 1,
         backgroundColor: 'rgba(255,255,255,0.1)',
         marginLeft: 64,
-    },
-    segmentContainer: {
-        flexDirection: 'row',
-        margin: 16,
-        padding: 4,
-    },
-
-    pickerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 16,
-        paddingTop: 0,
-    },
-    pickerContainer: {
-        alignItems: 'center',
-        gap: 8,
-    },
-    pickerLabel: {
-        fontSize: 11,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.5)',
     },
     footer: {
         textAlign: 'center',
@@ -288,5 +266,4 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginTop: 20,
     },
-
 });

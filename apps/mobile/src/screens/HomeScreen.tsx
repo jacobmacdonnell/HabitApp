@@ -6,16 +6,24 @@ import { Pet } from '../components/Pet';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { Plus } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { RootStackParamList, TabParamList } from '../navigation/types';
+
+type HomeScreenNavigationProp = CompositeNavigationProp<
+    BottomTabNavigationProp<TabParamList>,
+    NativeStackNavigationProp<RootStackParamList>
+>;
 
 const { width } = Dimensions.get('window');
 
 export const HomeScreen = () => {
     const { habits, progress, logProgress, undoProgress, getStreak, pet, deleteHabit } = useHabit();
-    const navigation = useNavigation();
+    const navigation = useNavigation<HomeScreenNavigationProp>();
     const [timeFilter, setTimeFilter] = useState('all');
     const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -135,8 +143,8 @@ export const HomeScreen = () => {
                 currentCount={current}
                 streak={streak}
                 onToggle={() => handleToggle(item)}
-                onPress={() => navigation.navigate('HabitForm' as never, { habit: item } as never)}
-                onEdit={() => navigation.navigate('HabitForm' as never, { habit: item } as never)}
+                onPress={() => navigation.navigate('HabitForm', { habit: item })}
+                onEdit={() => navigation.navigate('HabitForm', { habit: item })}
                 onDelete={() => handleDelete(item)}
             />
         );
@@ -157,7 +165,7 @@ export const HomeScreen = () => {
 
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => navigation.navigate('Pet' as never)}
+                    onPress={() => navigation.navigate('Pet')}
                     style={styles.petHeaderContainer}
                 >
                     <BlurView intensity={20} tint="light" style={styles.petGlass}>
@@ -178,8 +186,6 @@ export const HomeScreen = () => {
             </View>
         </View>
     );
-
-    // const insets = useSafeAreaInsets(); // Moved up
 
     // iOS 26: FAB positioned above floating dock
     // Dock top = insets.bottom + 16 (offset) + 68 (height) = insets.bottom + 84
@@ -214,18 +220,6 @@ export const HomeScreen = () => {
                     </View>
                 }
             />
-
-            {/* FAB */}
-            <TouchableOpacity
-                style={[styles.fab, { bottom: fabBottom }]}
-                activeOpacity={0.8}
-                onPress={() => navigation.navigate('HabitForm' as never)}
-            >
-                <BlurView intensity={40} tint="light" style={styles.fabBlur}>
-                    <Plus size={24} color="#000" strokeWidth={3} />
-                </BlurView>
-            </TouchableOpacity>
-
 
         </View>
     );
@@ -290,31 +284,6 @@ const styles = StyleSheet.create({
     emptyText: {
         color: 'rgba(255,255,255,0.3)',
         fontSize: 16,
-    },
-    fab: {
-        position: 'absolute',
-        // Dynamic bottom to clear the TabBar which is at (insets.bottom + 10) + 85 height
-        // We want it slightly above that. Let's say + 20 spacing.
-        // But since we can't use dynamic insets in stylesheet, we'll use inline styles or a memoized style.
-        // For now, let's just set a safe default high enough or handle it in the component.
-        // Actually, best practice is to pass it via style prop.
-        right: 20,
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        overflow: 'hidden',
-        shadowColor: '#fff',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 5,
-        zIndex: 100, // Ensure it's above everything
-    },
-    fabBlur: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff', // Fallback/Tint
     },
     sectionHeader: {
         flexDirection: 'row',

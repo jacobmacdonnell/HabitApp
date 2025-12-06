@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, ScrollView, Animated } from 'react-native';
-import { useHabit, Habit } from '@habitapp/shared';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated } from 'react-native';
+import { useHabit } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
 import { BlurView } from 'expo-blur';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { ArrowRight, Check, ChevronLeft, Minus, Plus } from 'lucide-react-native';
+import { ArrowRight, Check, Minus, Plus } from 'lucide-react-native';
+import { GlassInput } from '../components/GlassInput';
+import { GlassButton } from '../components/GlassButton';
 
 const { width } = Dimensions.get('window');
 
@@ -87,7 +89,7 @@ export const OnboardingScreen = () => {
                 ))}
             </View>
 
-            <ScrollView contentContainerStyle={styles.content} scrollEnabled={false}>
+            <ScrollView contentContainerStyle={styles.content} scrollEnabled={false} showsVerticalScrollIndicator={false}>
                 {/* STEP 0: WELCOME */}
                 {step === 0 && (
                     <View style={styles.stepContainer}>
@@ -98,10 +100,12 @@ export const OnboardingScreen = () => {
                         <Text style={styles.subtitle}>
                             Build better habits, track your progress, and grow alongside your digital companion.
                         </Text>
-                        <TouchableOpacity style={styles.primaryButton} onPress={handleNext}>
-                            <Text style={styles.primaryButtonText}>Get Started</Text>
-                            <ArrowRight size={20} color="#000" />
-                        </TouchableOpacity>
+                        <GlassButton
+                            title="Get Started"
+                            onPress={handleNext}
+                            icon={<ArrowRight size={20} color="#000" />}
+                            style={{ marginTop: 16 }}
+                        />
                     </View>
                 )}
 
@@ -117,12 +121,11 @@ export const OnboardingScreen = () => {
                                 <Text style={{ fontSize: 48 }}>🥚</Text>
                             </View>
 
-                            <TextInput
-                                style={styles.input}
+                            <GlassInput
                                 placeholder="Name your pet..."
-                                placeholderTextColor="rgba(255,255,255,0.3)"
                                 value={petName}
                                 onChangeText={setPetName}
+                                style={{ textAlign: 'center' }}
                             />
 
                             <View style={styles.colorRow}>
@@ -137,16 +140,18 @@ export const OnboardingScreen = () => {
                         </View>
 
                         <View style={styles.buttonRow}>
-                            <TouchableOpacity style={styles.secondaryButton} onPress={handleBack}>
-                                <Text style={styles.secondaryButtonText}>Back</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.primaryButton, !petName.trim() && styles.disabledButton]}
+                            <GlassButton
+                                title="Back"
+                                variant="secondary"
+                                onPress={handleBack}
+                                style={{ flex: 0.4 }}
+                            />
+                            <GlassButton
+                                title="Continue"
                                 onPress={handleNext}
                                 disabled={!petName.trim()}
-                            >
-                                <Text style={styles.primaryButtonText}>Continue</Text>
-                            </TouchableOpacity>
+                                style={{ flex: 1 }}
+                            />
                         </View>
                     </View>
                 )}
@@ -183,29 +188,30 @@ export const OnboardingScreen = () => {
 
                         <Text style={styles.orText}>OR CREATE CUSTOM</Text>
 
-                        <TextInput
-                            style={[styles.input, customHabit ? { borderColor: '#fff' } : {}]}
+                        <GlassInput
                             placeholder="e.g. Meditate for 5 mins"
-                            placeholderTextColor="rgba(255,255,255,0.3)"
                             value={customHabit}
                             onChangeText={(text) => {
                                 setCustomHabit(text);
                                 setSelectedPreset(null);
                                 setTargetCount(1);
                             }}
+                            style={customHabit ? { borderColor: '#fff' } : undefined}
                         />
 
                         <View style={styles.buttonRow}>
-                            <TouchableOpacity style={styles.secondaryButton} onPress={handleBack}>
-                                <Text style={styles.secondaryButtonText}>Back</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.primaryButton, (!selectedPreset && !customHabit) && styles.disabledButton]}
+                            <GlassButton
+                                title="Back"
+                                variant="secondary"
+                                onPress={handleBack}
+                                style={{ flex: 0.4 }}
+                            />
+                            <GlassButton
+                                title="Continue"
                                 onPress={handleNext}
                                 disabled={!selectedPreset && !customHabit}
-                            >
-                                <Text style={styles.primaryButtonText}>Continue</Text>
-                            </TouchableOpacity>
+                                style={{ flex: 1 }}
+                            />
                         </View>
                     </View>
                 )}
@@ -237,7 +243,7 @@ export const OnboardingScreen = () => {
 
                             <Text style={[styles.label, { marginTop: 24 }]}>TIME OF DAY</Text>
                             <View style={styles.grid}>
-                                <View style={{ marginTop: 8 }}>
+                                <View style={{ marginTop: 8, width: '100%' }}>
                                     <SegmentedControl
                                         values={['Morning', 'Noon', 'Evening', 'Anytime']}
                                         selectedIndex={['morning', 'midday', 'evening', 'anytime'].indexOf(timeOfDay)}
@@ -256,13 +262,18 @@ export const OnboardingScreen = () => {
                         </View>
 
                         <View style={styles.buttonRow}>
-                            <TouchableOpacity style={styles.secondaryButton} onPress={handleBack}>
-                                <Text style={styles.secondaryButtonText}>Back</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.primaryButton} onPress={handleFinish}>
-                                <Text style={styles.primaryButtonText}>Start Journey</Text>
-                                <Check size={20} color="#000" />
-                            </TouchableOpacity>
+                            <GlassButton
+                                title="Back"
+                                variant="secondary"
+                                onPress={handleBack}
+                                style={{ flex: 0.4 }}
+                            />
+                            <GlassButton
+                                title="Start Journey"
+                                onPress={handleFinish}
+                                icon={<Check size={20} color="#000" />}
+                                style={{ flex: 1 }}
+                            />
                         </View>
                     </View>
                 )}
@@ -333,38 +344,6 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         marginBottom: 16,
     },
-    primaryButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#fff',
-        paddingVertical: 16,
-        paddingHorizontal: 32,
-        borderRadius: 24,
-        gap: 8,
-        marginTop: 16,
-        flex: 1,
-    },
-    primaryButtonText: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: '#000',
-    },
-    secondaryButton: {
-        paddingVertical: 16,
-        paddingHorizontal: 24,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        marginTop: 16,
-    },
-    secondaryButtonText: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: '#fff',
-    },
-    disabledButton: {
-        opacity: 0.5,
-    },
     buttonRow: {
         flexDirection: 'row',
         gap: 12,
@@ -385,17 +364,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'center',
         borderWidth: 2,
-    },
-    input: {
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 16,
-        padding: 16,
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#fff',
-        textAlign: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
     },
     colorRow: {
         flexDirection: 'row',
@@ -476,21 +444,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 12,
         color: 'rgba(255,255,255,0.3)',
-    },
-    timeButton: {
-        width: '48%',
-        paddingVertical: 12,
-        borderRadius: 12,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        alignItems: 'center',
-    },
-    timeButtonSelected: {
-        backgroundColor: '#fff',
-    },
-    timeButtonText: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.6)',
-        textTransform: 'capitalize',
     },
 });

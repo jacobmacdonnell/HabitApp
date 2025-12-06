@@ -77,45 +77,30 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                 Animated.spring(scaleAnim, { toValue: 1, friction: 8, tension: 100, useNativeDriver: true })
             ]).start();
         }
-
         // 4. Data Step: Commit immediately
-        // We do NOT wait. We trust the Global Layer to handle the celebration persistence.
         onToggle();
     };
 
     const renderRightActions = (progress: any, dragX: any) => {
         const trans = dragX.interpolate({
-            inputRange: [-100, 0],
-            outputRange: [1, 0],
+            inputRange: [-160, 0],
+            outputRange: [0, 160],
             extrapolate: 'clamp',
         });
 
         return (
-            <View style={styles.rightAction}>
-                <Animated.View style={[styles.actionIcon, { transform: [{ scale: trans }] }]}>
-                    <TouchableOpacity onPress={onEdit}>
+            <Animated.View style={{ width: 160, flexDirection: 'row', transform: [{ translateX: trans }] }}>
+                <View style={styles.rightActionEdit}>
+                    <TouchableOpacity onPress={() => onEdit && onEdit()} style={styles.actionButtonContent}>
                         <Edit2 size={24} color="#fff" />
                     </TouchableOpacity>
-                </Animated.View>
-            </View>
-        );
-    };
-
-    const renderLeftActions = (progress: any, dragX: any) => {
-        const trans = dragX.interpolate({
-            inputRange: [0, 100],
-            outputRange: [0, 1],
-            extrapolate: 'clamp',
-        });
-
-        return (
-            <View style={styles.leftAction}>
-                <Animated.View style={[styles.actionIcon, { transform: [{ scale: trans }] }]}>
-                    <TouchableOpacity onPress={onDelete}>
+                </View>
+                <View style={[styles.rightActionDelete, { backgroundColor: '#ef4444' }]}>
+                    <TouchableOpacity onPress={onDelete} style={styles.actionButtonContent}>
                         <Trash2 size={24} color="#fff" />
                     </TouchableOpacity>
-                </Animated.View>
-            </View>
+                </View>
+            </Animated.View>
         );
     };
 
@@ -123,8 +108,8 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
         <Animated.View style={[styles.container, { transform: [{ scale: scaleAnim }] }]}>
             <Swipeable
                 renderRightActions={renderRightActions}
-                renderLeftActions={renderLeftActions}
                 onSwipeableOpen={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+                overshootRight={false}
             >
                 <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
                     <BlurView
@@ -216,7 +201,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                     </BlurView>
                 </TouchableOpacity>
             </Swipeable>
-        </Animated.View>
+        </Animated.View >
     );
 };
 
@@ -320,22 +305,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    leftAction: {
-        backgroundColor: '#ef4444',
+    rightActionEdit: {
+        backgroundColor: '#64748b', // Slate Gray for Edit
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
     },
-    rightAction: {
-        backgroundColor: '#3b82f6',
+    rightActionDelete: {
+        backgroundColor: '#ef4444', // Danger Red
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
     },
-    actionIcon: {
-        width: 40,
-        height: 40,
-        alignItems: 'center',
+    actionButtonContent: {
+        width: 80,
+        height: '100%',
         justifyContent: 'center',
+        alignItems: 'center',
     },
 });

@@ -55,6 +55,23 @@ export const LiquidGlass = {
             semibold: '600',
             regular: '400',
         }
+    },
+    // Colors & Text
+    text: {
+        primary: '#fff',
+        secondary: 'rgba(255,255,255,0.6)',
+        tertiary: 'rgba(255,255,255,0.3)',
+        label: 'rgba(255,255,255,0.5)',
+    },
+    colors: {
+        white: '#ffffff',
+        black: '#000000',
+        danger: '#ef4444',
+        success: '#22c55e',
+        warning: '#f59e0b',
+        info: '#3b82f6',
+        glassBorder: 'rgba(255,255,255,0.1)',
+        glassBackground: 'rgba(255,255,255,0.1)',
     }
 } as const;
 

@@ -1,10 +1,14 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, TextInput } from 'react-native';
 import { Check, Lock } from 'lucide-react-native';
 import { useHabit } from '@habitapp/shared';
 import * as Haptics from 'expo-haptics';
 import { useNavigation } from '@react-navigation/native';
 import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Rect } from 'react-native-svg';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { ScreenWrapper } from '../components/ScreenWrapper';
+import { GlassInput } from '../components/GlassInput';
 
 const { width } = Dimensions.get('window');
 
@@ -154,7 +158,7 @@ const HatIcon = ({ type }: { type: string }) => {
 
 export const PetCustomizeScreen = () => {
     const { pet, updatePet } = useHabit();
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     if (!pet) return null;
 
@@ -205,99 +209,91 @@ export const PetCustomizeScreen = () => {
     };
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-        >
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScreenWrapper keyboardAvoiding isModal contentContainerStyle={styles.content}>
 
-                {/* Live Pet Preview */}
-                <PetPreview color={selectedColor} hat={selectedHat} mood={pet.mood} />
+            {/* Live Pet Preview */}
+            <PetPreview color={selectedColor} hat={selectedHat} mood={pet.mood} />
 
-                {/* Name Input */}
-                <View style={styles.section}>
-                    <Text style={styles.label}>NAME</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={name}
-                        onChangeText={setName}
-                        placeholder="Pet Name"
-                        placeholderTextColor="rgba(255,255,255,0.3)"
-                        maxLength={20}
-                    />
-                </View>
+            {/* Name Input */}
+            <View style={styles.section}>
+                <GlassInput
+                    label="NAME"
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="Pet Name"
+                    maxLength={20}
+                />
+            </View>
 
-                {/* Color Picker */}
-                <View style={styles.section}>
-                    <Text style={styles.label}>COLOR</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorRow}>
-                        {COLORS.map((color) => (
+            {/* Color Picker */}
+            <View style={styles.section}>
+                <Text style={styles.label}>COLOR</Text>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.colorRow}
+                    style={{ marginHorizontal: -12 }}
+                >
+                    {COLORS.map((color) => (
+                        <TouchableOpacity
+                            key={color}
+                            style={[
+                                styles.colorDot,
+                                { backgroundColor: color },
+                                selectedColor === color && styles.colorSelected
+                            ]}
+                            onPress={() => handleColorSelect(color)}
+                        >
+                            {selectedColor === color && <Check size={16} color="#fff" strokeWidth={3} />}
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </View>
+
+            {/* Hat/Wardrobe Picker */}
+            <View style={styles.section}>
+                <Text style={styles.label}>ACCESSORIES</Text>
+                <View style={styles.hatGrid}>
+                    {HATS.map((hat) => {
+                        const isLocked = (pet.level || 1) < hat.requiredLevel;
+                        const isSelected = selectedHat === hat.id;
+
+                        return (
                             <TouchableOpacity
-                                key={color}
+                                key={hat.id}
                                 style={[
-                                    styles.colorDot,
-                                    { backgroundColor: color },
-                                    selectedColor === color && styles.colorSelected
+                                    styles.hatCard,
+                                    isSelected && styles.hatSelected,
+                                    isLocked && styles.hatLocked
                                 ]}
-                                onPress={() => handleColorSelect(color)}
+                                onPress={() => handleHatSelect(hat.id, isLocked)}
+                                activeOpacity={0.8}
                             >
-                                {selectedColor === color && <Check size={16} color="#fff" strokeWidth={3} />}
+                                <HatIcon type={hat.id} />
+                                <Text style={styles.hatName}>{hat.name}</Text>
+                                {isLocked && (
+                                    <View style={styles.lockBadge}>
+                                        <Lock size={8} color="#fff" />
+                                        <Text style={styles.lockText}>Lvl {hat.requiredLevel}</Text>
+                                    </View>
+                                )}
+                                {isSelected && !isLocked && (
+                                    <View style={styles.checkBadge}>
+                                        <Check size={10} color="#000" strokeWidth={3} />
+                                    </View>
+                                )}
                             </TouchableOpacity>
-                        ))}
-                    </ScrollView>
+                        );
+                    })}
                 </View>
-
-                {/* Hat/Wardrobe Picker */}
-                <View style={styles.section}>
-                    <Text style={styles.label}>ACCESSORIES</Text>
-                    <View style={styles.hatGrid}>
-                        {HATS.map((hat) => {
-                            const isLocked = (pet.level || 1) < hat.requiredLevel;
-                            const isSelected = selectedHat === hat.id;
-
-                            return (
-                                <TouchableOpacity
-                                    key={hat.id}
-                                    style={[
-                                        styles.hatCard,
-                                        isSelected && styles.hatSelected,
-                                        isLocked && styles.hatLocked
-                                    ]}
-                                    onPress={() => handleHatSelect(hat.id, isLocked)}
-                                    activeOpacity={0.8}
-                                >
-                                    <HatIcon type={hat.id} />
-                                    <Text style={styles.hatName}>{hat.name}</Text>
-                                    {isLocked && (
-                                        <View style={styles.lockBadge}>
-                                            <Lock size={8} color="#fff" />
-                                            <Text style={styles.lockText}>Lvl {hat.requiredLevel}</Text>
-                                        </View>
-                                    )}
-                                    {isSelected && !isLocked && (
-                                        <View style={styles.checkBadge}>
-                                            <Check size={10} color="#000" strokeWidth={3} />
-                                        </View>
-                                    )}
-                                </TouchableOpacity>
-                            );
-                        })}
-                    </View>
-                </View>
-
-            </ScrollView>
-        </KeyboardAvoidingView>
+            </View>
+        </ScreenWrapper>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#1c1c1e',
-    },
     content: {
-        padding: 20,
-        paddingBottom: 100,
+        // Padding handled by ScreenWrapper
     },
     previewContainer: {
         alignItems: 'center',
@@ -323,15 +319,15 @@ const styles = StyleSheet.create({
         marginLeft: 4,
     },
     input: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 12,
-        padding: 16,
-        color: '#fff',
-        fontSize: 18,
+        // backgroundColor: 'rgba(255,255,255,0.1)',
+        // borderRadius: 12,
+        // padding: 16,
+        // color: '#fff',
+        // fontSize: 18,
     },
     colorRow: {
         gap: 12,
-        paddingHorizontal: 4,
+        paddingHorizontal: 12,
         paddingVertical: 10,
     },
     colorDot: {
@@ -353,7 +349,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     hatCard: {
-        width: (width - 60) / 3,
+        width: (width - 60) / 3, // Roughly 3 columns
         backgroundColor: 'rgba(255,255,255,0.1)',
         borderRadius: 12,
         padding: 12,
