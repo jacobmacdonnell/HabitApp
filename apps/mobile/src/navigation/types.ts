@@ -20,7 +20,6 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeSta
 export type TabParamList = {
     Today: undefined;
     Pet: undefined;
-    Add: undefined;
     Trends: undefined;
     Settings: undefined;
 };

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView 
 import { useHabit } from '@habitapp/shared';
 import { Pet } from '../components/Pet';
 import { BlurView } from 'expo-blur';
+import { GlassView } from 'expo-glass-effect';
 import { Egg } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

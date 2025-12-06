@@ -187,13 +187,11 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                                         ]}
                                         activeOpacity={0.7}
                                     >
-                                        {isCompleted && (
-                                            <Check
-                                                size={22}
-                                                color="#fff" // Always white check
-                                                strokeWidth={4} // Thicker for emphasis
-                                            />
-                                        )}
+                                        <Check
+                                            size={22}
+                                            color={isCompleted ? '#fff' : 'rgba(255,255,255,0.3)'}
+                                            strokeWidth={isCompleted ? 4 : 2.5}
+                                        />
                                     </TouchableOpacity>
                                 </View>
                             </View>

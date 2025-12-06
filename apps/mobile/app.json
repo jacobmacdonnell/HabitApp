@@ -15,8 +15,10 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "UIDesignRequiresCompatibility": false
-      }
+        "UIDesignRequiresCompatibility": false,
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "bundleIdentifier": "com.habitapp.cyb3rmac"
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +34,11 @@
     "plugins": [
       "expo-asset",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "796d86cd-8cf6-4d0a-afed-f7ed3de677eb"
+      }
+    }
   }
 }

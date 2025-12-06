@@ -10,6 +10,7 @@ import { useNavigation, useIsFocused, CompositeNavigationProp } from '@react-nav
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
+import { GlassView } from 'expo-glass-effect';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RootStackParamList, TabParamList } from '../navigation/types';
@@ -221,6 +222,20 @@ export const HomeScreen = () => {
                 }
             />
 
+            {/* iOS 26 Floating Action Button */}
+            <TouchableOpacity
+                style={[styles.fab, { bottom: fabBottom }]}
+                activeOpacity={0.8}
+                onPress={() => (navigation as any).navigate('HabitForm')}
+            >
+                <GlassView
+                    style={styles.fabGlass}
+                    glassEffectStyle="regular"
+                >
+                    <Plus size={28} color="#fff" strokeWidth={2.5} />
+                </GlassView>
+            </TouchableOpacity>
+
         </View>
     );
 };
@@ -308,5 +323,27 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 12,
+    },
+    fab: {
+        position: 'absolute',
+        right: 20,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+    },
+    fabGlass: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.15)',
+        overflow: 'hidden',
     },
 });

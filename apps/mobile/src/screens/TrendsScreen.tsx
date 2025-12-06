@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { useHabit } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
+import { GlassView } from 'expo-glass-effect';
 import { TrendingUp, Award, Calendar, Check, X, Grid, List as ListIcon } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -160,14 +161,14 @@ export const TrendsScreen = () => {
                     <Text style={styles.statLabel}>Consistency</Text>
                     <Text style={styles.statBigValue}>{consistencyScore}%</Text>
                 </BlurView>
-                <BlurView intensity={20} tint="dark" style={styles.statCard}>
+                <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.statCard}>
                     <Text style={styles.statLabel}>Best Streak</Text>
                     <Text style={styles.statBigValue}>{bestStreak}</Text>
                 </BlurView>
             </View>
 
             <View style={styles.statsGrid}>
-                <BlurView intensity={20} tint="dark" style={[styles.statCard, { flex: 2 }]}>
+                <BlurView intensity={40} tint="systemThickMaterialDark" style={[styles.statCard, { flex: 2 }]}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                         <Award size={16} color="#fbbf24" />
                         <Text style={styles.statLabel}>Total Completions</Text>
@@ -179,7 +180,7 @@ export const TrendsScreen = () => {
             {/* Heatmap */}
             <View style={styles.section}>
                 <Text style={styles.sectionHeader}>30 DAY HEATMAP</Text>
-                <BlurView intensity={20} tint="dark" style={styles.heatmapCard}>
+                <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.heatmapCard}>
                     <View style={styles.heatmapGrid}>
                         {heatmapData.map((day, i) => (
                             <View

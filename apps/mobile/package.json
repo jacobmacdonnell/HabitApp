@@ -21,6 +21,7 @@
     "expo-asset": "*",
     "expo-blur": "~15.0.8",
     "expo-constants": "*",
+    "expo-dev-client": "~6.0.20",
     "expo-device": "~8.0.10",
     "expo-font": "*",
     "expo-glass-effect": "~0.1.8",
