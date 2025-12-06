@@ -1,8 +1,8 @@
 import React from 'react';
-import SegmentedControl, { NativeSegmentedControlIOSProps } from '@react-native-segmented-control/segmented-control';
+import SegmentedControl, { SegmentedControlProps } from '@react-native-segmented-control/segmented-control';
 import { LiquidGlass } from '../theme/theme';
 
-interface GlassSegmentedControlProps extends Omit<NativeSegmentedControlIOSProps, 'appearance' | 'fontStyle' | 'activeFontStyle' | 'backgroundColor'> {
+interface GlassSegmentedControlProps extends Omit<SegmentedControlProps, 'appearance' | 'fontStyle' | 'activeFontStyle' | 'backgroundColor'> {
     // We can add custom props here if needed in the future
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, NativeSyntheticEvent } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
@@ -139,7 +139,7 @@ export const HabitFormScreen = () => {
                 <GlassSegmentedControl
                     values={['Anytime', 'Morning', 'Noon', 'Evening']}
                     selectedIndex={['anytime', 'morning', 'midday', 'evening'].indexOf(timeOfDay)}
-                    onChange={(event) => {
+                    onChange={(event: NativeSyntheticEvent<{ selectedSegmentIndex: number }>) => {
                         const index = event.nativeEvent.selectedSegmentIndex;
                         const times = ['anytime', 'morning', 'midday', 'evening'] as const;
                         setTimeOfDay(times[index]);
