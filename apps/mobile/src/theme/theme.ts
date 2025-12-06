@@ -13,6 +13,8 @@ export const LiquidGlass = {
         light: 'systemMaterialLight',
         default: 'default',
     },
+    // Global App Background
+    backgroundColor: '#1c1c1e',
     // Floating Dock Specs - iOS 26 HIG aligned
     dock: {
         bottomOffset: 16, // Float 16pt above home indicator (iOS 26)

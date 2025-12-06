@@ -186,6 +186,7 @@ export const AppNavigator = () => {
                                 headerShown: true,
                                 headerStyle: { backgroundColor: '#1c1c1e' },
                                 headerTintColor: '#fff',
+                                headerShadowVisible: false, // Remove dark line
                                 contentStyle: { backgroundColor: '#1c1c1e' },
                             }}
                         />
@@ -197,6 +198,7 @@ export const AppNavigator = () => {
                                 headerShown: true,
                                 headerStyle: { backgroundColor: '#1c1c1e' },
                                 headerTintColor: '#fff',
+                                headerShadowVisible: false, // Remove dark line
                                 contentStyle: { backgroundColor: '#1c1c1e' },
                             }}
                         />

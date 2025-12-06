@@ -4,7 +4,7 @@ import { useHabit } from '@habitapp/shared';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Moon, Sun, Volume2, Bell, Shield, Trash2, ChevronRight, Smartphone } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
-import SegmentedControl from '@react-native-segmented-control/segmented-control';
+
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -12,7 +12,6 @@ export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
     const [notifications, setNotifications] = useState(settings.notifications ?? true);
     const [sound, setSound] = useState(settings.sound ?? true);
-    const [theme, setTheme] = useState<'auto' | 'light' | 'dark'>(settings.theme || 'auto');
 
     const handleReset = () => {
         Alert.alert(
@@ -44,10 +43,7 @@ export const SettingsScreen = () => {
         return date;
     };
 
-    const handleThemeChange = (newTheme: 'auto' | 'light' | 'dark') => {
-        setTheme(newTheme);
-        updateSettings({ theme: newTheme });
-    };
+
 
     const handleNotificationChange = (val: boolean) => {
         setNotifications(val);
@@ -63,9 +59,7 @@ export const SettingsScreen = () => {
 
     return (
         <View style={styles.wrapper}>
-            {/* Ambient Background - iOS 26 style */}
-            <View style={[styles.blob, { backgroundColor: '#6366f1', top: -100, left: -100 }]} />
-            <View style={[styles.blob, { backgroundColor: '#a855f7', bottom: -100, right: -100 }]} />
+            {/* Ambient Background - Clean Dark Theme */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
             <ScrollView
@@ -81,29 +75,9 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>PREFERENCES</Text>
                     <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.card}>
-                        {/* Theme Selector */}
-                        <View style={styles.row}>
-                            <View style={styles.iconLabel}>
-                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(99, 102, 241, 0.2)' }]}>
-                                    <Moon size={20} color="#818cf8" />
-                                </View>
-                                <Text style={styles.label}>Appearance</Text>
-                            </View>
-                        </View>
 
-                        <View style={styles.segmentContainer}>
-                            <SegmentedControl
-                                values={['Auto', 'Light', 'Dark']}
-                                selectedIndex={['auto', 'light', 'dark'].indexOf(theme)}
-                                onChange={(event) => {
-                                    const index = event.nativeEvent.selectedSegmentIndex;
-                                    handleThemeChange(['auto', 'light', 'dark'][index] as any);
-                                }}
-                                appearance="dark"
-                            />
-                        </View>
 
-                        <View style={styles.separator} />
+
 
                         {/* Sound */}
                         <View style={styles.row}>
@@ -220,7 +194,7 @@ export const SettingsScreen = () => {
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#1c1c1e',
     },
     container: {
         flex: 1,
@@ -314,12 +288,5 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         marginTop: 20,
     },
-    // iOS 26 ambient background
-    blob: {
-        position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        opacity: 0.3,
-    },
+
 });

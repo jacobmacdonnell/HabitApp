@@ -208,9 +208,7 @@ export const TrendsScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Ambient Background - iOS 26 style */}
-            <View style={[styles.blob, { backgroundColor: '#22c55e', top: -100, left: -100 }]} />
-            <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
+            {/* Ambient Background - Clean Dark Theme */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
             <ScrollView
@@ -233,7 +231,7 @@ export const TrendsScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#1c1c1e',
     },
     content: {
         padding: 20,
@@ -418,14 +416,7 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.5)',
         fontWeight: '600',
     },
-    // iOS 26 ambient background
-    blob: {
-        position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        opacity: 0.3,
-    },
+
     scrollView: {
         flex: 1,
     },

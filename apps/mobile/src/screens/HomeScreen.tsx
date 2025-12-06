@@ -190,9 +190,7 @@ export const HomeScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Ambient Background Blobs */}
-            <View style={[styles.blob, { backgroundColor: '#6366f1', top: -100, left: -100 }]} pointerEvents="none" />
-            <View style={[styles.blob, { backgroundColor: '#FF6B6B', bottom: -100, right: -100, opacity: 0.2 }]} pointerEvents="none" />
+            {/* Ambient Background - Clean Dark Theme */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
 
             <SectionList
@@ -236,15 +234,9 @@ export const HomeScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#1c1c1e',
     },
-    blob: {
-        position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        opacity: 0.3,
-    },
+
     dateHeader: {
         paddingHorizontal: 20,
         paddingTop: 10,

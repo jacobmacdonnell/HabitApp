@@ -162,24 +162,33 @@ export const PetCustomizeScreen = () => {
     const [selectedColor, setSelectedColor] = useState(pet.color);
     const [selectedHat, setSelectedHat] = useState(pet.hat || 'none');
 
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: 'Customize Pet',
+            headerLeft: () => (
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={{ paddingHorizontal: 16 }}
+                >
+                    <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
+                </TouchableOpacity>
+            ),
+            headerRight: () => (
+                <TouchableOpacity
+                    onPress={handleSave}
+                    style={{ paddingHorizontal: 16 }}
+                >
+                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Save</Text>
+                </TouchableOpacity>
+            ),
+        });
+    }, [navigation, name, selectedColor, selectedHat]);
+
     const handleSave = () => {
         updatePet({ name, color: selectedColor, hat: selectedHat });
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         navigation.goBack();
     };
-
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            title: 'Customize Pet',
-            headerRight: () => (
-                <TouchableOpacity onPress={handleSave} style={{ padding: 8 }}>
-                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600' }}>Done</Text>
-                </TouchableOpacity>
-            ),
-            headerStyle: { backgroundColor: '#1c1c1e' },
-            headerTintColor: '#fff',
-        });
-    }, [navigation, name, selectedColor, selectedHat]);
 
     const handleColorSelect = (color: string) => {
         setSelectedColor(color);

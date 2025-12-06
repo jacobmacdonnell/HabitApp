@@ -43,21 +43,25 @@ export const HabitFormScreen = () => {
         } else {
             addHabit(habitData);
         }
-
-        navigation.goBack();
     };
 
     useLayoutEffect(() => {
         navigation.setOptions({
             title: editingHabit ? 'Edit Habit' : 'New Habit',
             headerLeft: () => (
-                <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 8 }}>
-                    <Text style={{ color: '#fff', fontSize: 17 }}>Cancel</Text>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={{ paddingHorizontal: 16 }}
+                >
+                    <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
                 </TouchableOpacity>
             ),
             headerRight: () => (
-                <TouchableOpacity onPress={handleSave} style={{ padding: 8 }}>
-                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600' }}>Save</Text>
+                <TouchableOpacity
+                    onPress={handleSave}
+                    style={{ paddingHorizontal: 16 }}
+                >
+                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Save</Text>
                 </TouchableOpacity>
             ),
         });
