@@ -3,7 +3,7 @@ import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Animated, Easing,
 import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Text as SvgText, Rect } from 'react-native-svg';
 import { Pet as PetType } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
-import { Heart, Zap, Smile, Star, Palette, Shirt } from 'lucide-react-native';
+import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 
@@ -13,6 +13,7 @@ interface PetProps {
     pet: PetType | null;
     isFullView?: boolean;
     onUpdate?: (updates: Partial<PetType>) => void;
+    feedingBounce?: number; // Increment to trigger bounce animation
 }
 
 // Z-Particle Component using standard Animated
@@ -63,7 +64,7 @@ const ZParticle = ({ delay, xOffset }: { delay: number, xOffset: number }) => {
     );
 };
 
-export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
+export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetProps) => {
     // State
     const navigation = useNavigation();
     const [xpDiff, setXpDiff] = useState(0);
@@ -82,6 +83,16 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
     const levelScaleAnim = useRef(new Animated.Value(0)).current;
     const levelFadeAnim = useRef(new Animated.Value(0)).current;
     const interactionScale = useRef(new Animated.Value(1)).current;
+
+    // Bounce animation when receiving food (feedingBounce changes)
+    useEffect(() => {
+        if (feedingBounce && feedingBounce > 0) {
+            Animated.sequence([
+                Animated.timing(interactionScale, { toValue: 1.15, duration: 100, useNativeDriver: true }),
+                Animated.spring(interactionScale, { toValue: 1, friction: 3, tension: 300, useNativeDriver: true })
+            ]).start();
+        }
+    }, [feedingBounce]);
 
     const handlePetPress = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -304,6 +315,9 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
                     </Animated.View>
                 </TouchableOpacity>
 
+                {/* Shadow under pet */}
+                <View style={styles.petShadow} />
+
                 {isSleeping && (
                     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
                         <ZParticle delay={0} xOffset={160} />
@@ -331,73 +345,54 @@ export const Pet = ({ pet, isFullView = false, onUpdate }: PetProps) => {
             </View>
 
             <BlurView intensity={40} tint="systemThickMaterialDark" style={styles.statsCard}>
-                <View style={styles.nameRow}>
-                    <Text style={styles.label}>NAME</Text>
-                    <Text style={styles.name}>{pet.name}</Text>
-                </View>
-
-                <View style={styles.statsGrid}>
-                    <View style={styles.statFullRow}>
-                        <View style={styles.statHeader}>
-                            <View style={styles.iconLabel}>
-                                <Heart size={14} color="#f87171" />
-                                <Text style={styles.statLabel}>Health</Text>
-                            </View>
-                            <Text style={styles.statValue}>{Math.round(pet.health)}%</Text>
-                        </View>
-                        <View style={styles.barBg}>
-                            <View style={[styles.barFill, { width: `${pet.health}%`, backgroundColor: pet.health < 30 ? '#ef4444' : '#22c55e' }]} />
-                        </View>
+                {/* Level & Mood Header */}
+                <View style={styles.headerRow}>
+                    <View style={styles.levelBadge}>
+                        <Zap size={14} color="#facc15" />
+                        <Text style={styles.levelBadgeText}>Level {currentLevel}</Text>
                     </View>
-
-                    <View style={styles.statFullRow}>
-                        <View style={styles.statHeader}>
-                            <View style={styles.iconLabel}>
-                                <Zap size={14} color="#facc15" />
-                                <Text style={styles.statLabel}>XP</Text>
-                            </View>
-                            <Text style={styles.statValue}>Lvl {currentLevel}</Text>
-                        </View>
-                        <View style={styles.barBg}>
-                            <View style={[styles.barFill, { width: `${xpPercentage}%`, backgroundColor: '#eab308' }]} />
-                        </View>
-                    </View>
-
-                    {/* Grid Items - Forced to 2 columns */}
-                    <View style={styles.halfWidth}>
-                        <View style={styles.miniStat}>
-                            <View style={[styles.miniIcon, { backgroundColor: 'rgba(99, 102, 241, 0.2)' }]}>
-                                <Smile size={18} color="#a5b4fc" />
-                            </View>
-                            <Text style={styles.miniLabel} numberOfLines={1}>MOOD</Text>
-                            <Text style={styles.miniValue} numberOfLines={1}>{pet.mood.charAt(0).toUpperCase() + pet.mood.slice(1)}</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.halfWidth}>
-                        <View style={styles.miniStat}>
-                            <View style={[styles.miniIcon, { backgroundColor: 'rgba(168, 85, 247, 0.2)' }]}>
-                                <Star size={18} color="#d8b4fe" />
-                            </View>
-                            <Text style={styles.miniLabel} numberOfLines={1}>LEVEL</Text>
-                            <Text style={styles.miniValue}>{currentLevel}</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.halfWidth}>
-                        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('PetStyle' as never)}>
-                            <Palette size={16} color="#fff" />
-                            <Text style={styles.actionText} numberOfLines={1}>Style</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.halfWidth}>
-                        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('PetWardrobe' as never)}>
-                            <Shirt size={16} color="#fff" />
-                            <Text style={styles.actionText} numberOfLines={1}>Wardrobe</Text>
-                        </TouchableOpacity>
+                    <View style={styles.moodPill}>
+                        <Smile size={14} color={pet.mood === 'happy' ? '#22c55e' : pet.mood === 'sad' ? '#f87171' : '#a5b4fc'} />
+                        <Text style={styles.moodText}>{pet.mood.charAt(0).toUpperCase() + pet.mood.slice(1)}</Text>
                     </View>
                 </View>
+
+                {/* Stats Bars */}
+                <View style={styles.barsContainer}>
+                    {/* Health Bar */}
+                    <View style={styles.statRow}>
+                        <View style={styles.statInfo}>
+                            <Heart size={14} color="#f87171" />
+                            <Text style={styles.statLabel}>Health</Text>
+                        </View>
+                        <View style={styles.barWrapper}>
+                            <View style={styles.barBg}>
+                                <View style={[styles.barFill, { width: `${pet.health}%`, backgroundColor: pet.health < 30 ? '#ef4444' : '#22c55e' }]} />
+                            </View>
+                            <Text style={styles.barValue}>{Math.round(pet.health)}%</Text>
+                        </View>
+                    </View>
+
+                    {/* XP Bar */}
+                    <View style={styles.statRow}>
+                        <View style={styles.statInfo}>
+                            <Zap size={14} color="#facc15" />
+                            <Text style={styles.statLabel}>XP</Text>
+                        </View>
+                        <View style={styles.barWrapper}>
+                            <View style={styles.barBg}>
+                                <View style={[styles.barFill, { width: `${xpPercentage}%`, backgroundColor: '#facc15' }]} />
+                            </View>
+                            <Text style={styles.barValue}>{currentXp}/{xpToNextLevel}</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Customize Button */}
+                <TouchableOpacity style={styles.customizeButton} onPress={() => navigation.navigate('PetCustomize' as never)}>
+                    <Palette size={18} color="#fff" />
+                    <Text style={styles.customizeText}>Customize</Text>
+                </TouchableOpacity>
             </BlurView>
 
 
@@ -427,6 +422,7 @@ const styles = StyleSheet.create({
         width: 250,
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 24, // Add spacing between pet and stats card
     },
     glowContainer: {
         position: 'absolute',
@@ -485,67 +481,82 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
     },
+    petShadow: {
+        width: 120,
+        height: 20,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        borderRadius: 60,
+        marginTop: -10,
+    },
     statsCard: {
         width: width - 40,
         borderRadius: 20,
         padding: 16,
         backgroundColor: 'rgba(255,255,255,0.05)',
         overflow: 'hidden',
+        marginTop: 20,
     },
-    nameRow: {
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.08)',
-        paddingBottom: 8,
+        marginBottom: 16,
     },
-    label: {
-        fontSize: 10,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.5)',
-        marginBottom: 4,
-    },
-    name: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#fff',
-    },
-    statsGrid: {
+    levelBadge: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: 'rgba(250, 204, 21, 0.15)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        gap: 6,
     },
-    statFullRow: {
-        width: '100%',
-        marginBottom: 4,
+    levelBadgeText: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#facc15',
     },
-    halfWidth: {
-        width: '47%', // Slightly less than 50% to account for gap
-        marginBottom: 8,
-    },
-    statHeader: {
+    moodPill: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 6,
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        gap: 6,
     },
-    iconLabel: {
+    moodText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.8)',
+    },
+    barsContainer: {
+        gap: 12,
+        marginBottom: 16,
+    },
+    statRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    statInfo: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
+        width: 70,
     },
     statLabel: {
         fontSize: 12,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.7)',
-        textTransform: 'uppercase',
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.6)',
     },
-    statValue: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#fff',
+    barWrapper: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
     },
     barBg: {
+        flex: 1,
         height: 8,
         backgroundColor: 'rgba(0,0,0,0.3)',
         borderRadius: 4,
@@ -555,45 +566,27 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 4,
     },
-    miniStat: {
-        width: '100%',
-        height: 72,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 12,
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
+    barValue: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.7)',
+        width: 55,
+        textAlign: 'right',
     },
-    miniIcon: {
-        padding: 6,
-        borderRadius: 20,
-        marginBottom: 4,
-    },
-    miniLabel: {
-        fontSize: 9,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.5)',
-        marginBottom: 2,
-    },
-    miniValue: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#fff',
-    },
-    actionButton: {
+    customizeButton: {
         width: '100%',
         height: 44,
         backgroundColor: 'rgba(255,255,255,0.1)',
         borderRadius: 12,
-        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        gap: 6,
+        gap: 8,
     },
-    actionText: {
-        fontSize: 13,
+    customizeText: {
+        fontSize: 15,
         fontWeight: '600',
         color: '#fff',
     },
 });
+

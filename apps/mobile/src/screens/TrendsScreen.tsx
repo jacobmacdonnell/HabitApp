@@ -103,42 +103,52 @@ export const TrendsScreen = () => {
 
     const renderWeeklyView = () => (
         <View style={styles.listContainer}>
-            <View style={styles.weekHeaderRow}>
-                <View style={{ flex: 1 }} />
-                <View style={styles.daysRow}>
-                    {last7Days.map((day, i) => (
-                        <Text key={i} style={[styles.columnLabel, day.isToday && styles.todayLabel]}>
-                            {day.dayName}
-                        </Text>
-                    ))}
+            {habits.length === 0 ? (
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyIcon}>📊</Text>
+                    <Text style={styles.emptyTitle}>No habits yet</Text>
+                    <Text style={styles.emptyText}>Create your first habit to start tracking</Text>
                 </View>
-            </View>
+            ) : (
+                <>
+                    <View style={styles.weekHeaderRow}>
+                        <View style={{ flex: 1 }} />
+                        <View style={styles.daysRow}>
+                            {last7Days.map((day, i) => (
+                                <Text key={i} style={[styles.columnLabel, day.isToday && styles.todayLabel]}>
+                                    {day.dayName}
+                                </Text>
+                            ))}
+                        </View>
+                    </View>
 
-            {habitWeeklyStatus.map(habit => (
-                <BlurView key={habit.id} intensity={40} tint="systemThickMaterialDark" style={styles.habitRowCard}>
-                    <View style={styles.habitInfo}>
-                        <Text style={styles.habitTitle} numberOfLines={1}>{habit.title}</Text>
-                        <Text style={styles.streakLabel}>{getStreak(habit.id)} day streak</Text>
-                    </View>
-                    <View style={styles.daysRow}>
-                        {habit.history.map((day, i) => (
-                            <View key={i} style={styles.statusBubbleContainer}>
-                                {day.isCompleted ? (
-                                    <View style={[styles.statusBubble, { backgroundColor: habit.color }]}>
-                                        <Check size={10} color="#fff" strokeWidth={4} />
-                                    </View>
-                                ) : day.isPartiallyDone ? (
-                                    <View style={[styles.statusBubble, styles.partialBubble, { borderColor: habit.color }]}>
-                                        <Text style={{ fontSize: 8, color: habit.color }}>•</Text>
-                                    </View>
-                                ) : (
-                                    <View style={[styles.statusBubble, styles.emptyBubble]} />
-                                )}
+                    {habitWeeklyStatus.map(habit => (
+                        <BlurView key={habit.id} intensity={40} tint="systemThickMaterialDark" style={styles.habitRowCard}>
+                            <View style={styles.habitInfo}>
+                                <Text style={styles.habitTitle} numberOfLines={1}>{habit.title}</Text>
+                                <Text style={styles.streakLabel}>{getStreak(habit.id)} day streak</Text>
                             </View>
-                        ))}
-                    </View>
-                </BlurView>
-            ))}
+                            <View style={styles.daysRow}>
+                                {habit.history.map((day, i) => (
+                                    <View key={i} style={styles.statusBubbleContainer}>
+                                        {day.isCompleted ? (
+                                            <View style={[styles.statusBubble, { backgroundColor: habit.color }]}>
+                                                <Check size={10} color="#fff" strokeWidth={4} />
+                                            </View>
+                                        ) : day.isPartiallyDone ? (
+                                            <View style={[styles.statusBubble, styles.partialBubble, { borderColor: habit.color }]}>
+                                                <Text style={{ fontSize: 8, color: habit.color }}>•</Text>
+                                            </View>
+                                        ) : (
+                                            <View style={[styles.statusBubble, styles.emptyBubble]} />
+                                        )}
+                                    </View>
+                                ))}
+                            </View>
+                        </BlurView>
+                    ))}
+                </>
+            )}
         </View>
     );
 
@@ -418,5 +428,26 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         flex: 1,
+    },
+    // Empty State
+    emptyState: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 60,
+    },
+    emptyIcon: {
+        fontSize: 48,
+        marginBottom: 16,
+    },
+    emptyTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#fff',
+        marginBottom: 8,
+    },
+    emptyText: {
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.5)',
+        textAlign: 'center',
     },
 });

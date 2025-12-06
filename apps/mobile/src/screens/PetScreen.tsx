@@ -69,7 +69,7 @@ export const PetScreen = () => {
                 contentInsetAdjustmentBehavior="automatic"
             >
                 <View style={styles.headerRow}>
-                    <Text style={styles.headerTitle}>Companion</Text>
+                    <Text style={styles.headerTitle}>{pet.name}</Text>
                 </View>
                 <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
             </ScrollView>

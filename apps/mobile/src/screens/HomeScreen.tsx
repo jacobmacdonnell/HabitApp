@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Platform, Alert, Dimensions } from 'react-native';
+import React, { useState, useMemo, useLayoutEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, SectionList, TouchableOpacity, LayoutAnimation, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
 import { Pet } from '../components/Pet';
+import { ConfettiManager, useConfetti } from '../components/ConfettiManager';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { Plus } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
@@ -18,6 +19,16 @@ export const HomeScreen = () => {
     const navigation = useNavigation();
     const [timeFilter, setTimeFilter] = useState('all');
     const [selectedIndex, setSelectedIndex] = useState(0);
+
+    // Confetti system
+    const { bursts, triggerConfetti } = useConfetti();
+
+    // Pet reaction when confetti reaches it
+    const [petBounce, setPetBounce] = useState(0);
+    const handlePetFed = useCallback(() => {
+        setPetBounce(prev => prev + 1);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }, []);
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -56,7 +67,38 @@ export const HomeScreen = () => {
         });
     }, [habits, timeFilter]);
 
-    const handleToggle = (habit: Habit) => {
+    // Separate into pending and completed
+    const { pendingHabits, completedHabits } = useMemo(() => {
+        const pending: Habit[] = [];
+        const completed: Habit[] = [];
+
+        filteredHabits.forEach(habit => {
+            const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
+            const current = dayProgress?.currentCount || 0;
+            const isCompleted = current >= habit.targetCount;
+
+            if (isCompleted) {
+                completed.push(habit);
+            } else {
+                pending.push(habit);
+            }
+        });
+
+        return { pendingHabits: pending, completedHabits: completed };
+    }, [filteredHabits, progress, today]);
+
+    const sections = useMemo(() => {
+        const result = [];
+        if (pendingHabits.length > 0) {
+            result.push({ title: 'To Do', data: pendingHabits });
+        }
+        if (completedHabits.length > 0) {
+            result.push({ title: 'Completed', data: completedHabits });
+        }
+        return result;
+    }, [pendingHabits, completedHabits]);
+
+    const handleToggle = useCallback((habit: Habit) => {
         const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
         const current = dayProgress?.currentCount || 0;
         const isCompleted = current >= habit.targetCount;
@@ -66,7 +108,13 @@ export const HomeScreen = () => {
         } else {
             logProgress(habit.id, today);
         }
-    };
+    }, [progress, today, logProgress, undoProgress]);
+
+    // Called by HabitCard when a habit completes with checkbox position
+    const handleComplete = useCallback((x: number, y: number, color: string) => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        triggerConfetti(x, y, color);
+    }, [triggerConfetti]);
 
     const handleDelete = (habit: Habit) => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -100,6 +148,7 @@ export const HomeScreen = () => {
                 currentCount={current}
                 streak={streak}
                 onToggle={() => handleToggle(item)}
+                onComplete={handleComplete}
                 onPress={() => navigation.navigate('HabitForm' as never, { habit: item } as never)}
                 onEdit={() => navigation.navigate('HabitForm' as never, { habit: item } as never)}
                 onDelete={() => handleDelete(item)}
@@ -126,7 +175,7 @@ export const HomeScreen = () => {
                     style={styles.petHeaderContainer}
                 >
                     <BlurView intensity={20} tint="light" style={styles.petGlass}>
-                        <Pet pet={pet} isFullView={false} />
+                        <Pet pet={pet} isFullView={false} feedingBounce={petBounce} />
                     </BlurView>
                 </TouchableOpacity>
             </View>
@@ -160,14 +209,21 @@ export const HomeScreen = () => {
             <View style={[styles.blob, { backgroundColor: '#FF6B6B', bottom: -100, right: -100, opacity: 0.2 }]} />
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
-            <FlatList
-                data={filteredHabits}
+            <SectionList
+                sections={sections}
                 renderItem={renderItem}
+                renderSectionHeader={({ section }) => (
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>{section.title}</Text>
+                        <Text style={styles.sectionCount}>{section.data.length}</Text>
+                    </View>
+                )}
                 keyExtractor={item => item.id}
-                contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]} // Ensure enough scroll space
+                contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]}
                 showsVerticalScrollIndicator={false}
                 ListHeaderComponent={ListHeader}
                 contentInsetAdjustmentBehavior="automatic"
+                stickySectionHeadersEnabled={false}
                 ListEmptyComponent={
                     <View style={styles.emptyState}>
                         <Text style={styles.emptyText}>No habits found for {timeFilter}</Text>
@@ -185,6 +241,9 @@ export const HomeScreen = () => {
                     <Plus size={24} color="#000" strokeWidth={3} />
                 </BlurView>
             </TouchableOpacity>
+
+            {/* Confetti Manager - renders confetti at checkbox positions */}
+            <ConfettiManager bursts={bursts} onParticleReachPet={handlePetFed} />
         </View>
     );
 };
@@ -224,7 +283,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
         marginBottom: 24,
     },
     petHeaderContainer: {
@@ -242,7 +300,6 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.1)',
     },
     filterContainer: {
-        paddingHorizontal: 20,
         marginBottom: 16,
     },
     listContent: {
@@ -281,5 +338,29 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff', // Fallback/Tint
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 4,
+        paddingVertical: 12,
+        marginTop: 8,
+    },
+    sectionTitle: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.6)',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    sectionCount: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.4)',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
     },
 });

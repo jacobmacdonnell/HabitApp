@@ -8,8 +8,7 @@ import { PetScreen } from '../screens/PetScreen';
 import { TrendsScreen } from '../screens/TrendsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { HabitFormScreen } from '../screens/HabitFormScreen';
-import { PetStyleScreen } from '../screens/PetStyleScreen';
-import { PetWardrobeScreen } from '../screens/PetWardrobeScreen';
+import { PetCustomizeScreen } from '../screens/PetCustomizeScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { useHabit, Habit } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
@@ -22,8 +21,7 @@ export type RootStackParamList = {
     Onboarding: undefined;
     Main: undefined;
     HabitForm: { habit?: Habit };
-    PetStyle: undefined;
-    PetWardrobe: undefined;
+    PetCustomize: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -192,19 +190,8 @@ export const AppNavigator = () => {
                             }}
                         />
                         <Stack.Screen
-                            name="PetStyle"
-                            component={PetStyleScreen}
-                            options={{
-                                presentation: 'modal',
-                                headerShown: true,
-                                headerStyle: { backgroundColor: '#1c1c1e' },
-                                headerTintColor: '#fff',
-                                contentStyle: { backgroundColor: '#1c1c1e' },
-                            }}
-                        />
-                        <Stack.Screen
-                            name="PetWardrobe"
-                            component={PetWardrobeScreen}
+                            name="PetCustomize"
+                            component={PetCustomizeScreen}
                             options={{
                                 presentation: 'modal',
                                 headerShown: true,

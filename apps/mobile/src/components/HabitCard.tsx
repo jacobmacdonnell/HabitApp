@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Animated, Pressable } from 'react-native';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, LayoutChangeEvent } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon } from 'lucide-react-native';
 import { Habit } from '@habitapp/shared';
@@ -7,14 +7,13 @@ import * as Haptics from 'expo-haptics';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Trash2, Edit2 } from 'lucide-react-native';
 
-const { width } = Dimensions.get('window');
-
 interface HabitCardProps {
     habit: Habit;
     isCompleted: boolean;
     currentCount: number;
     streak: number;
     onToggle: () => void;
+    onComplete?: (x: number, y: number, color: string) => void;
     onPress: () => void;
     onDelete?: () => void;
     onEdit?: () => void;
@@ -34,28 +33,77 @@ const TimeLabels: Record<string, string> = {
     evening: 'Evening',
 };
 
-export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, onPress, onDelete, onEdit }: HabitCardProps) => {
+export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, onComplete, onPress, onDelete, onEdit }: HabitCardProps) => {
     const Icon = TimeIcons[habit.timeOfDay] || Sparkles;
-    const scaleAnim = useRef(new Animated.Value(1)).current;
 
-    const animateScale = () => {
-        Animated.sequence([
-            Animated.timing(scaleAnim, {
-                toValue: 0.95,
-                duration: 100,
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: 100,
-                useNativeDriver: true,
-            })
-        ]).start();
-    };
+    // State
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    // Refs
+    const checkButtonRef = useRef<View>(null);
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const checkScaleAnim = useRef(new Animated.Value(1)).current;
+    const progressWidthAnim = useRef(new Animated.Value(0)).current;
+    const lastSeenCount = useRef(currentCount);
+
+    // Measure container width
+    const onLayout = useCallback((event: LayoutChangeEvent) => {
+        const { width } = event.nativeEvent.layout;
+        setContainerWidth(width);
+    }, []);
+
+    // Animate progress bar when count changes AND trigger celebration after bar fills
+    useEffect(() => {
+        if (containerWidth > 0) {
+            const targetWidth = (currentCount / habit.targetCount) * containerWidth;
+            const wasIncrement = currentCount > lastSeenCount.current;
+            const willComplete = currentCount >= habit.targetCount && lastSeenCount.current < habit.targetCount;
+
+            if (wasIncrement) {
+                // Animate progress bar FIRST
+                Animated.spring(progressWidthAnim, {
+                    toValue: Math.min(targetWidth, containerWidth),
+                    friction: 6,
+                    tension: 80,
+                    useNativeDriver: false,
+                }).start(() => {
+                    // AFTER progress bar fills, trigger celebration
+                    if (willComplete) {
+                        // Success haptic when bar finishes filling
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+                        // Measure checkbox position and trigger confetti
+                        if (onComplete && checkButtonRef.current) {
+                            checkButtonRef.current.measureInWindow((x, y, width, height) => {
+                                onComplete(x + width / 2, y + height / 2, habit.color);
+                            });
+                        }
+
+                        // Checkmark celebration animation
+                        Animated.sequence([
+                            Animated.timing(checkScaleAnim, { toValue: 1.4, duration: 150, useNativeDriver: true }),
+                            Animated.spring(checkScaleAnim, { toValue: 1, friction: 3, tension: 200, useNativeDriver: true })
+                        ]).start();
+
+                        // Card pulse
+                        Animated.sequence([
+                            Animated.timing(scaleAnim, { toValue: 1.02, duration: 100, useNativeDriver: true }),
+                            Animated.spring(scaleAnim, { toValue: 1, friction: 4, useNativeDriver: true })
+                        ]).start();
+                    }
+                });
+            } else {
+                // Initial load
+                progressWidthAnim.setValue(Math.min(targetWidth, containerWidth));
+            }
+
+            lastSeenCount.current = currentCount;
+        }
+    }, [currentCount, containerWidth]);
 
     const handleToggle = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        animateScale();
+        // Simple haptic for the tap
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         onToggle();
     };
 
@@ -102,22 +150,41 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                 renderLeftActions={renderLeftActions}
                 onSwipeableOpen={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
             >
-                <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.touchable}>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={[styles.blur, isCompleted && styles.completedBlur]}>
-                        {/* Progress Bar Background */}
-                        <View style={[styles.progressBar, { width: `${Math.min((currentCount / habit.targetCount) * 100, 100)}%` }]} />
+                <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
+                    <BlurView
+                        intensity={40}
+                        tint="systemThickMaterialDark"
+                        style={styles.blur}
+                        onLayout={onLayout}
+                    >
+                        {/* Progress Bar */}
+                        <Animated.View
+                            style={[
+                                styles.progressBar,
+                                {
+                                    width: progressWidthAnim,
+                                    backgroundColor: isCompleted ? habit.color : `${habit.color}40`
+                                }
+                            ]}
+                        />
 
                         <View style={styles.content}>
                             <View style={styles.leftSection}>
-                                <View style={styles.iconContainer}>
-                                    {/* Lucide icons need color and size props */}
-                                    {/* We can render a text emoji or use a map if habit.icon is a string name */}
+                                <View style={[
+                                    styles.iconContainer,
+                                    isCompleted && { backgroundColor: `${habit.color}25` }
+                                ]}>
                                     <Text style={{ fontSize: 24 }}>{habit.icon}</Text>
                                 </View>
 
                                 <View style={styles.textContainer}>
                                     <View style={styles.titleRow}>
-                                        <Text style={styles.title} numberOfLines={1}>{habit.title}</Text>
+                                        <Text style={[
+                                            styles.title,
+                                            isCompleted && { opacity: 0.7 }
+                                        ]} numberOfLines={1}>
+                                            {habit.title}
+                                        </Text>
                                         <View style={styles.badge}>
                                             <Icon size={10} color="rgba(255,255,255,0.5)" />
                                             <Text style={styles.badgeText}>{TimeLabels[habit.timeOfDay]}</Text>
@@ -126,7 +193,12 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
 
                                     <View style={styles.statsRow}>
                                         {habit.targetCount > 1 && (
-                                            <Text style={styles.statsText}>{currentCount} / {habit.targetCount}</Text>
+                                            <Text style={[
+                                                styles.statsText,
+                                                isCompleted && { color: habit.color, fontWeight: '700' }
+                                            ]}>
+                                                {currentCount}/{habit.targetCount}
+                                            </Text>
                                         )}
                                         {streak >= 2 && (
                                             <View style={styles.streakBadge}>
@@ -137,9 +209,25 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                                 </View>
                             </View>
 
-                            <TouchableOpacity onPress={handleToggle} style={[styles.checkButton, isCompleted && styles.checkButtonCompleted]}>
-                                <Check size={20} color="#fff" strokeWidth={3} />
-                            </TouchableOpacity>
+                            <Animated.View style={{ transform: [{ scale: checkScaleAnim }] }}>
+                                <View ref={checkButtonRef} collapsable={false}>
+                                    <TouchableOpacity
+                                        onPress={handleToggle}
+                                        style={[
+                                            styles.checkButton,
+                                            { borderColor: habit.color },
+                                            isCompleted && { backgroundColor: habit.color, borderColor: habit.color }
+                                        ]}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Check
+                                            size={22}
+                                            color={isCompleted ? "#fff" : habit.color}
+                                            strokeWidth={3}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                            </Animated.View>
                         </View>
                     </BlurView>
                 </TouchableOpacity>
@@ -156,22 +244,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
-    touchable: {
-        flex: 1,
-    },
     blur: {
         padding: 16,
         backgroundColor: 'rgba(0,0,0,0.3)',
-    },
-    completedBlur: {
-        opacity: 0.8,
+        overflow: 'hidden',
     },
     progressBar: {
         position: 'absolute',
         top: 0,
         left: 0,
         bottom: 0,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 24,
     },
     content: {
         flexDirection: 'row',
@@ -187,11 +270,11 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 48,
         height: 48,
-        borderRadius: 16,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
-        backgroundColor: 'rgba(255,255,255,0.05)', // Subtle background instead of color tint
+        backgroundColor: 'rgba(255,255,255,0.08)',
     },
     textContainer: {
         flex: 1,
@@ -204,7 +287,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 17,
-        fontWeight: '700',
+        fontWeight: '600',
         color: '#fff',
         flexShrink: 1,
     },
@@ -221,7 +304,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: 'rgba(255,255,255,0.5)',
         fontWeight: '600',
-        textTransform: 'uppercase',
     },
     statsRow: {
         flexDirection: 'row',
@@ -229,7 +311,7 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     statsText: {
-        fontSize: 13,
+        fontSize: 14,
         color: 'rgba(255,255,255,0.5)',
         fontWeight: '500',
     },
@@ -238,8 +320,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 100,
-        borderWidth: 1,
-        borderColor: 'rgba(251, 146, 60, 0.3)',
     },
     streakText: {
         fontSize: 12,
@@ -247,34 +327,25 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     checkButton: {
-        width: 44,
-        height: 44,
+        width: 48,
+        height: 48,
         borderRadius: 14,
-        backgroundColor: 'rgba(34, 197, 94, 1)',
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#22c55e',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    checkButtonCompleted: {
-        backgroundColor: '#22c55e',
     },
     leftAction: {
         backgroundColor: '#ef4444',
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
-        height: '100%',
     },
     rightAction: {
         backgroundColor: '#3b82f6',
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
-        height: '100%',
     },
     actionIcon: {
         width: 40,
