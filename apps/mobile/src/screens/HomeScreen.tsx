@@ -1,9 +1,8 @@
-import React, { useState, useMemo, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, SectionList, TouchableOpacity, LayoutAnimation, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
 import { Pet } from '../components/Pet';
-import { ConfettiManager, useConfetti } from '../components/ConfettiManager';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { Plus } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
@@ -20,15 +19,7 @@ export const HomeScreen = () => {
     const [timeFilter, setTimeFilter] = useState('all');
     const [selectedIndex, setSelectedIndex] = useState(0);
 
-    // Confetti system
-    const { bursts, triggerConfetti } = useConfetti();
-
-    // Pet reaction when confetti reaches it
     const [petBounce, setPetBounce] = useState(0);
-    const handlePetFed = useCallback(() => {
-        setPetBounce(prev => prev + 1);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }, []);
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -110,11 +101,7 @@ export const HomeScreen = () => {
         }
     }, [progress, today, logProgress, undoProgress]);
 
-    // Called by HabitCard when a habit completes with checkbox position
-    const handleComplete = useCallback((x: number, y: number, color: string) => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        triggerConfetti(x, y, color);
-    }, [triggerConfetti]);
+
 
     const handleDelete = (habit: Habit) => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -148,7 +135,6 @@ export const HomeScreen = () => {
                 currentCount={current}
                 streak={streak}
                 onToggle={() => handleToggle(item)}
-                onComplete={handleComplete}
                 onPress={() => navigation.navigate('HabitForm' as never, { habit: item } as never)}
                 onEdit={() => navigation.navigate('HabitForm' as never, { habit: item } as never)}
                 onDelete={() => handleDelete(item)}
@@ -205,9 +191,9 @@ export const HomeScreen = () => {
     return (
         <View style={styles.container}>
             {/* Ambient Background Blobs */}
-            <View style={[styles.blob, { backgroundColor: '#6366f1', top: -100, left: -100 }]} />
-            <View style={[styles.blob, { backgroundColor: '#FF6B6B', bottom: -100, right: -100, opacity: 0.2 }]} />
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <View style={[styles.blob, { backgroundColor: '#6366f1', top: -100, left: -100 }]} pointerEvents="none" />
+            <View style={[styles.blob, { backgroundColor: '#FF6B6B', bottom: -100, right: -100, opacity: 0.2 }]} pointerEvents="none" />
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
 
             <SectionList
                 sections={sections}
@@ -242,8 +228,7 @@ export const HomeScreen = () => {
                 </BlurView>
             </TouchableOpacity>
 
-            {/* Confetti Manager - renders confetti at checkbox positions */}
-            <ConfettiManager bursts={bursts} onParticleReachPet={handlePetFed} />
+
         </View>
     );
 };

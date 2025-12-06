@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert,
 import { useHabit, Habit } from '@habitapp/shared';
 import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { Trash2 } from 'lucide-react-native';
+import { Trash2, Minus, Plus } from 'lucide-react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
 type ParamList = {
@@ -99,34 +99,28 @@ export const HabitFormScreen = () => {
                         />
                     </View>
 
-                    {/* Color Picker */}
+                    {/* Daily Target */}
                     <View style={styles.section}>
-                        <Text style={styles.label}>COLOR</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorRow}>
-                            {HABIT_COLORS.map(c => (
-                                <TouchableOpacity
-                                    key={c}
-                                    style={[styles.colorDot, { backgroundColor: c }, color === c && styles.colorSelected]}
-                                    onPress={() => setColor(c)}
-                                />
-                            ))}
-                        </ScrollView>
-                    </View>
+                        <Text style={styles.label}>DAILY TARGET</Text>
+                        <View style={styles.inputRow}>
+                            <TouchableOpacity
+                                style={styles.stepperBtn}
+                                onPress={() => setTargetCount(Math.max(1, targetCount - 1))}
+                                activeOpacity={0.7}
+                            >
+                                <Minus size={24} color="#fff" strokeWidth={2.5} />
+                            </TouchableOpacity>
 
-                    {/* Icon Picker */}
-                    <View style={styles.section}>
-                        <Text style={styles.label}>ICON</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconRow}>
-                            {HABIT_ICONS.map(i => (
-                                <TouchableOpacity
-                                    key={i}
-                                    style={[styles.iconButton, icon === i && { backgroundColor: color }]}
-                                    onPress={() => setIcon(i)}
-                                >
-                                    <Text style={styles.iconText}>{i}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </ScrollView>
+                            <Text style={styles.targetValue}>{targetCount}</Text>
+
+                            <TouchableOpacity
+                                style={styles.stepperBtn}
+                                onPress={() => setTargetCount(targetCount + 1)}
+                                activeOpacity={0.7}
+                            >
+                                <Plus size={24} color="#fff" strokeWidth={2.5} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     {/* Time of Day */}
@@ -144,24 +138,38 @@ export const HabitFormScreen = () => {
                         />
                     </View>
 
-                    {/* Target Count */}
+                    {/* Icon Picker */}
                     <View style={styles.section}>
-                        <Text style={styles.label}>DAILY TARGET: {targetCount}</Text>
-                        <View style={styles.stepperContainer}>
-                            <TouchableOpacity
-                                style={styles.stepperButton}
-                                onPress={() => setTargetCount(Math.max(1, targetCount - 1))}
-                            >
-                                <Text style={styles.stepperText}>-</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.targetValue}>{targetCount}</Text>
-                            <TouchableOpacity
-                                style={styles.stepperButton}
-                                onPress={() => setTargetCount(targetCount + 1)}
-                            >
-                                <Text style={styles.stepperText}>+</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <Text style={styles.label}>ICON</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconRow}>
+                            {HABIT_ICONS.map(i => (
+                                <TouchableOpacity
+                                    key={i}
+                                    style={[
+                                        styles.iconButton,
+                                        icon === i && { backgroundColor: color },
+                                        icon === i && styles.iconSelected
+                                    ]}
+                                    onPress={() => setIcon(i)}
+                                >
+                                    <Text style={styles.iconText}>{i}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                    </View>
+
+                    {/* Color Picker */}
+                    <View style={styles.section}>
+                        <Text style={styles.label}>COLOR</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.colorRow}>
+                            {HABIT_COLORS.map(c => (
+                                <TouchableOpacity
+                                    key={c}
+                                    style={[styles.colorDot, { backgroundColor: c }, color === c && styles.colorSelected]}
+                                    onPress={() => setColor(c)}
+                                />
+                            ))}
+                        </ScrollView>
                     </View>
 
                 </ScrollView>
@@ -206,23 +214,21 @@ const styles = StyleSheet.create({
     },
     colorRow: {
         gap: 12,
-        paddingHorizontal: 20,
-        paddingVertical: 10, // Prevent clipping of scaled dots
+        paddingVertical: 10,
     },
     colorDot: {
         width: 44,
         height: 44,
-        borderRadius: 22,
+        borderRadius: 12, // Square to match icons
         borderWidth: 3,
         borderColor: 'transparent',
     },
     colorSelected: {
         borderColor: '#fff',
-        transform: [{ scale: 1.1 }],
+        // No scale to prevent clipping
     },
     iconRow: {
         gap: 12,
-        paddingHorizontal: 20,
         paddingVertical: 4,
     },
     iconButton: {
@@ -236,34 +242,31 @@ const styles = StyleSheet.create({
     iconText: {
         fontSize: 24,
     },
-    stepperContainer: {
+    iconSelected: {
+        borderWidth: 3,
+        borderColor: '#fff',
+    },
+    inputRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12, // Reduced from 20
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        justifyContent: 'space-between',
+        backgroundColor: 'rgba(255,255,255,0.1)', // Uniform background
         borderRadius: 12,
-        padding: 4, // Reduced from 8
-    },
-    stepperButton: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    stepperText: {
-        fontSize: 24,
-        color: '#fff',
-        fontWeight: '600',
+        padding: 4, // Tight padding for buttons
     },
     targetValue: {
-        fontSize: 24,
-        fontWeight: '700',
+        fontSize: 22,
+        fontWeight: '600',
         color: '#fff',
-        width: 40,
-        textAlign: 'center',
+        fontVariant: ['tabular-nums'],
+    },
+    stepperBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        backgroundColor: 'transparent', // Blend into container
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     footer: {
         padding: 20,
