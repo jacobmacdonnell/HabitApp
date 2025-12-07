@@ -60,6 +60,10 @@ export interface StorageServiceType {
     getProgressForRange?: (startDate: string, endDate: string) => Promise<DailyProgress[]>;
     logSingleProgress?: (item: DailyProgress) => Promise<void>;
     getHabitStats?: (habitId: string) => Promise<{ currentStreak: number; bestStreak?: number; totalCompletions: number }>;
+    // Atomic habit operations for O(1) performance
+    addHabit?: (habit: Habit) => Promise<void>;
+    updateHabit?: (id: string, updates: Partial<Habit>) => Promise<void>;
+    deleteHabit?: (id: string) => Promise<void>;
 }
 
 export interface HabitContextType {

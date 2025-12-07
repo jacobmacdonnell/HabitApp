@@ -121,7 +121,7 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
                 setNotifications(prev => prev.filter(n => n.id !== id));
             });
         }, 700);
-    }, []);
+    }, [settings.sound]);
 
     return (
         <XPNotificationContext.Provider value={{ showXP }}>

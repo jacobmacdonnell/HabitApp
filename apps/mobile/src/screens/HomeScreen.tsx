@@ -57,7 +57,7 @@ export const HomeScreen = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const handleSegmentChange = (event: any) => {
+    const handleSegmentChange = (event: { nativeEvent: { selectedSegmentIndex: number } }) => {
         Haptics.selectionAsync();
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         const index = event.nativeEvent.selectedSegmentIndex;
@@ -365,7 +365,7 @@ export const HomeScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1c1c1e',
+        backgroundColor: LiquidGlass.backgroundColor,
     },
     // Custom Header Styles
     headerRow: {

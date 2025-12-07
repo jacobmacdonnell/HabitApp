@@ -58,7 +58,13 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
                 setPet(loadedPet);
                 setIsOnboarding(!loadedPet);
 
-                const loadedProgress = await storage.getProgress();
+                // Load only last 90 days of progress for performance
+                // This prevents loading unbounded historical data as the app ages
+                const today = getLocalDateString();
+                const ninetyDaysAgo = getLocalDateString(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000));
+                const loadedProgress = storage.getProgressForRange
+                    ? await storage.getProgressForRange(ninetyDaysAgo, today)
+                    : await storage.getProgress();
                 setProgress(loadedProgress || []);
 
             } catch (error) {
@@ -126,27 +132,47 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         const newHabit: Habit = { ...habit, id: generateId() };
         const updatedHabits = [...habits, newHabit];
         setHabits(updatedHabits);
-        await storage.saveHabits(updatedHabits);
+
+        // Use atomic operation when available, fallback to full save
+        if (storage.addHabit) {
+            await storage.addHabit(newHabit);
+        } else {
+            await storage.saveHabits(updatedHabits);
+        }
 
         // Init stats
         setStats(prev => ({ ...prev, [newHabit.id]: { currentStreak: 0, totalCompletions: 0 } }));
     };
 
-    const updateHabit = (id: string, updates: Partial<Habit>) => {
+    const updateHabit = async (id: string, updates: Partial<Habit>) => {
         const updatedHabits = habits.map(h => h.id === id ? { ...h, ...updates } : h);
         setHabits(updatedHabits);
-        storage.saveHabits(updatedHabits);
+
+        // Use atomic operation when available, fallback to full save
+        if (storage.updateHabit) {
+            await storage.updateHabit(id, updates);
+        } else {
+            await storage.saveHabits(updatedHabits);
+        }
     };
 
-    const deleteHabit = (id: string) => {
+    const deleteHabit = async (id: string) => {
         const updatedHabits = habits.filter(h => h.id !== id);
         setHabits(updatedHabits);
-        storage.saveHabits(updatedHabits);
 
-        // Clean up progress for deleted habit
-        const updatedProgress = progress.filter(p => p.habitId !== id);
-        setProgress(updatedProgress);
-        storage.saveProgress(updatedProgress);
+        // Use atomic operation when available (cascade delete handles progress)
+        if (storage.deleteHabit) {
+            await storage.deleteHabit(id);
+        } else {
+            await storage.saveHabits(updatedHabits);
+            // Clean up progress for deleted habit (only needed for legacy storage)
+            const updatedProgress = progress.filter(p => p.habitId !== id);
+            setProgress(updatedProgress);
+            await storage.saveProgress(updatedProgress);
+        }
+
+        // Cleanup local progress state (even with cascade, local state needs update)
+        setProgress(prev => prev.filter(p => p.habitId !== id));
 
         // Cleanup stats
         setStats(prev => {

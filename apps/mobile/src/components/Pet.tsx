@@ -8,6 +8,7 @@ import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import { ZParticle } from './PetAnimations';
 
 const { width } = Dimensions.get('window');
 
@@ -18,77 +19,7 @@ interface PetProps {
     feedingBounce?: number; // Increment to trigger bounce animation
 }
 
-// Enhanced Z-Particle Component - smoother, more organic
-const ZParticle = ({ delay, xOffset, size = 24 }: { delay: number, xOffset: number, size?: number }) => {
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const liftAnim = useRef(new Animated.Value(0)).current;
-    const scaleAnim = useRef(new Animated.Value(0.5)).current;
-    const rotateAnim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        const animate = () => {
-            fadeAnim.setValue(0);
-            liftAnim.setValue(0);
-            scaleAnim.setValue(0.5);
-            rotateAnim.setValue(0);
-
-            Animated.sequence([
-                Animated.delay(delay),
-                Animated.parallel([
-                    // Fade in then out
-                    Animated.sequence([
-                        Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
-                        Animated.delay(800),
-                        Animated.timing(fadeAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
-                    ]),
-                    // Float upward
-                    Animated.timing(liftAnim, {
-                        toValue: -60,
-                        duration: 1800,
-                        easing: Easing.out(Easing.quad),
-                        useNativeDriver: true,
-                    }),
-                    // Scale up as it rises
-                    Animated.timing(scaleAnim, {
-                        toValue: 1.2,
-                        duration: 1800,
-                        easing: Easing.out(Easing.ease),
-                        useNativeDriver: true,
-                    }),
-                    // Gentle rotation
-                    Animated.timing(rotateAnim, {
-                        toValue: 1,
-                        duration: 1800,
-                        easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
-                    }),
-                ])
-            ]).start(() => animate());
-        };
-        animate();
-    }, []);
-
-    const rotate = rotateAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['-15deg', '15deg']
-    });
-
-    return (
-        <Animated.View style={{
-            position: 'absolute',
-            left: xOffset,
-            top: 50,
-            opacity: fadeAnim,
-            transform: [
-                { translateY: liftAnim },
-                { scale: scaleAnim },
-                { rotate: rotate }
-            ]
-        }}>
-            <Text style={[styles.zText, { fontSize: size }]}>z</Text>
-        </Animated.View>
-    );
-};
+// ZParticle is now imported from './PetAnimations'
 
 export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetProps) => {
     // State

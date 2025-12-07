@@ -11,6 +11,7 @@ import { ThemeProvider } from '../src/context/ThemeContext';
 import { migrateFromAsyncStorage } from '../src/services/storage';
 import { useMigrationHelper } from '../src/db/migrate';
 import { Stack, SplashScreen } from 'expo-router';
+import { LiquidGlass } from '../src/theme/theme';
 
 // Initialize notification handler
 Notifications.setNotificationHandler({
@@ -39,14 +40,14 @@ const ThemedRoot = () => {
 
     return (
         <>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#1c1c1e' } }}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: LiquidGlass.backgroundColor } }}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
                     name="habit-form"
                     options={{
                         presentation: 'modal',
                         headerShown: true,
-                        headerStyle: { backgroundColor: '#1c1c1e' },
+                        headerStyle: { backgroundColor: LiquidGlass.backgroundColor },
                         headerTintColor: '#fff',
                         headerShadowVisible: false,
                     }}
@@ -56,7 +57,7 @@ const ThemedRoot = () => {
                     options={{
                         presentation: 'modal',
                         headerShown: true,
-                        headerStyle: { backgroundColor: '#1c1c1e' },
+                        headerStyle: { backgroundColor: LiquidGlass.backgroundColor },
                         headerTintColor: '#fff',
                         headerShadowVisible: false,
                     }}

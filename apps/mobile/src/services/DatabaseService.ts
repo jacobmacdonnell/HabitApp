@@ -1,4 +1,4 @@
-import { StorageServiceType, Habit, Pet, DailyProgress, Settings } from '@habitapp/shared';
+import { StorageServiceType, Habit, Pet, DailyProgress, Settings, HabitFrequency } from '@habitapp/shared';
 import { db } from '../db/client';
 import { habits, dailyProgress, pet, settings } from '../db/schema';
 import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
@@ -88,7 +88,7 @@ export const SQLiteStorageService: StorageServiceType = {
         const rows = await db.select().from(habits);
         return rows.map(row => ({
             ...row,
-            frequency: row.frequency as any,
+            frequency: row.frequency as HabitFrequency,
         })) as Habit[];
     },
 
@@ -312,7 +312,7 @@ export const SQLiteStorageService: StorageServiceType = {
             ...rows[0],
             notifications: !!rows[0].notifications,
             sound: !!rows[0].sound,
-            theme: rows[0].theme as any
+            theme: rows[0].theme as Settings['theme']
         };
     },
 
@@ -323,6 +323,26 @@ export const SQLiteStorageService: StorageServiceType = {
         } else {
             await db.insert(settings).values(newSettings);
         }
+    },
+
+    // Atomic habit operations for O(1) performance
+    addHabit: async (habit: Habit) => {
+        await db.insert(habits).values({
+            ...habit,
+            frequency: habit.frequency,
+            createdAt: Date.now()
+        });
+    },
+
+    updateHabit: async (id: string, updates: Partial<Habit>) => {
+        await db.update(habits)
+            .set(updates as any) // Drizzle types are complex with partials
+            .where(eq(habits.id, id));
+    },
+
+    deleteHabit: async (id: string) => {
+        // Cascade delete in schema handles progress cleanup
+        await db.delete(habits).where(eq(habits.id, id));
     },
 
 
