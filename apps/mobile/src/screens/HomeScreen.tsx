@@ -265,9 +265,9 @@ export const HomeScreen = () => {
                         onPress={() => router.push('/(tabs)/pet')}
                         style={styles.petHeaderContainer}
                     >
-                        <BlurView intensity={20} tint="light" style={styles.petGlass}>
+                        <View style={styles.petGlass}>
                             <Pet pet={pet} isFullView={false} feedingBounce={petBounce} />
-                        </BlurView>
+                        </View>
                     </TouchableOpacity>
                 </View>
 
@@ -391,15 +391,11 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     petGlass: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        overflow: 'hidden',
+        width: 110,
+        height: 110,
+        overflow: 'visible',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
     },
     filterContainer: {
         marginBottom: 16,

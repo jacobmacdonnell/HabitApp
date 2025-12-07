@@ -223,7 +223,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
                     health: newHealth,
                     xp: newXp,
                     level: newLevel,
-                    mood: 'happy'
+                    // Don't force mood - let updatePet determine based on health/sleep
                 };
             } else {
                 // Small increment for progress

@@ -109,6 +109,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
     const xpFloatAnim = useRef(new Animated.Value(0)).current; // Y position
     const xpFadeAnim = useRef(new Animated.Value(0)).current;
     const speechFadeAnim = useRef(new Animated.Value(0)).current;
+    const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Track hide timeout
     const levelScaleAnim = useRef(new Animated.Value(0)).current;
     const levelFadeAnim = useRef(new Animated.Value(0)).current;
     const interactionScale = useRef(new Animated.Value(1)).current;
@@ -123,27 +124,165 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
         }
     }, [feedingBounce]);
 
-    const handlePetPress = () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Mood flags - needed early for handlers
+    const isHappy = pet?.mood === 'happy';
+    const isSad = pet?.mood === 'sad';
+    const isSick = pet?.mood === 'sick';
+    const isSleeping = pet?.mood === 'sleeping';
 
-        // Bounce
+    // Blinking state for awake animations
+    const [isBlinking, setIsBlinking] = useState(false);
+
+    // Peeking state - one eye open when doing habits while sleeping
+    const [isPeeking, setIsPeeking] = useState(false);
+    const [pupilY, setPupilY] = useState(85); // Track pupil Y position for SVG
+    const eyeLookAnim = useRef(new Animated.Value(0)).current; // 0 = center, 1 = looking down
+
+    // Listen to eyeLookAnim changes and update pupilY for SVG
+    useEffect(() => {
+        const listenerId = eyeLookAnim.addListener(({ value }) => {
+            // Interpolate: 0 -> 85 (center), 1 -> 92 (looking down)
+            setPupilY(85 + (value * 7));
+        });
+        return () => eyeLookAnim.removeListener(listenerId);
+    }, []);
+
+    // Late night habit completion - pet peeks with one eye
+    // Trigger on feedingBounce OR XP changes while sleeping
+    const triggerPeek = () => {
+        if (!isSleeping) return;
+
+        setIsPeeking(true);
+        eyeLookAnim.setValue(0); // Start centered
+
+        // Animate eye to look down after opening
+        Animated.sequence([
+            Animated.delay(300), // Pause after opening
+            Animated.timing(eyeLookAnim, {
+                toValue: 1,
+                duration: 400,
+                easing: Easing.inOut(Easing.ease),
+                useNativeDriver: false // Can't use native for interpolated values we read
+            })
+        ]).start();
+
+        // Show a funny late-night message
+        const lateNightPhrases = [
+            "Up late, huh? 👀",
+            "*one eye opens* ...nice.",
+            "Couldn't sleep either?",
+            "Midnight grinder! 🌙",
+            "Shh... I won't tell.",
+            "*peeks* ...productive!",
+            "Night owl energy! 🦉",
+        ];
+        const randomPhrase = lateNightPhrases[Math.floor(Math.random() * lateNightPhrases.length)];
+        setSpeechBubbleText(randomPhrase);
+
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        Animated.timing(speechFadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+
+        // Clear any existing timeout
+        if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
+        speechTimeoutRef.current = setTimeout(() => {
+            Animated.timing(speechFadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }).start(() => {
+                setSpeechBubbleText(null);
+            });
+        }, 3000);
+
+        // Close eye after a moment
+        setTimeout(() => setIsPeeking(false), 2500);
+    };
+
+    useEffect(() => {
+        if (feedingBounce && feedingBounce > 0 && isSleeping) {
+            triggerPeek();
+        }
+    }, [feedingBounce]);
+
+    // Also trigger peek on XP gain while sleeping
+    useEffect(() => {
+        if (!pet) return;
+        const xpGained = (pet.xp || 0) > prevXpRef.current;
+        if (xpGained && isSleeping) {
+            triggerPeek();
+        }
+    }, [pet?.xp]);
+
+    // Random blink interval for awake pet
+    useEffect(() => {
+        if (!pet || pet.mood === 'sleeping') return;
+
+        const scheduleBlink = () => {
+            const delay = 2000 + Math.random() * 4000; // 2-6 seconds
+            return setTimeout(() => {
+                setIsBlinking(true);
+                setTimeout(() => setIsBlinking(false), 150); // Blink duration
+                scheduleBlink();
+            }, delay);
+        };
+
+        const blinkTimer = scheduleBlink();
+        return () => clearTimeout(blinkTimer);
+    }, [pet?.mood]);
+
+    const handlePetPress = () => {
+        // Different haptics based on mood
+        if (isSleeping) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+        } else {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+
+        // Bounce animation
         Animated.sequence([
             Animated.timing(interactionScale, { toValue: 0.9, duration: 100, useNativeDriver: true }),
             Animated.spring(interactionScale, { toValue: 1, friction: 4, tension: 40, useNativeDriver: true })
         ]).start();
 
-        // Chatter Logic
-        const phrases = [
-            "You're doing great!",
-            "Let's get some XP!",
-            "I'm hungry!",
-            "Did you drink water?",
-            "Keep it up!",
-            "You got this!",
-            "Time to focus!",
-            "Shiny habits!",
-            "Level up time?"
-        ];
+        // Mood-specific phrases
+        let phrases: string[];
+
+        if (isSleeping) {
+            phrases = [
+                "*yawn* ...five more minutes...",
+                "Zzz... huh? ...zzz...",
+                "*mumbles* ...so tired...",
+                "Let me sleep... 😴",
+                "*stretches* ...not yet...",
+                "Shh... dreaming of XP...",
+            ];
+        } else if (isSad) {
+            phrases = [
+                "I miss you...",
+                "Complete some habits?",
+                "I'm kinda lonely...",
+                "Need some attention...",
+                "*sigh*",
+            ];
+        } else if (isSick) {
+            phrases = [
+                "Not feeling great...",
+                "Need some care...",
+                "*cough*",
+                "Help me feel better?",
+            ];
+        } else {
+            // Happy/Neutral - energetic phrases
+            phrases = [
+                "You're doing great!",
+                "Let's get some XP!",
+                "I'm hungry for habits!",
+                "Did you drink water?",
+                "Keep it up! 💪",
+                "You got this!",
+                "Time to focus!",
+                "Shiny habits! ✨",
+                "Level up time?",
+                "I believe in you!",
+                "Let's crush today!",
+            ];
+        }
 
         const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
         setSpeechBubbleText(randomPhrase);
@@ -151,12 +290,18 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
         // Fade in bubble
         Animated.timing(speechFadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
 
-        // Hide after 3 seconds
-        setTimeout(() => {
+        // Clear any existing timeout and set new one
+        if (speechTimeoutRef.current) {
+            clearTimeout(speechTimeoutRef.current);
+        }
+
+        // Hide after appropriate time (longer for sleeping/groggy)
+        const hideDelay = isSleeping ? 3000 : 2500;
+        speechTimeoutRef.current = setTimeout(() => {
             Animated.timing(speechFadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }).start(() => {
                 setSpeechBubbleText(null);
             });
-        }, 3000);
+        }, hideDelay);
     };
 
     useEffect(() => {
@@ -164,8 +309,8 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
 
         const breathing = Animated.loop(
             Animated.sequence([
-                Animated.timing(breathVal, { toValue: 1, duration: 2000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-                Animated.timing(breathVal, { toValue: 0, duration: 2000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+                Animated.timing(breathVal, { toValue: 1, duration: 2500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+                Animated.timing(breathVal, { toValue: 0, duration: 2500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
             ])
         );
 
@@ -231,24 +376,45 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
 
     if (!pet) return null;
 
-    const isHappy = pet.mood === 'happy';
-    const isSad = pet.mood === 'sad';
-    const isSick = pet.mood === 'sick';
-    const isSleeping = pet.mood === 'sleeping';
+    // Note: mood flags defined earlier for use in handlers
 
     const renderEyes = () => {
+        // Peeking - one eye open while sleeping (late night habit), animates to look down
+        if (isSleeping && isPeeking) return (
+            <G>
+                {/* Left eye - still closed */}
+                <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
+                {/* Right eye - open, animates to look down at habits */}
+                <Circle cx="130" cy="85" r="16" fill="white" />
+                <Circle cx="130" cy={pupilY} r="6" fill="black" />
+                <Circle cx="133" cy={pupilY - 4} r="2" fill="white" fillOpacity="0.8" />
+            </G>
+        );
+
+        // Sleeping eyes - curved lines
         if (isSleeping) return (
             <G>
                 <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
                 <Path d="M 120 85 Q 130 95 140 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
             </G>
         );
+
+        // Blinking - show curved lines briefly
+        if (isBlinking) return (
+            <G>
+                <Path d="M 54 85 L 86 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
+                <Path d="M 114 85 L 146 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
+            </G>
+        );
+
+        // Normal open eyes
         return (
             <G>
                 <Circle cx="70" cy="85" r="16" fill="white" />
                 <Circle cx="70" cy="85" r="6" fill="black" />
                 <Circle cx="130" cy="85" r="16" fill="white" />
                 <Circle cx="130" cy="85" r="6" fill="black" />
+                {/* Eye shine */}
                 <Circle cx="76" cy="78" r="4" fill="white" fillOpacity="0.8" />
                 <Circle cx="136" cy="78" r="4" fill="white" fillOpacity="0.8" />
             </G>
@@ -288,25 +454,39 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
         );
     };
 
-    // Compact View (Header)
+    // Compact View (Header) - with subtle animations
     if (!isFullView) {
+        // Compact animations - breathing (more noticeable)
+        const compactScale = breathVal.interpolate({ inputRange: [0, 1], outputRange: [1, 1.1] });
+        const compactGlowOpacity = breathVal.interpolate({ inputRange: [0, 1], outputRange: [0.3, 0.7] });
+
         return (
             <View style={[styles.compactContainer]}>
-                <Svg viewBox="0 0 200 200" style={styles.svg}>
-                    <Defs>
-                        <RadialGradient id="bodyGrad" cx="30%" cy="30%" r="80%">
-                            <Stop offset="0%" stopColor={pet.color} stopOpacity="1" />
-                            <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
-                        </RadialGradient>
-                    </Defs>
-                    <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGrad)" stroke={pet.color} strokeWidth="2" />
-                    <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
-                    <G transform="translate(0, 10)">
-                        {renderEyes()}
-                        {renderMouth()}
-                        {renderHat()}
-                    </G>
-                </Svg>
+                <Animated.View style={{ transform: [{ scale: compactScale }] }}>
+                    <Svg viewBox="0 0 200 200" style={styles.svg}>
+                        <Defs>
+                            <RadialGradient id="bodyGrad" cx="30%" cy="30%" r="80%">
+                                <Stop offset="0%" stopColor={pet.color} stopOpacity="1" />
+                                <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
+                            </RadialGradient>
+                        </Defs>
+                        <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGrad)" stroke={pet.color} strokeWidth="2" />
+                        <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
+                        <G transform="translate(0, 10)">
+                            {renderEyes()}
+                            {renderMouth()}
+                            {renderHat()}
+                        </G>
+                    </Svg>
+                </Animated.View>
+
+                {/* Mini Z's for sleeping - subtle, slow */}
+                {isSleeping && (
+                    <View style={styles.miniZContainer}>
+                        <ZParticle delay={0} xOffset={0} size={11} />
+                        <ZParticle delay={2000} xOffset={6} size={14} />
+                    </View>
+                )}
             </View>
         );
     }
@@ -377,9 +557,8 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
 
                 {isSleeping && (
                     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-                        <ZParticle delay={0} xOffset={155} size={18} />
-                        <ZParticle delay={1200} xOffset={175} size={24} />
-                        <ZParticle delay={2400} xOffset={165} size={30} />
+                        <ZParticle delay={0} xOffset={80} size={18} />
+                        <ZParticle delay={2000} xOffset={95} size={24} />
                     </View>
                 )}
 
@@ -467,8 +646,25 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
 
 const styles = StyleSheet.create({
     compactContainer: {
-        width: 60,
-        height: 60,
+        width: 100,
+        height: 100,
+        position: 'relative',
+        overflow: 'visible',
+    },
+    compactGlow: {
+        position: 'absolute',
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        top: 5,
+        left: 5,
+    },
+    miniZContainer: {
+        position: 'absolute',
+        top: -10,
+        right: 35,
+        width: 25,
+        height: 30,
     },
     svg: {
         width: '100%',
