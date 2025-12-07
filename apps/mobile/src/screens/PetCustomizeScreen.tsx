@@ -9,6 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { GlassInput } from '../components/GlassInput';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -159,6 +160,7 @@ const HatIcon = ({ type }: { type: string }) => {
 export const PetCustomizeScreen = () => {
     const { pet, updatePet } = useHabit();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const router = useRouter();
 
     if (!pet) return null;
 
@@ -171,7 +173,7 @@ export const PetCustomizeScreen = () => {
             title: 'Customize Pet',
             headerLeft: () => (
                 <TouchableOpacity
-                    onPress={() => navigation.goBack()}
+                    onPress={() => router.back()}
                     style={{ paddingHorizontal: 16 }}
                 >
                     <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
@@ -191,7 +193,7 @@ export const PetCustomizeScreen = () => {
     const handleSave = () => {
         updatePet({ name, color: selectedColor, hat: selectedHat });
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        navigation.goBack();
+        router.back();
     };
 
     const handleColorSelect = (color: string) => {

@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useLayoutEffect, useCallback } from 'react';
+import { useRouter } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Animated, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
 import { Pet } from '../components/Pet';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
+import { EmptyState } from '../components/EmptyState';
 import { Plus, Eye, EyeOff } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
@@ -14,6 +16,7 @@ import { GlassView } from 'expo-glass-effect';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RootStackParamList, TabParamList } from '../navigation/types';
+import { getGreeting } from '../data/greetings';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
     BottomTabNavigationProp<TabParamList>,
@@ -25,6 +28,7 @@ const { width } = Dimensions.get('window');
 export const HomeScreen = () => {
     const { habits, progress, logProgress, undoProgress, getStreak, pet, deleteHabit } = useHabit();
     const navigation = useNavigation<HomeScreenNavigationProp>();
+    const router = useRouter(); // Use Expo Router
     const [timeFilter, setTimeFilter] = useState('all');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [showCompleted, setShowCompleted] = useState(false);
@@ -34,22 +38,23 @@ export const HomeScreen = () => {
     const today = new Date().toISOString().split('T')[0];
 
     useLayoutEffect(() => {
-        navigation.setOptions({
-            headerTransparent: true,
-            headerRight: () => (
-                <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => navigation.navigate('Pet')}
-                    style={{ marginRight: 0 }}
-                >
-                    {/* Reuse the Pet component but simpler wrapper for header */}
-                    <View style={styles.petHeaderWrapper}>
-                        <Pet pet={pet} isFullView={false} feedingBounce={petBounce} />
-                    </View>
-                </TouchableOpacity>
-            ),
-        });
-    }, [navigation, pet, petBounce]);
+        // Clear native options since we are using a custom header
+        navigation.setOptions({});
+    }, [navigation]);
+
+    // Use useState for greeting to ensure it is stable across renders
+    // It will only update when the component remounts or we explicitly update it
+    const [greeting, setGreeting] = useState(() => getGreeting());
+
+    // Optional: Update greeting if the app comes to foreground or time significantly changes
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            const newGreeting = getGreeting();
+            // Only update if the "time bucket" has actually changed conceptually to avoid random shuffling
+            // For now, we'll keep it stable for the session to prevent "changing way too much"
+        }, 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     const handleSegmentChange = (event: any) => {
         Haptics.selectionAsync();
@@ -59,6 +64,8 @@ export const HomeScreen = () => {
         const filters = ['all', 'morning', 'midday', 'evening'];
         setTimeFilter(filters[index]);
     };
+
+    // ... (filteredHabits, hasCompletedHabits logic remains same) ...
 
     const filteredHabits = useMemo(() => {
         return habits.filter(habit => {
@@ -81,7 +88,7 @@ export const HomeScreen = () => {
             const order: Record<string, number> = { anytime: 0, morning: 1, midday: 2, evening: 3 };
             return (order[a.timeOfDay] || 0) - (order[b.timeOfDay] || 0);
         });
-    }, [habits, timeFilter, progress, today, showCompleted]);
+    }, [habits, timeFilter, showCompleted, progress]); // Removed 'today' if it's constant, but it's likely fine. Ensure 'progress' isn't a new array every render.
 
     // Check if there are any completed habits today
     const hasCompletedHabits = useMemo(() => {
@@ -118,6 +125,7 @@ export const HomeScreen = () => {
                     toValue: 1,
                     duration: 300,
                     useNativeDriver: false,
+                    easing: (value) => 1 - Math.pow(1 - value, 3),
                 }),
                 Animated.spring(animScale, {
                     toValue: 1,
@@ -167,9 +175,28 @@ export const HomeScreen = () => {
         if (isCompleted) {
             undoProgress(habit.id, today);
         } else {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
             logProgress(habit.id, today);
+
+            // Check if this completion finishes the entire day
+            const willBeCompleted = current + 1 >= habit.targetCount;
+
+            if (willBeCompleted) {
+                const otherHabits = habits.filter(h => h.id !== habit.id);
+                // Check if all other habits (filtered by time or global?)
+                // Ideally check global, but for visual celebration, global makes sense.
+                const allOthersDone = otherHabits.every(h => {
+                    const p = progress.find(prog => prog.habitId === h.id && prog.date === today);
+                    return (p?.currentCount || 0) >= h.targetCount;
+                });
+
+                if (allOthersDone) {
+                    confettiRef.current?.start();
+                }
+            }
         }
-    }, [progress, today, logProgress, undoProgress]);
+    }, [progress, today, logProgress, undoProgress, habits]);
 
     const handleDelete = (habit: Habit) => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -191,10 +218,10 @@ export const HomeScreen = () => {
     };
 
     const renderItem = ({ item }: { item: Habit }) => {
+        const streak = getStreak(item.id);
         const dayProgress = progress.find(p => p.habitId === item.id && p.date === today);
         const current = dayProgress?.currentCount || 0;
-        const isCompleted = current >= item.targetCount;
-        const streak = getStreak(item.id);
+        const isCompleted = !!dayProgress?.completed;
 
         return (
             <HabitCard
@@ -204,7 +231,8 @@ export const HomeScreen = () => {
                 streak={streak}
                 onToggle={() => handleToggle(item)}
                 onDecrement={() => undoProgress(item.id, today)}
-                onEdit={() => navigation.navigate('HabitForm', { habit: item })}
+                // Use router.push with object for serialization if needed, or params
+                onEdit={() => router.push({ pathname: '/habit-form', params: { habit: JSON.stringify(item) } })}
                 onDelete={() => handleDelete(item)}
             />
         );
@@ -221,66 +249,105 @@ export const HomeScreen = () => {
             {/* Ambient Background - Clean Dark Theme */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
 
+            {/* Custom Fixed Header */}
+            <View style={{ paddingTop: insets.top + (LiquidGlass.header.contentTopPadding || 20), paddingHorizontal: LiquidGlass.screenPadding }}>
+                <View style={styles.headerRow}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.greeting}>{greeting}</Text>
+                        <Text style={styles.date}>
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => router.push('/(tabs)/pet')}
+                        style={styles.petHeaderContainer}
+                    >
+                        <BlurView intensity={20} tint="light" style={styles.petGlass}>
+                            <Pet pet={pet} isFullView={false} feedingBounce={petBounce} />
+                        </BlurView>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Filter Row */}
+                <View style={styles.filterContainer}>
+                    <View style={styles.filterRow}>
+                        {/* Time Selector */}
+                        <View style={{ flex: 1, zIndex: 1 }}>
+                            <GlassSegmentedControl
+                                values={['All', 'Morning', 'Noon', 'Evening']}
+                                selectedIndex={selectedIndex}
+                                onChange={handleSegmentChange}
+                            />
+                        </View>
+
+                        {/* Animated Eye Toggle */}
+                        <Animated.View style={{
+                            width: animWidth,
+                            marginLeft: animMargin,
+                            opacity: animOpacity,
+                            transform: [{ scale: animScale }],
+                            overflow: 'hidden',
+                            zIndex: 0,
+                            alignItems: 'flex-end',
+                        }}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    Haptics.selectionAsync();
+                                    setShowCompleted(!showCompleted);
+                                }}
+                                style={styles.completedToggle}
+                                activeOpacity={0.7}
+                                disabled={!hasCompletedHabits}
+                            >
+                                {showCompleted ? (
+                                    <Eye size={18} color="#34C759" />
+                                ) : (
+                                    <EyeOff size={18} color="rgba(255,255,255,0.4)" />
+                                )}
+                            </TouchableOpacity>
+                        </Animated.View>
+                    </View>
+                </View>
+            </View>
+
             <FlatList
                 data={filteredHabits}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]}
                 showsVerticalScrollIndicator={false}
-                contentInsetAdjustmentBehavior="automatic"
-                ListHeaderComponent={
-                    <View style={styles.filterContainer}>
-                        <View style={styles.filterRow}>
-                            {/* Time Selector */}
-                            <View style={{ flex: 1, zIndex: 1 }}>
-                                <GlassSegmentedControl
-                                    values={['All', 'Morning', 'Noon', 'Evening']}
-                                    selectedIndex={selectedIndex}
-                                    onChange={handleSegmentChange}
-                                />
-                            </View>
+                contentInsetAdjustmentBehavior="never" // Disable native adjustment since we have a fixed header view
+                ListEmptyComponent={() => {
+                    // Determine why it's empty
+                    // Check if there ARE habits for this filter that are just hidden because completed
+                    const hasHiddenCompleted = habits.some(h => {
+                        // Time match
+                        if (timeFilter !== 'all' && h.timeOfDay !== timeFilter && h.timeOfDay !== 'anytime') return false;
+                        // Is it completed?
+                        const dayProgress = progress.find(p => p.habitId === h.id && p.date === today);
+                        const current = dayProgress?.currentCount || 0;
+                        return current >= h.targetCount;
+                    });
 
-                            {/* Animated Eye Toggle */}
-                            <Animated.View style={{
-                                width: animWidth,
-                                marginLeft: animMargin,
-                                opacity: animOpacity,
-                                transform: [{ scale: animScale }],
-                                overflow: 'hidden',
-                                zIndex: 0,
-                                alignItems: 'flex-end',
-                            }}>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        Haptics.selectionAsync();
-                                        setShowCompleted(!showCompleted);
-                                    }}
-                                    style={styles.completedToggle}
-                                    activeOpacity={0.7}
-                                    disabled={!hasCompletedHabits}
-                                >
-                                    {showCompleted ? (
-                                        <Eye size={18} color="#34C759" />
-                                    ) : (
-                                        <EyeOff size={18} color="rgba(255,255,255,0.4)" />
-                                    )}
-                                </TouchableOpacity>
-                            </Animated.View>
-                        </View>
-                    </View>
-                }
-                ListEmptyComponent={
-                    <View style={styles.emptyState}>
-                        <Text style={styles.emptyText}>No habits found for {timeFilter}</Text>
-                    </View>
-                }
+                    // If filteredHabits is empty...
+                    // 1. If we have hidden completed items -> "All Done!"
+                    // 2. Otherwise -> "No habits set"
+
+                    if (hasHiddenCompleted && !showCompleted) {
+                        return <EmptyState type="all-done" />;
+                    }
+
+                    return <EmptyState type="empty" message={`No habits found for ${timeFilter}`} />;
+                }}
             />
 
             {/* iOS 26 Floating Action Button */}
             <TouchableOpacity
                 style={[styles.fab, { bottom: fabBottom }]}
                 activeOpacity={0.8}
-                onPress={() => (navigation as any).navigate('HabitForm')}
+                onPress={() => router.push('/habit-form')}
             >
                 <GlassView
                     style={styles.fabGlass}
@@ -299,22 +366,41 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#1c1c1e',
     },
-    // Removed old date/greeting styles
-    petHeaderWrapper: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        marginRight: 8,
+    // Custom Header Styles
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        marginBottom: LiquidGlass.header.marginBottom,
+    },
+    greeting: {
+        fontSize: LiquidGlass.header.titleSize,
+        fontWeight: LiquidGlass.header.titleWeight,
+        color: LiquidGlass.header.titleColor,
+        letterSpacing: LiquidGlass.header.titleLetterSpacing,
+    },
+    date: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 13,
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        marginTop: 4,
+    },
+    petHeaderContainer: {
+        marginBottom: 4,
+    },
+    petGlass: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
         overflow: 'hidden',
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: 'rgba(255,255,255,0.1)',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
     filterContainer: {
-        // Added margin top to spacing under large title
-        marginTop: 16,
         marginBottom: 16,
     },
     filterRow: {
@@ -332,14 +418,6 @@ const styles = StyleSheet.create({
     listContent: {
         paddingHorizontal: LiquidGlass.screenPadding,
         paddingBottom: 100,
-    },
-    emptyState: {
-        padding: 40,
-        alignItems: 'center',
-    },
-    emptyText: {
-        color: 'rgba(255,255,255,0.3)',
-        fontSize: 16,
     },
     fab: {
         position: 'absolute',

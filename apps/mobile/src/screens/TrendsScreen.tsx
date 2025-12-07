@@ -223,7 +223,10 @@ export const TrendsScreen = () => {
                 contentContainerStyle={[styles.content]}
                 contentInsetAdjustmentBehavior="automatic"
             >
-                {/* Header removed for Native Large Title */}
+                {/* Custom Fixed Header */}
+                <View style={[styles.headerRow, { marginTop: 20 }]}>
+                    <Text style={styles.headerTitle}>Trends</Text>
+                </View>
 
                 {renderToggle()}
 

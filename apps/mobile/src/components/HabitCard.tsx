@@ -8,6 +8,8 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import type { Swipeable as SwipeableType } from 'react-native-gesture-handler';
 import { useXPNotification } from '../context/XPNotificationContext';
 
+import { LiquidGlass } from '../theme/theme';
+
 interface HabitCardProps {
     habit: Habit;
     isCompleted: boolean;
@@ -319,7 +321,7 @@ const styles = StyleSheet.create({
     },
     countText: {
         fontSize: 16,
-        color: '#34C759',
+        color: LiquidGlass.colors.primary,
         fontWeight: '600',
         fontVariant: ['tabular-nums'],
     },
@@ -327,13 +329,13 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#34C759',
+        backgroundColor: LiquidGlass.colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
     },
     checkboxCompleted: {
-        backgroundColor: '#34C759',
-        borderColor: '#34C759',
+        backgroundColor: LiquidGlass.colors.primary,
+        borderColor: LiquidGlass.colors.primary,
     },
     // Actions - Clean integrated swipe design
     actionsContainer: {

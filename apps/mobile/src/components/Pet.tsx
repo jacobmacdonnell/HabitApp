@@ -7,6 +7,7 @@ import { GlassView } from 'expo-glass-effect';
 import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -68,7 +69,9 @@ const ZParticle = ({ delay, xOffset }: { delay: number, xOffset: number }) => {
 export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetProps) => {
     // State
     const navigation = useNavigation();
+    const router = useRouter();
     const [xpDiff, setXpDiff] = useState(0);
+    const [speechBubbleText, setSpeechBubbleText] = useState<string | null>(null);
 
     // Track previous values to trigger animations
     const prevXpRef = useRef(pet?.xp || 0);
@@ -81,6 +84,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
     // Feedback Animations
     const xpFloatAnim = useRef(new Animated.Value(0)).current; // Y position
     const xpFadeAnim = useRef(new Animated.Value(0)).current;
+    const speechFadeAnim = useRef(new Animated.Value(0)).current;
     const levelScaleAnim = useRef(new Animated.Value(0)).current;
     const levelFadeAnim = useRef(new Animated.Value(0)).current;
     const interactionScale = useRef(new Animated.Value(1)).current;
@@ -97,10 +101,38 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
 
     const handlePetPress = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+        // Bounce
         Animated.sequence([
             Animated.timing(interactionScale, { toValue: 0.9, duration: 100, useNativeDriver: true }),
             Animated.spring(interactionScale, { toValue: 1, friction: 4, tension: 40, useNativeDriver: true })
         ]).start();
+
+        // Chatter Logic
+        const phrases = [
+            "You're doing great!",
+            "Let's get some XP!",
+            "I'm hungry!",
+            "Did you drink water?",
+            "Keep it up!",
+            "You got this!",
+            "Time to focus!",
+            "Shiny habits!",
+            "Level up time?"
+        ];
+
+        const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+        setSpeechBubbleText(randomPhrase);
+
+        // Fade in bubble
+        Animated.timing(speechFadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+
+        // Hide after 3 seconds
+        setTimeout(() => {
+            Animated.timing(speechFadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }).start(() => {
+                setSpeechBubbleText(null);
+            });
+        }, 3000);
     };
 
     useEffect(() => {
@@ -343,6 +375,14 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
                     <Text style={styles.levelText}>LEVEL UP!</Text>
                     <Text style={styles.levelSubText}>Lvl {pet.level}</Text>
                 </Animated.View>
+
+                {/* Speech Bubble */}
+                {speechBubbleText && (
+                    <Animated.View style={[styles.speechBubble, { opacity: speechFadeAnim }]}>
+                        <Text style={styles.speechText}>{speechBubbleText}</Text>
+                        <View style={styles.speechArrow} />
+                    </Animated.View>
+                )}
             </View>
 
             <GlassView glassEffectStyle="regular" style={styles.statsCard}>
@@ -390,7 +430,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
                 </View>
 
                 {/* Customize Button */}
-                <TouchableOpacity style={styles.customizeButton} onPress={() => navigation.navigate('PetCustomize' as never)}>
+                <TouchableOpacity style={styles.customizeButton} onPress={() => router.push('/pet-customize')}>
                     <Palette size={18} color="#fff" />
                     <Text style={styles.customizeText}>Customize</Text>
                 </TouchableOpacity>
@@ -472,6 +512,44 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.9)',
+    },
+    // Speech Bubble
+    speechBubble: {
+        position: 'absolute',
+        top: -40,
+        backgroundColor: '#fff',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 4,
+        maxWidth: 200,
+        zIndex: 60,
+    },
+    speechText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#000',
+        textAlign: 'center',
+    },
+    speechArrow: {
+        position: 'absolute',
+        bottom: -6,
+        left: '50%',
+        marginLeft: -6,
+        width: 0,
+        height: 0,
+        backgroundColor: 'transparent',
+        borderStyle: 'solid',
+        borderLeftWidth: 6,
+        borderRightWidth: 6,
+        borderTopWidth: 6,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderTopColor: '#fff',
     },
     zText: {
         fontSize: 24,
@@ -590,4 +668,3 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
 });
-

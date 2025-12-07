@@ -104,6 +104,11 @@ export const SettingsScreen = () => {
                 contentInsetAdjustmentBehavior="automatic"
             >
 
+                {/* Custom Fixed Header */}
+                <View style={[styles.headerRow, { marginTop: 20 }]}>
+                    <Text style={styles.headerTitle}>Settings</Text>
+                </View>
+
                 {/* Preferences */}
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>PREFERENCES</Text>
@@ -113,15 +118,15 @@ export const SettingsScreen = () => {
                             {/* Sound */}
                             <View style={styles.row}>
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(236, 72, 153, 0.2)' }]}>
-                                        <Volume2 size={20} color="#f472b6" />
+                                    <View style={[styles.iconContainer, { backgroundColor: LiquidGlass.colors.glassBackground }]}>
+                                        <Volume2 size={20} color={LiquidGlass.colors.secondary} />
                                     </View>
                                     <Text style={styles.label}>Sound Effects</Text>
                                 </View>
                                 <Switch
                                     value={sound}
                                     onValueChange={handleSoundChange}
-                                    trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
+                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.colors.secondary }}
                                     ios_backgroundColor="#3e3e3e"
                                 />
                             </View>
@@ -131,15 +136,15 @@ export const SettingsScreen = () => {
                             {/* Notifications */}
                             <View style={styles.row}>
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
-                                        <Bell size={20} color="#34d399" />
+                                    <View style={[styles.iconContainer, { backgroundColor: LiquidGlass.colors.glassBackground }]}>
+                                        <Bell size={20} color={LiquidGlass.colors.primary} />
                                     </View>
                                     <Text style={styles.label}>Notifications</Text>
                                 </View>
                                 <Switch
                                     value={notifications}
                                     onValueChange={handleNotificationChange}
-                                    trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
+                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.colors.primary }}
                                     ios_backgroundColor="#3e3e3e"
                                 />
                             </View>
@@ -153,9 +158,9 @@ export const SettingsScreen = () => {
                     <View style={[styles.card, { overflow: 'hidden' }]}>
                         <BlurView intensity={60} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
                         <View style={{ position: 'relative', zIndex: 1 }}>
-                            {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color="#c084fc" />, '#c084fc', 'rgba(168, 85, 247, 0.2)')}
+                            {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color={LiquidGlass.colors.sleep} />, LiquidGlass.colors.sleep, LiquidGlass.colors.glassBackground)}
                             <View style={styles.separator} />
-                            {renderTimePicker('Wake Up', settings.sleepEnd || '07:00', 'wakeup', <Sun size={20} color="#fbbf24" />, '#fbbf24', 'rgba(251, 191, 36, 0.2)')}
+                            {renderTimePicker('Wake Up', settings.sleepEnd || '07:00', 'wakeup', <Sun size={20} color={LiquidGlass.colors.tertiary} />, LiquidGlass.colors.tertiary, LiquidGlass.colors.glassBackground)}
                         </View>
                     </View>
                 </View>

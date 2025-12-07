@@ -124,15 +124,24 @@ export const LiquidGlass = {
 
     // Colors
     colors: {
+        // Semantic Palette - Playful Theme
+        primary: '#34C759',      // Verified Green (Navbar, Complete)
+        secondary: '#AF52DE',    // Playful Purple (Accents, Toggles)
+        tertiary: '#FF9500',     // Playful Orange (Highlights)
+
+        // System Colors
         white: '#ffffff',
         black: '#000000',
         danger: '#ef4444',
-        success: '#22c55e',
+        success: '#34C759',      // Match primary green
         warning: '#f59e0b',
         info: '#3b82f6',
+
+        // UI Colors
         glassBorder: 'rgba(255,255,255,0.1)',
         glassBackground: 'rgba(255,255,255,0.1)',
-        // Additional app-specific colors
+
+        // Domain Specific
         xp: '#facc15',           // XP/gold
         levelUp: '#a855f7',      // Purple for level up
         sleep: '#c084fc',        // Light purple for sleep

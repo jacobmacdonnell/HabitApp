@@ -170,40 +170,31 @@ export const SQLiteStorageService: StorageServiceType = {
     },
 
     saveProgress: async (progressList: DailyProgress[]) => {
-        // Same issue as habits. The app passes the WHOLE list.
-        // Replacing 365 days of history every click is madness.
-        // We MUST optimize this.
-        // We detect "what changed" or we just blindly insert/update.
+        // Full sync implementation: Delete all and re-insert.
+        // This is inefficient but ensures exact consistency with the Context's state.
+        // Optimized methods like logSingleProgress should be used for frequent updates.
 
-        // HACK: For compatibility, we check if we can identify the "latest" change?
-        // No, the context logic pushes a new array.
-        // We will assume the context logic is "append-only" or "update-today-only".
+        try {
+            await db.transaction(async (tx) => {
+                await tx.delete(dailyProgress);
 
-        // BETTER APPROACH:
-        // We only save the items for the CURRENT DAY/WEEK from the list?
-        // No, `undoProgress` might touch past.
-
-        // TEMPORARY FIX:
-        // We only Upsert the items in the list.
-        // Since we don't track "dirty" state, this is hard.
-
-        // REAL FIX:
-        // Only one item usually changes at a time.
-        // We should change the helper in `storage.ts` to `logProgress(singleItem)`.
-
-        // For this step, to satisfy strict interface compatibility without breaking Context:
-        // We will do nothing here. The Context logic calls `logProgress` which calls `saveProgress`.
-        // We should change `HabitContext` to call `storage.logProgress` (singular).
-        // BUT `StorageServiceType` defines `saveProgress(DailyProgress[])`.
-
-        // I will implement a "Smart Merge" here? Too slow.
-        // I will implement "Delete All & Insert" for now? NO, that destroys the scalability gain.
-
-        // ACTION: I will modify `src/services/storage.ts` wrapper to NOT use `saveProgress` array dump,
-        // but instead expose a new method, and I'll update Context to use it.
-        // This breaks the "Drop-in replacement" promise but is necessary.
-
-        console.warn('saveProgress(Array) called on SQLite - this is deprecated and slow. Use logSingleProgress.');
+                if (progressList.length > 0) {
+                    // Insert in chunks of 50 to avoid SQL variable limits
+                    const CHUNK_SIZE = 50;
+                    for (let i = 0; i < progressList.length; i += CHUNK_SIZE) {
+                        const chunk = progressList.slice(i, i + CHUNK_SIZE);
+                        await tx.insert(dailyProgress).values(chunk.map(p => ({
+                            habitId: p.habitId,
+                            date: p.date,
+                            currentCount: p.currentCount,
+                            completed: p.completed
+                        })));
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Failed to save progress:', error);
+        }
     },
 
     // New Method for O(1) updates

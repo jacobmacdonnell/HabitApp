@@ -41,7 +41,7 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
 
         try {
             const { sound } = await Audio.Sound.createAsync(
-                { uri: 'https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3' },
+                require('../../assets/sounds/xp-pop.mp3'),
                 { shouldPlay: true, volume: 0.5 }
             );
             // Unload after playing

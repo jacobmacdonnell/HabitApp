@@ -12,10 +12,12 @@ import { ScreenWrapper } from '../components/ScreenWrapper';
 import { GlassInput } from '../components/GlassInput';
 import { GlassButton } from '../components/GlassButton';
 import { LiquidGlass } from '../theme/theme';
+import { useRouter } from 'expo-router';
 
 export const HabitFormScreen = () => {
     const { addHabit, updateHabit, deleteHabit } = useHabit();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const router = useRouter();
     const route = useRoute<RouteProp<RootStackParamList, 'HabitForm'>>();
     const editingHabit = route.params?.habit;
 
@@ -47,7 +49,7 @@ export const HabitFormScreen = () => {
             addHabit(habitData);
         }
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        navigation.goBack();
+        router.back();
     };
 
     useLayoutEffect(() => {
@@ -55,7 +57,7 @@ export const HabitFormScreen = () => {
             title: editingHabit ? 'Edit Habit' : 'New Habit',
             headerLeft: () => (
                 <TouchableOpacity
-                    onPress={() => navigation.goBack()}
+                    onPress={() => router.back()}
                     style={{ paddingHorizontal: 16 }}
                 >
                     <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
@@ -84,7 +86,7 @@ export const HabitFormScreen = () => {
                     style: 'destructive',
                     onPress: () => {
                         deleteHabit(editingHabit.id);
-                        navigation.goBack();
+                        router.back();
                     }
                 }
             ]

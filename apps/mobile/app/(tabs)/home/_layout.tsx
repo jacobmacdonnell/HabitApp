@@ -18,7 +18,7 @@ export default function TodayLayout() {
                 name="index"
                 options={{
                     title: 'Today',
-                    headerLargeTitle: true,
+                    headerShown: false,
                 }}
             />
         </Stack>
