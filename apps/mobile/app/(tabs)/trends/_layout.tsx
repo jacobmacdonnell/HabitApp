@@ -1,24 +1,26 @@
 import { Stack } from 'expo-router';
-import { Platform } from 'react-native';
 
-export default function SettingsLayout() {
+export default function TrendsLayout() {
     return (
         <Stack
             screenOptions={{
                 headerShown: true,
                 headerTransparent: true,
-                headerBlurEffect: 'systemMaterialDark', // Matches our dark theme liquid glass
+                headerBlurEffect: 'systemMaterialDark',
                 headerLargeTitle: true,
                 headerLargeTitleShadowVisible: false,
-                headerShadowVisible: false, // Clean glass look
-                contentStyle: { backgroundColor: '#1c1c1e' }, // Match app background
+                headerShadowVisible: false,
+                contentStyle: { backgroundColor: '#1c1c1e' },
                 headerTintColor: '#fff',
+                headerLargeTitleStyle: {
+                    color: '#fff',
+                },
             }}
         >
             <Stack.Screen
                 name="index"
                 options={{
-                    title: 'Settings',
+                    title: 'Trends',
                     headerLargeTitle: true,
                 }}
             />

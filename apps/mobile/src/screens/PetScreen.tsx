@@ -67,11 +67,9 @@ export const PetScreen = () => {
 
             <ScrollView
                 style={styles.container}
-                contentContainerStyle={[styles.content, { paddingTop: insets.top + LiquidGlass.header.contentTopPadding }]}
+                contentContainerStyle={[styles.content]}
+                contentInsetAdjustmentBehavior="automatic"
             >
-                <View style={styles.headerRow}>
-                    <Text style={styles.headerTitle}>{pet.name}</Text>
-                </View>
                 <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
             </ScrollView>
         </View>

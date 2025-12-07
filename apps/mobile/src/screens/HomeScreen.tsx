@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Animated, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
@@ -6,7 +6,7 @@ import { Pet } from '../components/Pet';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { Plus, Eye, EyeOff } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
-import { useNavigation, useIsFocused, CompositeNavigationProp } from '@react-navigation/native';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
@@ -33,21 +33,23 @@ export const HomeScreen = () => {
 
     const today = new Date().toISOString().split('T')[0];
 
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour < 12) return 'Good morning';
-        if (hour < 17) return 'Good afternoon';
-        return 'Good evening';
-    };
-
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: '',
-            title: '',
-            headerRight: () => null,
             headerTransparent: true,
+            headerRight: () => (
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate('Pet')}
+                    style={{ marginRight: 0 }}
+                >
+                    {/* Reuse the Pet component but simpler wrapper for header */}
+                    <View style={styles.petHeaderWrapper}>
+                        <Pet pet={pet} isFullView={false} feedingBounce={petBounce} />
+                    </View>
+                </TouchableOpacity>
+            ),
         });
-    }, [navigation]);
+    }, [navigation, pet, petBounce]);
 
     const handleSegmentChange = (event: any) => {
         Haptics.selectionAsync();
@@ -210,9 +212,6 @@ export const HomeScreen = () => {
 
     const insets = useSafeAreaInsets();
 
-    // iOS 26: FAB positioned above floating dock
-    // Dock top = insets.bottom + 16 (offset) + 68 (height) = insets.bottom + 84
-    // FAB should be ~20pt above dock top
     const fabBottom = Platform.OS === 'ios'
         ? insets.bottom + LiquidGlass.dock.bottomOffset + LiquidGlass.dock.height + 20
         : 100;
@@ -222,69 +221,6 @@ export const HomeScreen = () => {
             {/* Ambient Background - Clean Dark Theme */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
 
-            {/* Fixed Header - outside FlatList to prevent re-renders */}
-            <View style={{ paddingTop: insets.top + LiquidGlass.header.contentTopPadding, paddingHorizontal: LiquidGlass.screenPadding }}>
-                {/* Unified Header Row */}
-                <View style={styles.headerRow}>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.date}>
-                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </Text>
-                        <Text style={styles.greeting}>{getGreeting()}</Text>
-                    </View>
-
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={() => navigation.navigate('Pet')}
-                        style={styles.petHeaderContainer}
-                    >
-                        <BlurView intensity={20} tint="light" style={styles.petGlass}>
-                            <Pet pet={pet} isFullView={false} feedingBounce={petBounce} />
-                        </BlurView>
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.filterContainer}>
-                    <View style={styles.filterRow}>
-                        {/* Time Selector - ZIndex 1 to slide OVER the eye */}
-                        <View style={{ flex: 1, zIndex: 1 }}>
-                            <GlassSegmentedControl
-                                values={['All', 'Morning', 'Noon', 'Evening']}
-                                selectedIndex={selectedIndex}
-                                onChange={handleSegmentChange}
-                            />
-                        </View>
-
-                        {/* Animated Eye Toggle */}
-                        <Animated.View style={{
-                            width: animWidth,
-                            marginLeft: animMargin,
-                            opacity: animOpacity,
-                            transform: [{ scale: animScale }],
-                            overflow: 'hidden', // Clip content to prevent overlap
-                            zIndex: 0,
-                            alignItems: 'flex-end', // Keep content anchored right
-                        }}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    Haptics.selectionAsync();
-                                    setShowCompleted(!showCompleted);
-                                }}
-                                style={styles.completedToggle}
-                                activeOpacity={0.7}
-                                disabled={!hasCompletedHabits}
-                            >
-                                {showCompleted ? (
-                                    <Eye size={18} color="#34C759" />
-                                ) : (
-                                    <EyeOff size={18} color="rgba(255,255,255,0.4)" />
-                                )}
-                            </TouchableOpacity>
-                        </Animated.View>
-                    </View>
-                </View>
-            </View>
-
             <FlatList
                 data={filteredHabits}
                 renderItem={renderItem}
@@ -292,6 +228,47 @@ export const HomeScreen = () => {
                 contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]}
                 showsVerticalScrollIndicator={false}
                 contentInsetAdjustmentBehavior="automatic"
+                ListHeaderComponent={
+                    <View style={styles.filterContainer}>
+                        <View style={styles.filterRow}>
+                            {/* Time Selector */}
+                            <View style={{ flex: 1, zIndex: 1 }}>
+                                <GlassSegmentedControl
+                                    values={['All', 'Morning', 'Noon', 'Evening']}
+                                    selectedIndex={selectedIndex}
+                                    onChange={handleSegmentChange}
+                                />
+                            </View>
+
+                            {/* Animated Eye Toggle */}
+                            <Animated.View style={{
+                                width: animWidth,
+                                marginLeft: animMargin,
+                                opacity: animOpacity,
+                                transform: [{ scale: animScale }],
+                                overflow: 'hidden',
+                                zIndex: 0,
+                                alignItems: 'flex-end',
+                            }}>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        Haptics.selectionAsync();
+                                        setShowCompleted(!showCompleted);
+                                    }}
+                                    style={styles.completedToggle}
+                                    activeOpacity={0.7}
+                                    disabled={!hasCompletedHabits}
+                                >
+                                    {showCompleted ? (
+                                        <Eye size={18} color="#34C759" />
+                                    ) : (
+                                        <EyeOff size={18} color="rgba(255,255,255,0.4)" />
+                                    )}
+                                </TouchableOpacity>
+                            </Animated.View>
+                        </View>
+                    </View>
+                }
                 ListEmptyComponent={
                     <View style={styles.emptyState}>
                         <Text style={styles.emptyText}>No habits found for {timeFilter}</Text>
@@ -322,57 +299,31 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#1c1c1e',
     },
-
-    dateHeader: {
-        paddingHorizontal: LiquidGlass.screenPadding,
-        paddingTop: 10,
-        paddingBottom: 10,
-    },
-    date: {
-        color: 'rgba(255,255,255,0.6)',
-        fontSize: 13,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        marginBottom: 4,
-        marginLeft: 2, // Optical alignment with large title
-    },
-    greeting: {
-        fontSize: LiquidGlass.header.titleSize,
-        fontWeight: LiquidGlass.header.titleWeight,
-        color: LiquidGlass.header.titleColor,
-        letterSpacing: LiquidGlass.header.titleLetterSpacing,
-    },
-    headerRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        marginBottom: LiquidGlass.header.marginBottom,
-    },
-    petHeaderContainer: {
-        marginBottom: 4,
-    },
-    petGlass: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
+    // Removed old date/greeting styles
+    petHeaderWrapper: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 8,
         overflow: 'hidden',
-        alignItems: 'center',
         justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: 'rgba(255,255,255,0.1)',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
     filterContainer: {
+        // Added margin top to spacing under large title
+        marginTop: 16,
         marginBottom: 16,
     },
     filterRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        // gap: 12, // Removing gap to manage via animation
     },
     completedToggle: {
-        width: 40, // Matched to SegmentedControl height
-        height: 40, // Matched to SegmentedControl height
+        width: 40,
+        height: 40,
         borderRadius: 20,
         backgroundColor: 'rgba(255,255,255,0.08)',
         justifyContent: 'center',

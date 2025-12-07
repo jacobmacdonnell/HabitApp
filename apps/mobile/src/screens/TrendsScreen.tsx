@@ -220,11 +220,10 @@ export const TrendsScreen = () => {
 
             <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={[styles.content, { paddingTop: insets.top + LiquidGlass.header.contentTopPadding }]}
+                contentContainerStyle={[styles.content]}
+                contentInsetAdjustmentBehavior="automatic"
             >
-                <View style={styles.headerRow}>
-                    <Text style={styles.headerTitle}>Trends</Text>
-                </View>
+                {/* Header removed for Native Large Title */}
 
                 {renderToggle()}
 

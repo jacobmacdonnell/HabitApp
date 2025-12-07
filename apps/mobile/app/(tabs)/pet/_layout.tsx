@@ -1,24 +1,23 @@
 import { Stack } from 'expo-router';
-import { Platform } from 'react-native';
 
-export default function SettingsLayout() {
+export default function PetLayout() {
     return (
         <Stack
             screenOptions={{
                 headerShown: true,
                 headerTransparent: true,
-                headerBlurEffect: 'systemMaterialDark', // Matches our dark theme liquid glass
+                headerBlurEffect: 'systemMaterialDark',
                 headerLargeTitle: true,
                 headerLargeTitleShadowVisible: false,
-                headerShadowVisible: false, // Clean glass look
-                contentStyle: { backgroundColor: '#1c1c1e' }, // Match app background
+                headerShadowVisible: false,
+                contentStyle: { backgroundColor: '#1c1c1e' },
                 headerTintColor: '#fff',
             }}
         >
             <Stack.Screen
                 name="index"
                 options={{
-                    title: 'Settings',
+                    title: 'My Companion',
                     headerLargeTitle: true,
                 }}
             />
