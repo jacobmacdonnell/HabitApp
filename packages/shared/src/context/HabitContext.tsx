@@ -161,7 +161,15 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         }
 
         setProgress(newProgress);
-        storage.saveProgress(newProgress);
+        setProgress(newProgress);
+
+        // Optimistic update for SQLite (Single Item)
+        const changedItem = newProgress.find(p => p.habitId === habitId && p.date === date);
+        if (storage.logSingleProgress && changedItem) {
+            storage.logSingleProgress(changedItem);
+        } else {
+            storage.saveProgress(newProgress);
+        }
 
         // Update Pet Health & XP Logic
         if (pet) {
@@ -217,7 +225,13 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         });
 
         setProgress(newProgress);
-        storage.saveProgress(newProgress);
+        // Optimistic update for SQLite (Single Item)
+        const changedItem = newProgress.find(p => p.habitId === habitId && p.date === date);
+        if (storage.logSingleProgress && changedItem) {
+            storage.logSingleProgress(changedItem);
+        } else {
+            storage.saveProgress(newProgress);
+        }
 
         if (pet && wasCompleted) {
             // Revert XP

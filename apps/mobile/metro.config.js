@@ -20,4 +20,7 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = false;
 
+// 4. Add .sql support for Drizzle
+config.resolver.sourceExts.push('sql');
+
 module.exports = config;

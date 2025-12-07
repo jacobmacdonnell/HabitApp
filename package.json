@@ -11,6 +11,7 @@
     "mobile:ios": "npm run ios --workspace=apps/mobile"
   },
   "devDependencies": {
+    "eas-cli": "^0.0.0",
     "turbo": "^2.0.0"
   },
   "overrides": {

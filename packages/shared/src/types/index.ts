@@ -57,6 +57,8 @@ export interface StorageServiceType {
     saveProgress: (progress: DailyProgress[]) => Promise<void>;
     getSettings: () => Promise<Settings>;
     saveSettings: (settings: Settings) => Promise<void>;
+    getProgressForRange?: (startDate: string, endDate: string) => Promise<DailyProgress[]>;
+    logSingleProgress?: (item: DailyProgress) => Promise<void>;
 }
 
 export interface HabitContextType {

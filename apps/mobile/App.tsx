@@ -8,6 +8,9 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { XPNotificationProvider } from './src/context/XPNotificationContext';
+import { migrateFromAsyncStorage } from './src/services/storage';
+import { db } from './src/db/client';
+import { useMigrationHelper } from './src/db/migrate';
 
 // Initialize notification handler
 Notifications.setNotificationHandler({
@@ -40,6 +43,16 @@ const ThemedApp = () => {
 };
 
 export default function App() {
+  const { success, error } = useMigrationHelper();
+
+  React.useEffect(() => {
+    if (success) {
+      migrateFromAsyncStorage();
+    }
+  }, [success]);
+
+  if (!success && !error) return null; // Loading migrations
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
