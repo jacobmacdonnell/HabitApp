@@ -7,6 +7,7 @@ import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { ArrowRight, Check, Minus, Plus } from 'lucide-react-native';
 import { GlassInput } from '../components/GlassInput';
 import { GlassButton } from '../components/GlassButton';
+import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -67,6 +68,7 @@ export const OnboardingScreen = () => {
         }
 
         setIsOnboarding(false);
+        router.replace('/(tabs)');
     };
 
     return (

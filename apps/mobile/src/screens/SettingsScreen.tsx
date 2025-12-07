@@ -109,78 +109,87 @@ export const SettingsScreen = () => {
                 {/* Preferences */}
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>PREFERENCES</Text>
-                    <GlassView glassEffectStyle="regular" style={styles.card}>
-                        {/* Sound */}
-                        <View style={styles.row}>
-                            <View style={styles.iconLabel}>
-                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(236, 72, 153, 0.2)' }]}>
-                                    <Volume2 size={20} color="#f472b6" />
+                    <View style={[styles.card, { overflow: 'hidden' }]}>
+                        <BlurView intensity={60} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
+                        <View style={{ position: 'relative', zIndex: 1 }}>
+                            {/* Sound */}
+                            <View style={styles.row}>
+                                <View style={styles.iconLabel}>
+                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(236, 72, 153, 0.2)' }]}>
+                                        <Volume2 size={20} color="#f472b6" />
+                                    </View>
+                                    <Text style={styles.label}>Sound Effects</Text>
                                 </View>
-                                <Text style={styles.label}>Sound Effects</Text>
+                                <Switch
+                                    value={sound}
+                                    onValueChange={handleSoundChange}
+                                    trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
+                                    ios_backgroundColor="#3e3e3e"
+                                />
                             </View>
-                            <Switch
-                                value={sound}
-                                onValueChange={handleSoundChange}
-                                trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
-                                ios_backgroundColor="#3e3e3e"
-                            />
-                        </View>
 
-                        <View style={styles.separator} />
+                            <View style={styles.separator} />
 
-                        {/* Notifications */}
-                        <View style={styles.row}>
-                            <View style={styles.iconLabel}>
-                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
-                                    <Bell size={20} color="#34d399" />
+                            {/* Notifications */}
+                            <View style={styles.row}>
+                                <View style={styles.iconLabel}>
+                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.2)' }]}>
+                                        <Bell size={20} color="#34d399" />
+                                    </View>
+                                    <Text style={styles.label}>Notifications</Text>
                                 </View>
-                                <Text style={styles.label}>Notifications</Text>
+                                <Switch
+                                    value={notifications}
+                                    onValueChange={handleNotificationChange}
+                                    trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
+                                    ios_backgroundColor="#3e3e3e"
+                                />
                             </View>
-                            <Switch
-                                value={notifications}
-                                onValueChange={handleNotificationChange}
-                                trackColor={{ false: '#3e3e3e', true: '#6366f1' }}
-                                ios_backgroundColor="#3e3e3e"
-                            />
                         </View>
-                    </GlassView>
+                    </View>
                 </View>
 
                 {/* Sleep Schedule */}
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>SLEEP SCHEDULE</Text>
-                    <GlassView glassEffectStyle="regular" style={styles.card}>
-                        {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color="#c084fc" />, '#c084fc', 'rgba(168, 85, 247, 0.2)')}
-                        <View style={styles.separator} />
-                        {renderTimePicker('Wake Up', settings.sleepEnd || '07:00', 'wakeup', <Sun size={20} color="#fbbf24" />, '#fbbf24', 'rgba(251, 191, 36, 0.2)')}
-                    </GlassView>
+                    <View style={[styles.card, { overflow: 'hidden' }]}>
+                        <BlurView intensity={60} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
+                        <View style={{ position: 'relative', zIndex: 1 }}>
+                            {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color="#c084fc" />, '#c084fc', 'rgba(168, 85, 247, 0.2)')}
+                            <View style={styles.separator} />
+                            {renderTimePicker('Wake Up', settings.sleepEnd || '07:00', 'wakeup', <Sun size={20} color="#fbbf24" />, '#fbbf24', 'rgba(251, 191, 36, 0.2)')}
+                        </View>
+                    </View>
                 </View>
 
                 {/* Data & Privacy */}
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>DATA & PRIVACY</Text>
-                    <GlassView glassEffectStyle="regular" style={styles.card}>
-                        <TouchableOpacity style={styles.row}>
-                            <View style={styles.iconLabel}>
-                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
-                                    <Shield size={20} color="#60a5fa" />
+                    <View style={[styles.card, { overflow: 'hidden' }]}>
+                        <BlurView intensity={60} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
+                        <View style={{ position: 'relative', zIndex: 1 }}>
+                            <TouchableOpacity style={styles.row}>
+                                <View style={styles.iconLabel}>
+                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
+                                        <Shield size={20} color="#60a5fa" />
+                                    </View>
+                                    <Text style={styles.label}>Privacy Policy</Text>
                                 </View>
-                                <Text style={styles.label}>Privacy Policy</Text>
-                            </View>
-                            <ChevronRight size={20} color="rgba(255,255,255,0.3)" />
-                        </TouchableOpacity>
+                                <ChevronRight size={20} color="rgba(255,255,255,0.3)" />
+                            </TouchableOpacity>
 
-                        <View style={styles.separator} />
+                            <View style={styles.separator} />
 
-                        <TouchableOpacity style={styles.row} onPress={handleReset}>
-                            <View style={styles.iconLabel}>
-                                <View style={[styles.iconContainer, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
-                                    <Trash2 size={20} color="#ef4444" />
+                            <TouchableOpacity style={styles.row} onPress={handleReset}>
+                                <View style={styles.iconLabel}>
+                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
+                                        <Trash2 size={20} color="#ef4444" />
+                                    </View>
+                                    <Text style={[styles.label, { color: '#ef4444' }]}>Reset All Data</Text>
                                 </View>
-                                <Text style={[styles.label, { color: '#ef4444' }]}>Reset All Data</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </GlassView>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
 
                 <Text style={styles.footer}>Habit Companion v1.0.2 (iOS)</Text>
@@ -223,7 +232,7 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: 24,
         overflow: 'hidden',
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'transparent',
     },
     row: {
         flexDirection: 'row',

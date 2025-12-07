@@ -233,11 +233,11 @@ const styles = StyleSheet.create({
     blur: {
         paddingVertical: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#2c2c2e', // Solid dark background so swipe doesn't show through
+        backgroundColor: 'rgba(44, 44, 46, 0.4)', // Semi-transparent for glass effect
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 0.5,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(255,255,255,0.15)',
     },
     content: {
         flexDirection: 'row',

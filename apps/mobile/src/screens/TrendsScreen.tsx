@@ -159,30 +159,34 @@ export const TrendsScreen = () => {
         <View>
             {/* Stats Overview */}
             <View style={styles.statsGrid}>
-                <GlassView glassEffectStyle="regular" style={styles.statCard}>
+                <View style={[styles.statCard, { overflow: 'hidden' }]}>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
                     <Text style={styles.statLabel}>Consistency</Text>
                     <Text style={styles.statBigValue}>{consistencyScore}%</Text>
-                </GlassView>
-                <GlassView glassEffectStyle="regular" style={styles.statCard}>
+                </View>
+                <View style={[styles.statCard, { overflow: 'hidden' }]}>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
                     <Text style={styles.statLabel}>Best Streak</Text>
                     <Text style={styles.statBigValue}>{bestStreak}</Text>
-                </GlassView>
+                </View>
             </View>
 
             <View style={styles.statsGrid}>
-                <GlassView glassEffectStyle="regular" style={[styles.statCard, { flex: 2 }]}>
+                <View style={[styles.statCard, { flex: 2, overflow: 'hidden' }]}>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                         <Award size={16} color="#fbbf24" />
                         <Text style={styles.statLabel}>Total Completions</Text>
                     </View>
                     <Text style={styles.statBigValue}>{totalCompletions}</Text>
-                </GlassView>
+                </View>
             </View>
 
             {/* Heatmap */}
             <View style={styles.section}>
                 <Text style={styles.sectionHeader}>30 DAY HEATMAP</Text>
-                <GlassView glassEffectStyle="regular" style={styles.heatmapCard}>
+                <View style={[styles.heatmapCard, { overflow: 'hidden' }]}>
+                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
                     <View style={styles.heatmapGrid}>
                         {heatmapData.map((day, i) => (
                             <View
@@ -190,7 +194,7 @@ export const TrendsScreen = () => {
                                 style={[
                                     styles.heatmapSquare,
                                     {
-                                        backgroundColor: day.intensity > 0 ? '#22c55e' : 'rgba(255,255,255,0.05)',
+                                        backgroundColor: day.intensity > 0 ? '#22c55e' : 'rgba(255,255,255,0.1)',
                                         opacity: day.intensity > 0 ? Math.max(0.3, day.intensity) : 1
                                     }
                                 ]}
@@ -202,7 +206,7 @@ export const TrendsScreen = () => {
                         <View style={styles.legendGradient} />
                         <Text style={styles.legendText}>More</Text>
                     </View>
-                </GlassView>
+                </View>
             </View>
         </View>
     );
@@ -367,7 +371,7 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'transparent',
         padding: 24,
         borderRadius: 24,
         overflow: 'hidden',
@@ -384,7 +388,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     heatmapCard: {
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'transparent',
         padding: 24,
         borderRadius: 24,
         overflow: 'hidden',
