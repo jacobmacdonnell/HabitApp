@@ -60,9 +60,7 @@ export const PetScreen = () => {
 
     return (
         <View style={styles.wrapper}>
-            {/* Ambient Background - Only behind Pet */}
-            <View style={[styles.blob, { backgroundColor: pet.color || '#6366f1', top: -50, left: -50, opacity: 0.15 }]} />
-            {/* Removed secondary blob */}
+            {/* Pet component has its own glow effect */}
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
             <ScrollView
@@ -165,9 +163,11 @@ const styles = StyleSheet.create({
     },
     blob: {
         position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        opacity: 0.3,
+        width: 600,
+        height: 600,
+        borderRadius: 300,
+        opacity: 0.25,
+        top: '15%',
+        alignSelf: 'center',
     },
 });

@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
-import { useHabit } from '@habitapp/shared';
+import { useHabit, getLocalDateString } from '@habitapp/shared';
 import { BlurView } from 'expo-blur';
-import { GlassView } from 'expo-glass-effect';
-import { TrendingUp, Award, Calendar, Check, X, Grid, List as ListIcon } from 'lucide-react-native';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
@@ -15,16 +15,15 @@ type ViewMode = 'weekly' | 'monthly';
 export const TrendsScreen = () => {
     const { habits, progress, getStreak } = useHabit();
     const [viewMode, setViewMode] = useState<ViewMode>('weekly');
+    const [currentDate, setCurrentDate] = useState(new Date());
 
-    // --- Data Processing ---
-
-    // 1. Weekly History (Last 7 Days) for EACH habit
+    // --- Data Processing: Weekly ---
     const last7Days = useMemo(() => {
         return Array.from({ length: 7 }, (_, i) => {
             const d = new Date();
             d.setDate(d.getDate() - (6 - i));
             return {
-                dateStr: d.toISOString().split('T')[0],
+                dateStr: getLocalDateString(d),
                 dayName: d.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
                 isToday: i === 6
             };
@@ -35,7 +34,8 @@ export const TrendsScreen = () => {
         return habits.map(habit => {
             const history = last7Days.map(day => {
                 const entry = progress.find(p => p.date === day.dateStr && p.habitId === habit.id);
-                const isCompleted = entry?.completed || false;
+                // Handle both boolean true and old string/number values if any exist, though types say boolean
+                const isCompleted = !!entry?.completed;
                 const isPartiallyDone = (entry?.currentCount || 0) > 0;
                 return { ...day, isCompleted, isPartiallyDone };
             });
@@ -43,28 +43,69 @@ export const TrendsScreen = () => {
         });
     }, [habits, progress, last7Days]);
 
-    // 2. Monthly Heatmap (Last 30 Days) - Aggregate
-    const last30Days = useMemo(() => {
-        return Array.from({ length: 30 }, (_, i) => {
-            const d = new Date();
-            d.setDate(d.getDate() - (29 - i));
-            return d.toISOString().split('T')[0];
-        });
-    }, []);
+    // --- Data Processing: Monthly (Calendar) ---
+    const calendarData = useMemo(() => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
 
-    const heatmapData = useMemo(() => {
-        return last30Days.map(dateStr => {
+        const firstDayOfMonth = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // 0 = Sunday, 1 = Monday ... 6 = Saturday
+        // We want Monday start: 0 = Mon ... 6 = Sun
+        let startDay = firstDayOfMonth.getDay();
+        startDay = startDay === 0 ? 6 : startDay - 1; // Adjust for Monday start
+
+        const days = [];
+        // Empty slots for start padding
+        for (let i = 0; i < startDay; i++) {
+            days.push({ id: `pad-${i}`, isEmpty: true });
+        }
+
+        // Actual days
+        const todayStr = getLocalDateString();
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            // Construct local date string carefully
+            // Using a new Date(year, month, i) and getFullYear/Month/Date ensures local time usage
+            const d = new Date(year, month, i);
+            const dateStr = [
+                d.getFullYear(),
+                String(d.getMonth() + 1).padStart(2, '0'),
+                String(d.getDate()).padStart(2, '0')
+            ].join('-');
+
+            // Get stats for this day
             const dayProgress = progress.filter(p => p.date === dateStr);
-            const totalTarget = habits.length; // Simplified: usually check if habit existed
+            const totalHabits = habits.length || 1;
+
+            // Count distinct habits completed
             const completedCount = dayProgress.filter(p => p.completed).length;
+            const intensity = completedCount / totalHabits;
 
-            // Opacity calculation
-            const intensity = totalTarget > 0 ? completedCount / totalTarget : 0;
-            return { dateStr, intensity, completedCount };
+            days.push({
+                id: dateStr,
+                dayNum: i,
+                intensity,
+                completedCount,
+                isToday: dateStr === todayStr,
+                isEmpty: false
+            });
+        }
+
+        return days;
+    }, [currentDate, progress, habits]);
+
+    const changeMonth = (increment: number) => {
+        Haptics.selectionAsync();
+        setCurrentDate(prev => {
+            const newDate = new Date(prev);
+            newDate.setMonth(prev.getMonth() + increment);
+            return newDate;
         });
-    }, [progress, habits, last30Days]);
+    };
 
-    // 3. Stats
+    // --- Stats ---
     const bestStreak = useMemo(() => {
         if (habits.length === 0) return 0;
         return Math.max(...habits.map(h => getStreak(h.id)));
@@ -75,34 +116,32 @@ export const TrendsScreen = () => {
     }, [progress]);
 
     const consistencyScore = useMemo(() => {
-        if (heatmapData.length === 0) return 0;
-        const sumIntensity = heatmapData.reduce((acc, curr) => acc + curr.intensity, 0);
-        return Math.round((sumIntensity / heatmapData.length) * 100);
-    }, [heatmapData]);
+        if (habits.length === 0) return 0;
+        // Consistency across the currently viewed month
+        const filledDays = calendarData.filter(d => !d.isEmpty);
+        if (filledDays.length === 0) return 0;
+
+        const now = new Date();
+        const viewingFutureMonth = currentDate.getFullYear() > now.getFullYear() ||
+            (currentDate.getFullYear() === now.getFullYear() && currentDate.getMonth() > now.getMonth());
+
+        if (viewingFutureMonth) return 0;
+
+        let daysToCount = filledDays.length;
+        // If viewing current month, only count up to today
+        if (currentDate.getMonth() === now.getMonth() && currentDate.getFullYear() === now.getFullYear()) {
+            daysToCount = now.getDate();
+        }
+
+        const validDays = filledDays.slice(0, daysToCount);
+        if (validDays.length === 0) return 0;
+
+        const sumIntensity = validDays.reduce((acc, curr) => acc + (curr.intensity || 0), 0);
+        return Math.round((sumIntensity / daysToCount) * 100);
+    }, [calendarData, habits.length, currentDate]);
 
 
-    // --- Render Components ---
-
-    const renderToggle = () => (
-        <View style={styles.toggleContainer}>
-            <View style={styles.toggleTrack}>
-                <TouchableOpacity
-                    style={[styles.toggleOption, viewMode === 'weekly' && styles.toggleActive]}
-                    onPress={() => setViewMode('weekly')}
-                >
-                    <ListIcon size={16} color={viewMode === 'weekly' ? '#fff' : 'rgba(255,255,255,0.5)'} />
-                    <Text style={[styles.toggleText, viewMode === 'weekly' && styles.toggleTextActive]}>Weekly</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.toggleOption, viewMode === 'monthly' && styles.toggleActive]}
-                    onPress={() => setViewMode('monthly')}
-                >
-                    <Grid size={16} color={viewMode === 'monthly' ? '#fff' : 'rgba(255,255,255,0.5)'} />
-                    <Text style={[styles.toggleText, viewMode === 'monthly' && styles.toggleTextActive]}>Monthly</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+    // --- Render Views ---
 
     const renderWeeklyView = () => (
         <View style={styles.listContainer}>
@@ -135,12 +174,12 @@ export const TrendsScreen = () => {
                                 {habit.history.map((day, i) => (
                                     <View key={i} style={styles.statusBubbleContainer}>
                                         {day.isCompleted ? (
-                                            <View style={[styles.statusBubble, { backgroundColor: habit.color }]}>
+                                            <View style={[styles.statusBubble, { backgroundColor: LiquidGlass.colors.primary }]}>
                                                 <Check size={10} color="#fff" strokeWidth={4} />
                                             </View>
                                         ) : day.isPartiallyDone ? (
-                                            <View style={[styles.statusBubble, styles.partialBubble, { borderColor: habit.color }]}>
-                                                <Text style={{ fontSize: 8, color: habit.color }}>•</Text>
+                                            <View style={[styles.statusBubble, styles.partialBubble, { borderColor: LiquidGlass.colors.primary }]}>
+                                                <Text style={{ fontSize: 8, color: LiquidGlass.colors.primary }}>•</Text>
                                             </View>
                                         ) : (
                                             <View style={[styles.statusBubble, styles.emptyBubble]} />
@@ -157,55 +196,74 @@ export const TrendsScreen = () => {
 
     const renderMonthlyView = () => (
         <View>
-            {/* Stats Overview */}
-            <View style={styles.statsGrid}>
-                <View style={[styles.statCard, { overflow: 'hidden' }]}>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
-                    <Text style={styles.statLabel}>Consistency</Text>
-                    <Text style={styles.statBigValue}>{consistencyScore}%</Text>
+            {/* Stats Overview - Compact Row */}
+            <View style={styles.statsRow}>
+                <View style={styles.compactStat}>
+                    <Text style={styles.compactStatLabel}>Consistency</Text>
+                    <Text style={styles.compactStatValue}>{consistencyScore}%</Text>
                 </View>
-                <View style={[styles.statCard, { overflow: 'hidden' }]}>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
-                    <Text style={styles.statLabel}>Best Streak</Text>
-                    <Text style={styles.statBigValue}>{bestStreak}</Text>
+                <View style={styles.statDivider} />
+                <View style={styles.compactStat}>
+                    <Text style={styles.compactStatLabel}>Best Streak</Text>
+                    <Text style={styles.compactStatValue}>{bestStreak}</Text>
                 </View>
-            </View>
-
-            <View style={styles.statsGrid}>
-                <View style={[styles.statCard, { flex: 2, overflow: 'hidden' }]}>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <Award size={16} color="#fbbf24" />
-                        <Text style={styles.statLabel}>Total Completions</Text>
-                    </View>
-                    <Text style={styles.statBigValue}>{totalCompletions}</Text>
+                <View style={styles.statDivider} />
+                <View style={styles.compactStat}>
+                    <Text style={styles.compactStatLabel}>Total Done</Text>
+                    <Text style={styles.compactStatValue}>{totalCompletions}</Text>
                 </View>
             </View>
 
-            {/* Heatmap */}
-            <View style={styles.section}>
-                <Text style={styles.sectionHeader}>30 DAY HEATMAP</Text>
-                <View style={[styles.heatmapCard, { overflow: 'hidden' }]}>
-                    <BlurView intensity={40} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
-                    <View style={styles.heatmapGrid}>
-                        {heatmapData.map((day, i) => (
-                            <View
-                                key={day.dateStr}
-                                style={[
-                                    styles.heatmapSquare,
-                                    {
-                                        backgroundColor: day.intensity > 0 ? '#22c55e' : 'rgba(255,255,255,0.1)',
-                                        opacity: day.intensity > 0 ? Math.max(0.3, day.intensity) : 1
-                                    }
-                                ]}
-                            />
-                        ))}
-                    </View>
-                    <View style={styles.heatmapLegend}>
-                        <Text style={styles.legendText}>Less</Text>
-                        <View style={styles.legendGradient} />
-                        <Text style={styles.legendText}>More</Text>
-                    </View>
+            {/* Calendar Card */}
+            <View style={styles.calendarContainer}>
+
+                {/* Month Navigation Header */}
+                <View style={styles.monthNavRow}>
+                    <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.navButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <ChevronLeft size={24} color={LiquidGlass.text.secondary} />
+                    </TouchableOpacity>
+                    <Text style={styles.monthTitle}>
+                        {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    </Text>
+                    <TouchableOpacity onPress={() => changeMonth(1)} style={styles.navButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <ChevronRight size={24} color={LiquidGlass.text.secondary} />
+                    </TouchableOpacity>
+                </View>
+
+                {/* Weekday Headers */}
+                <View style={styles.weekDaysGrid}>
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+                        <Text key={i} style={styles.calendarDayHeader}>{day}</Text>
+                    ))}
+                </View>
+
+                {/* Days Grid */}
+                <View style={styles.daysGrid}>
+                    {calendarData.map((day, i) => (
+                        <View key={day.id ?? i} style={styles.dayCell}>
+                            {!day.isEmpty && (
+                                <View style={styles.dayContent}>
+                                    <View style={[
+                                        styles.intensityCircle,
+                                        {
+                                            backgroundColor: (day.intensity ?? 0) > 0
+                                                ? LiquidGlass.colors.primary
+                                                : 'rgba(255,255,255,0.03)',
+                                            opacity: (day.intensity ?? 0) > 0 ? Math.max(0.4, day.intensity ?? 0) : 1
+                                        }
+                                    ]}>
+                                        <Text style={[
+                                            styles.dayNum,
+                                            (day.intensity ?? 0) > 0.6 && { color: '#000', fontWeight: '700' }, // Dark text on bright backgrounds
+                                            day.isToday && styles.todayNum
+                                        ]}>
+                                            {day.dayNum}
+                                        </Text>
+                                    </View>
+                                </View>
+                            )}
+                        </View>
+                    ))}
                 </View>
             </View>
         </View>
@@ -228,7 +286,17 @@ export const TrendsScreen = () => {
                     <Text style={styles.headerTitle}>Trends</Text>
                 </View>
 
-                {renderToggle()}
+                <View style={styles.toggleContainer}>
+                    <GlassSegmentedControl
+                        values={['Weekly', 'Monthly']}
+                        selectedIndex={viewMode === 'weekly' ? 0 : 1}
+                        onChange={(event) => {
+                            Haptics.selectionAsync();
+                            const index = event.nativeEvent.selectedSegmentIndex;
+                            setViewMode(index === 0 ? 'weekly' : 'monthly');
+                        }}
+                    />
+                </View>
 
                 {viewMode === 'weekly' ? renderWeeklyView() : renderMonthlyView()}
             </ScrollView>
@@ -257,36 +325,8 @@ const styles = StyleSheet.create({
 
     // Toggle
     toggleContainer: {
-        alignItems: 'center',
         marginBottom: 24,
-    },
-    toggleTrack: {
-        flexDirection: 'row',
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 28,
-        padding: 4,
-        width: 240,
-    },
-    toggleOption: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 10,
-        gap: 8,
-        borderRadius: 24,
-    },
-    toggleActive: {
-        backgroundColor: 'rgba(255,255,255,0.2)',
-    },
-    toggleText: {
-        color: 'rgba(255,255,255,0.5)',
-        fontWeight: '600',
-        fontSize: 14,
-    },
-    toggleTextActive: {
-        color: '#fff',
-        fontWeight: '700',
+        marginHorizontal: 16, // Use standard margin
     },
     // Weekly
     listContainer: {
@@ -355,74 +395,127 @@ const styles = StyleSheet.create({
     emptyBubble: {
         backgroundColor: 'rgba(255,255,255,0.1)',
     },
-    // Monthly
-    section: {
-        marginTop: 24,
-    },
-    sectionHeader: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.5)',
-        marginBottom: 8,
-        marginLeft: 12,
-    },
-    statsGrid: {
+
+    // Monthly Calendar Styles
+    statsRow: {
         flexDirection: 'row',
-        gap: 12,
-        marginBottom: 12,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 24,
+        paddingVertical: 20,
+        paddingHorizontal: 12,
+        marginBottom: 24,
     },
-    statCard: {
+    compactStat: {
+        alignItems: 'center',
         flex: 1,
-        backgroundColor: 'transparent',
-        padding: 24,
+    },
+    compactStatLabel: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.4)',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        marginBottom: 6, // More breathing room
+        fontWeight: '600',
+    },
+    compactStatValue: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#fff',
+        fontVariant: ['tabular-nums'],
+    },
+    statDivider: {
+        width: 1,
+        height: 24,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+    },
+
+    calendarContainer: {
         borderRadius: 24,
         overflow: 'hidden',
+        padding: 16,
+        backgroundColor: 'rgba(255,255,255,0.04)',
     },
-    statLabel: {
-        fontSize: 12,
+    monthNavRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+        paddingHorizontal: 8,
+    },
+    navButton: {
+        padding: 8,
+    },
+    monthTitle: {
+        fontSize: 17,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.5)',
-        marginBottom: 8,
-    },
-    statBigValue: {
-        fontSize: 32,
-        fontWeight: '800',
         color: '#fff',
     },
-    heatmapCard: {
-        backgroundColor: 'transparent',
-        padding: 24,
-        borderRadius: 24,
-        overflow: 'hidden',
+    weekDaysGrid: {
+        flexDirection: 'row',
+        marginBottom: 8,
     },
-    heatmapGrid: {
+    calendarDayHeader: {
+        flex: 1,
+        textAlign: 'center',
+        fontSize: 11,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.3)',
+    },
+    daysGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 6,
-        justifyContent: 'center',
     },
-    heatmapSquare: {
-        width: (width - 40 - 40 - 36) / 7, // Card padding, gaps
+    dayCell: {
+        width: `${100 / 7}%`, // Exact 7 columns
         aspectRatio: 1,
-        borderRadius: 4,
+        padding: 4,
     },
-    heatmapLegend: {
+    dayContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    intensityCircle: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dayNum: {
+        fontSize: 13,
+        fontWeight: '500',
+        color: 'rgba(255,255,255,0.5)',
+    },
+    todayNum: {
+        color: '#fff',
+        fontWeight: '700',
+    },
+
+    // Legend
+    legendContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 16,
-        gap: 8,
-    },
-    legendGradient: {
-        width: 100,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        marginTop: 20,
+        gap: 12,
+        opacity: 0.6,
     },
     legendText: {
         fontSize: 10,
-        color: 'rgba(255,255,255,0.5)',
-        fontWeight: '600',
+        color: 'rgba(255,255,255,0.6)',
+        fontWeight: '500',
+    },
+    legendGradient: {
+        flexDirection: 'row',
+        gap: 4,
+    },
+    legendDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
     },
 
     scrollView: {

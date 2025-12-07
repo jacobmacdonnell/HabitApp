@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Habit, Pet, DailyProgress, Settings, StorageServiceType, HabitContextType } from '../types';
+import { getLocalDateString } from '../utils/dateUtils';
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined);
 
@@ -312,8 +313,8 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         if (habitProgress.length === 0) return 0;
 
         let streak = 0;
-        const today = new Date().toISOString().split('T')[0];
-        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        const today = getLocalDateString();
+        const yesterday = getLocalDateString(new Date(Date.now() - 86400000));
 
         // Check if the streak is active (completed today or yesterday)
         const lastCompleted = habitProgress[0].date;

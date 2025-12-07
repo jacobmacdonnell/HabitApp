@@ -8,9 +8,11 @@ import { GlassView } from 'expo-glass-effect';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NotificationService } from '../services/notifications';
 import { LiquidGlass } from '../theme/theme';
+import { useTheme } from '../context/ThemeContext';
 
 export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
+    const { colors: themeColors } = useTheme();
     const [notifications, setNotifications] = useState(settings.notifications ?? true);
     const [sound, setSound] = useState(settings.sound ?? true);
 
@@ -118,15 +120,15 @@ export const SettingsScreen = () => {
                             {/* Sound */}
                             <View style={styles.row}>
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: LiquidGlass.colors.glassBackground }]}>
-                                        <Volume2 size={20} color={LiquidGlass.colors.secondary} />
+                                    <View style={[styles.iconContainer, { backgroundColor: themeColors.accentLight }]}>
+                                        <Volume2 size={20} color={themeColors.accent} />
                                     </View>
                                     <Text style={styles.label}>Sound Effects</Text>
                                 </View>
                                 <Switch
                                     value={sound}
                                     onValueChange={handleSoundChange}
-                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.colors.secondary }}
+                                    trackColor={{ false: '#3e3e3e', true: themeColors.accent }}
                                     ios_backgroundColor="#3e3e3e"
                                 />
                             </View>
@@ -136,15 +138,15 @@ export const SettingsScreen = () => {
                             {/* Notifications */}
                             <View style={styles.row}>
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: LiquidGlass.colors.glassBackground }]}>
-                                        <Bell size={20} color={LiquidGlass.colors.primary} />
+                                    <View style={[styles.iconContainer, { backgroundColor: themeColors.accentLight }]}>
+                                        <Bell size={20} color={themeColors.accent} />
                                     </View>
                                     <Text style={styles.label}>Notifications</Text>
                                 </View>
                                 <Switch
                                     value={notifications}
                                     onValueChange={handleNotificationChange}
-                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.colors.primary }}
+                                    trackColor={{ false: '#3e3e3e', true: themeColors.accent }}
                                     ios_backgroundColor="#3e3e3e"
                                 />
                             </View>

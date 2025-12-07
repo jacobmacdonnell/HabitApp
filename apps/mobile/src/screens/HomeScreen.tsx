@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Animated, Platform, Alert, Dimensions } from 'react-native';
-import { useHabit, Habit } from '@habitapp/shared';
+import { useHabit, Habit, getLocalDateString } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
 import { Pet } from '../components/Pet';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
@@ -36,7 +36,7 @@ export const HomeScreen = () => {
     const [petBounce, setPetBounce] = useState(0);
     const confettiRef = useRef<any>(null);
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
 
     useLayoutEffect(() => {
         // Clear native options since we are using a custom header

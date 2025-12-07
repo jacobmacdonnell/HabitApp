@@ -183,8 +183,15 @@ export const SQLiteStorageService: StorageServiceType = {
         // If someone has a > 1 year streak, this might be inaccurate, but it's a reasonable optimization for mobile.
         // Or we could use a recursive CTE if SQLite version allows, but let's stick to safe logic.
 
-        const today = new Date().toISOString().split('T')[0];
-        const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const getLocalDateString = (d: Date = new Date()): string => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const today = getLocalDateString();
+        const oneYearAgo = getLocalDateString(new Date(Date.now() - 365 * 24 * 60 * 60 * 1000));
 
         const recentProgress = await db.select({ date: dailyProgress.date })
             .from(dailyProgress)
@@ -318,7 +325,5 @@ export const SQLiteStorageService: StorageServiceType = {
         }
     },
 
-    getHabitStats,
-    logSingleProgress,
-    getProgressForRange,
+
 };

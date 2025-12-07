@@ -18,50 +18,74 @@ interface PetProps {
     feedingBounce?: number; // Increment to trigger bounce animation
 }
 
-// Z-Particle Component using standard Animated
-const ZParticle = ({ delay, xOffset }: { delay: number, xOffset: number }) => {
+// Enhanced Z-Particle Component - smoother, more organic
+const ZParticle = ({ delay, xOffset, size = 24 }: { delay: number, xOffset: number, size?: number }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const liftAnim = useRef(new Animated.Value(0)).current;
-    const wiggledAnim = useRef(new Animated.Value(0)).current;
+    const scaleAnim = useRef(new Animated.Value(0.5)).current;
+    const rotateAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const animate = () => {
             fadeAnim.setValue(0);
             liftAnim.setValue(0);
-            wiggledAnim.setValue(0);
+            scaleAnim.setValue(0.5);
+            rotateAnim.setValue(0);
 
             Animated.sequence([
                 Animated.delay(delay),
                 Animated.parallel([
+                    // Fade in then out
                     Animated.sequence([
-                        Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
-                        Animated.timing(fadeAnim, { toValue: 0, duration: 1000, useNativeDriver: true }),
+                        Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+                        Animated.delay(800),
+                        Animated.timing(fadeAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
                     ]),
+                    // Float upward
                     Animated.timing(liftAnim, {
-                        toValue: -40,
-                        duration: 1500,
+                        toValue: -60,
+                        duration: 1800,
+                        easing: Easing.out(Easing.quad),
+                        useNativeDriver: true,
+                    }),
+                    // Scale up as it rises
+                    Animated.timing(scaleAnim, {
+                        toValue: 1.2,
+                        duration: 1800,
                         easing: Easing.out(Easing.ease),
                         useNativeDriver: true,
                     }),
-                    Animated.sequence([
-                        Animated.timing(wiggledAnim, { toValue: 10, duration: 750, useNativeDriver: true }),
-                        Animated.timing(wiggledAnim, { toValue: -10, duration: 750, useNativeDriver: true }),
-                    ])
+                    // Gentle rotation
+                    Animated.timing(rotateAnim, {
+                        toValue: 1,
+                        duration: 1800,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
                 ])
             ]).start(() => animate());
         };
         animate();
     }, []);
 
+    const rotate = rotateAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['-15deg', '15deg']
+    });
+
     return (
         <Animated.View style={{
             position: 'absolute',
             left: xOffset,
-            top: 40,
+            top: 50,
             opacity: fadeAnim,
-            transform: [{ translateY: liftAnim }, { translateX: wiggledAnim }]
+            transform: [
+                { translateY: liftAnim },
+                { scale: scaleAnim },
+                { rotate: rotate }
+            ]
         }}>
-            <Text style={styles.zText}>Z</Text>
+            <Text style={[styles.zText, { fontSize: size }]}>z</Text>
         </Animated.View>
     );
 };
@@ -287,11 +311,11 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
         );
     }
 
-    // Full View Animations
-    const glowScale = breathVal.interpolate({ inputRange: [0, 1], outputRange: [1, 1.15] });
-    const glowOpacity = breathVal.interpolate({ inputRange: [0, 1], outputRange: [0.3, 0.6] });
-    const petFloatY = floatVal.interpolate({ inputRange: [0, 1], outputRange: [0, -15] });
-    const petScale = breathVal.interpolate({ inputRange: [0, 1], outputRange: [1, 1.02] });
+    // Full View Animations - more dramatic glow pulsing
+    const glowScale = breathVal.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1.25] });
+    const glowOpacity = breathVal.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0.8] });
+    const petFloatY = floatVal.interpolate({ inputRange: [0, 1], outputRange: [0, -12] });
+    const petScale = breathVal.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] });
 
     const currentLevel = pet.level || 1;
     const currentXp = pet.xp || 0;
@@ -305,14 +329,14 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
             <View style={styles.petDisplay}>
                 {/* Glow Effect using RadialGradient for softness */}
                 <Animated.View style={[styles.glowContainer, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}>
-                    <Svg height="300" width="300" viewBox="0 0 300 300">
+                    <Svg height="500" width="500" viewBox="0 0 500 500">
                         <Defs>
                             <RadialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
-                                <Stop offset="0%" stopColor={pet.color} stopOpacity="0.6" />
+                                <Stop offset="0%" stopColor={pet.color} stopOpacity="0.7" />
                                 <Stop offset="100%" stopColor={pet.color} stopOpacity="0" />
                             </RadialGradient>
                         </Defs>
-                        <Circle cx="150" cy="150" r="150" fill="url(#glowGrad)" />
+                        <Circle cx="250" cy="250" r="250" fill="url(#glowGrad)" />
                     </Svg>
                 </Animated.View>
 
@@ -353,9 +377,9 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
 
                 {isSleeping && (
                     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-                        <ZParticle delay={0} xOffset={160} />
-                        <ZParticle delay={1500} xOffset={190} />
-                        <ZParticle delay={3000} xOffset={170} />
+                        <ZParticle delay={0} xOffset={155} size={18} />
+                        <ZParticle delay={1200} xOffset={175} size={24} />
+                        <ZParticle delay={2400} xOffset={165} size={30} />
                     </View>
                 )}
 
@@ -467,8 +491,8 @@ const styles = StyleSheet.create({
     },
     glowContainer: {
         position: 'absolute',
-        width: 300,
-        height: 300,
+        width: 500,
+        height: 500,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -553,8 +577,12 @@ const styles = StyleSheet.create({
     },
     zText: {
         fontSize: 24,
-        fontWeight: '800',
-        color: 'rgba(255,255,255,0.6)',
+        fontWeight: '700',
+        fontStyle: 'italic',
+        color: 'rgba(255,255,255,0.7)',
+        textShadowColor: 'rgba(255,255,255,0.3)',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
     },
     petSvgContainer: {
         width: 200,

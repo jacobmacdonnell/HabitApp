@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { XPNotificationProvider } from '../src/context/XPNotificationContext';
+import { ThemeProvider } from '../src/context/ThemeContext';
 import { migrateFromAsyncStorage } from '../src/services/storage';
 import { useMigrationHelper } from '../src/db/migrate';
 import { Stack, SplashScreen } from 'expo-router';
@@ -85,9 +86,11 @@ export default function RootLayout() {
             <SafeAreaProvider>
                 <ErrorBoundary>
                     <HabitProvider storage={MobileStorageService}>
-                        <XPNotificationProvider>
-                            <ThemedRoot />
-                        </XPNotificationProvider>
+                        <ThemeProvider>
+                            <XPNotificationProvider>
+                                <ThemedRoot />
+                            </XPNotificationProvider>
+                        </ThemeProvider>
                     </HabitProvider>
                 </ErrorBoundary>
             </SafeAreaProvider>

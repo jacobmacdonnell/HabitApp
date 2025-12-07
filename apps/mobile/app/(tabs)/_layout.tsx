@@ -1,12 +1,13 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
-
-import { LiquidGlass } from '../../src/theme/theme';
+import { useTheme } from '../../src/context/ThemeContext';
 
 export default function TabLayout() {
+    const { colors: themeColors } = useTheme();
+
     return (
         <NativeTabs
             // Native styling options
-            tintColor={LiquidGlass.colors.primary} // Brand primary green
+            tintColor={themeColors.accent} // Dynamic pet color
             backgroundColor={null} // Transparent to allow blur
             blurEffect="systemMaterial" // The "Liquid Glass" effect
             shadowColor="transparent" // Clean look
