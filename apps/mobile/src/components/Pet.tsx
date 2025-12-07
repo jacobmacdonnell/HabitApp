@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { ZParticle } from './PetAnimations';
+import { PetEyes, PetMouth, PetHat } from './PetExpressions';
 
 const { width } = Dimensions.get('window');
 
@@ -309,81 +310,7 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
 
     // Note: mood flags defined earlier for use in handlers
 
-    const renderEyes = () => {
-        // Peeking - one eye open while sleeping (late night habit), animates to look down
-        if (isSleeping && isPeeking) return (
-            <G>
-                {/* Left eye - still closed */}
-                <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-                {/* Right eye - open, animates to look down at habits */}
-                <Circle cx="130" cy="85" r="16" fill="white" />
-                <Circle cx="130" cy={pupilY} r="6" fill="black" />
-                <Circle cx="133" cy={pupilY - 4} r="2" fill="white" fillOpacity="0.8" />
-            </G>
-        );
-
-        // Sleeping eyes - curved lines
-        if (isSleeping) return (
-            <G>
-                <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-                <Path d="M 120 85 Q 130 95 140 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-            </G>
-        );
-
-        // Blinking - show curved lines briefly
-        if (isBlinking) return (
-            <G>
-                <Path d="M 54 85 L 86 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
-                <Path d="M 114 85 L 146 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
-            </G>
-        );
-
-        // Normal open eyes
-        return (
-            <G>
-                <Circle cx="70" cy="85" r="16" fill="white" />
-                <Circle cx="70" cy="85" r="6" fill="black" />
-                <Circle cx="130" cy="85" r="16" fill="white" />
-                <Circle cx="130" cy="85" r="6" fill="black" />
-                {/* Eye shine */}
-                <Circle cx="76" cy="78" r="4" fill="white" fillOpacity="0.8" />
-                <Circle cx="136" cy="78" r="4" fill="white" fillOpacity="0.8" />
-            </G>
-        );
-    };
-
-    const renderMouth = () => {
-        if (isHappy) return <Path d="M 70 120 Q 100 150 130 120" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />;
-        if (isSad || isSick) return <Path d="M 70 140 Q 100 110 130 140" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />;
-        return <Path d="M 70 130 L 130 130" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />;
-    };
-
-    const renderHat = () => {
-        if (!pet.hat || pet.hat === 'none') return null;
-        return (
-            <G transform="translate(60, 10) scale(0.8)">
-                {pet.hat === 'party' && <Path d="M50 10 L80 70 L20 70 Z" fill="#facc15" stroke="white" strokeWidth="2" strokeLinejoin="round" />}
-                {pet.hat === 'cowboy' && (
-                    <G transform="translate(-10, -10)">
-                        <Path d="M10 60 Q50 30 90 60" fill="#78350f" stroke="white" strokeWidth="2" />
-                        <Path d="M30 60 L30 40 Q50 20 70 40 L70 60" fill="#78350f" stroke="white" strokeWidth="2" />
-                    </G>
-                )}
-                {pet.hat === 'tophat' && (
-                    <G transform="translate(-10, -20)">
-                        <Rect x="20" y="60" width="60" height="10" fill="#1f2937" stroke="white" strokeWidth="2" />
-                        <Rect x="30" y="20" width="40" height="40" fill="#1f2937" stroke="white" strokeWidth="2" />
-                        <Rect x="30" y="50" width="40" height="5" fill="#ef4444" />
-                    </G>
-                )}
-                {pet.hat === 'crown' && (
-                    <G transform="translate(0, -10)">
-                        <Path d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z" fill="#fbbf24" stroke="white" strokeWidth="2" strokeLinejoin="round" />
-                    </G>
-                )}
-            </G>
-        );
-    };
+    // Face rendering now uses extracted components from PetExpressions.tsx
 
     // Compact View (Header) - with subtle animations
     if (!isFullView) {
@@ -404,9 +331,9 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
                         <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGrad)" stroke={pet.color} strokeWidth="2" />
                         <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
                         <G transform="translate(0, 10)">
-                            {renderEyes()}
-                            {renderMouth()}
-                            {renderHat()}
+                            <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} pupilY={pupilY} />
+                            <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
+                            <PetHat hat={pet.hat} />
                         </G>
                     </Svg>
                 </Animated.View>
@@ -469,15 +396,15 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
                             <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGradFull)" stroke={pet.color} strokeWidth="2" />
                             <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
                             <G transform="translate(0, 10)">
-                                {renderEyes()}
-                                {renderMouth()}
+                                <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} pupilY={pupilY} />
+                                <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
                                 {!isSick && (
                                     <G>
                                         <Circle cx="60" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
                                         <Circle cx="140" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
                                     </G>
                                 )}
-                                {renderHat()}
+                                <PetHat hat={pet.hat} />
                             </G>
                         </Svg>
                     </Animated.View>
