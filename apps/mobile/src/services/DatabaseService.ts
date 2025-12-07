@@ -1,7 +1,7 @@
 import { StorageServiceType, Habit, Pet, DailyProgress, Settings } from '@habitapp/shared';
 import { db } from '../db/client';
 import { habits, dailyProgress, pet, settings } from '../db/schema';
-import { eq, and, gte, lte } from 'drizzle-orm';
+import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEYS = {
@@ -169,6 +169,77 @@ export const SQLiteStorageService: StorageServiceType = {
         }));
     },
 
+    getHabitStats: async (habitId: string) => {
+        // SCALABLE STATS CALCULATION
+        // 1. Total Completions (Fast Count)
+        const completionResult = await db.select({ count: sql<number>`count(*)` })
+            .from(dailyProgress)
+            .where(and(eq(dailyProgress.habitId, habitId), eq(dailyProgress.completed, true)));
+
+        const totalCompletions = completionResult[0]?.count || 0;
+
+        // 2. Current Streak (Optimized Loading)
+        // Instead of loading all history, we load the last 365 days of completion data.
+        // If someone has a > 1 year streak, this might be inaccurate, but it's a reasonable optimization for mobile.
+        // Or we could use a recursive CTE if SQLite version allows, but let's stick to safe logic.
+
+        const today = new Date().toISOString().split('T')[0];
+        const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        const recentProgress = await db.select({ date: dailyProgress.date })
+            .from(dailyProgress)
+            .where(and(
+                eq(dailyProgress.habitId, habitId),
+                eq(dailyProgress.completed, true),
+                gte(dailyProgress.date, oneYearAgo)
+            ))
+            .orderBy(desc(dailyProgress.date));
+
+        // Calculate Streak in JS from sorted dates
+        let currentStreak = 0;
+        let lastDate: Date | null = null;
+        const now = new Date(today);
+
+        // Helper to check if dates are consecutive
+        const isConsecutive = (d1: Date, d2: Date) => {
+            const diffTime = Math.abs(d2.getTime() - d1.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays === 1;
+        };
+
+        const isSameDay = (d1: Date, d2: Date) => d1.getTime() === d2.getTime();
+
+        for (const entry of recentProgress) {
+            const entryDate = new Date(entry.date);
+
+            if (currentStreak === 0) {
+                // Check if streak is active (today or yesterday)
+                const diffTime = Math.abs(now.getTime() - entryDate.getTime());
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays <= 1) {
+                    currentStreak = 1;
+                    lastDate = entryDate;
+                } else {
+                    break; // Streak broken before it started
+                }
+            } else if (lastDate) {
+                if (isSameDay(lastDate, entryDate)) continue; // Ignore duplicates
+                if (isConsecutive(entryDate, lastDate)) {
+                    currentStreak++;
+                    lastDate = entryDate;
+                } else {
+                    break; // Streak broken
+                }
+            }
+        }
+
+        return {
+            totalCompletions,
+            currentStreak
+        };
+    },
+
     saveProgress: async (progressList: DailyProgress[]) => {
         // Full sync implementation: Delete all and re-insert.
         // This is inefficient but ensures exact consistency with the Context's state.
@@ -246,4 +317,8 @@ export const SQLiteStorageService: StorageServiceType = {
             await db.insert(settings).values(newSettings);
         }
     },
+
+    getHabitStats,
+    logSingleProgress,
+    getProgressForRange,
 };

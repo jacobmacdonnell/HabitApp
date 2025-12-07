@@ -53,6 +53,7 @@
   "devDependencies": {
     "@types/react": "19.1.10",
     "babel-plugin-inline-import": "^3.0.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "drizzle-kit": "^0.31.8",
     "semver": "^6.3.1",
     "typescript": "~5.9.2"

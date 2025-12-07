@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Animated, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
@@ -34,6 +34,7 @@ export const HomeScreen = () => {
     const [showCompleted, setShowCompleted] = useState(false);
 
     const [petBounce, setPetBounce] = useState(0);
+    const confettiRef = useRef<any>(null);
 
     const today = new Date().toISOString().split('T')[0];
 

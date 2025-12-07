@@ -68,7 +68,7 @@ export const OnboardingScreen = () => {
         }
 
         setIsOnboarding(false);
-        router.replace('/(tabs)');
+        router.replace('/home');
     };
 
     return (

@@ -8,6 +8,13 @@
       "when": 1765079667984,
       "tag": "0000_majestic_wolfpack",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1765091159712,
+      "tag": "0001_simple_scarlet_spider",
+      "breakpoints": true
     }
   ]
 }

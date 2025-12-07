@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "Habit App",
+    "slug": "habit-app",
     "version": "1.0.0",
     "scheme": "habitapp",
     "orientation": "portrait",
@@ -36,7 +36,8 @@
       "expo-asset",
       "expo-font",
       "expo-sqlite",
-      "expo-router"
+      "expo-router",
+      "expo-notifications"
     ],
     "extra": {
       "eas": {
