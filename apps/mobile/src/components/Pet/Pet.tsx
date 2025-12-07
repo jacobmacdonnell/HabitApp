@@ -8,21 +8,26 @@ import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { ZParticle } from './PetAnimations';
-import { PetEyes, PetMouth, PetHat } from './PetExpressions';
+import { ZParticle } from './ZParticle';
+import { PetEyes } from './PetEyes';
+import { PetMouth } from './PetMouth';
+import { PetHat } from './PetHat';
 
 const { width } = Dimensions.get('window');
 
 interface PetProps {
     pet: PetType | null;
     isFullView?: boolean;
+    hideStats?: boolean; // Hide the stats card (for onboarding hatching screen)
+    disablePress?: boolean; // Disable tap interactions (for onboarding)
+    initialSpeechText?: string; // Show a speech bubble with this text on mount
     onUpdate?: (updates: Partial<PetType>) => void;
     feedingBounce?: number; // Increment to trigger bounce animation
 }
 
 // ZParticle is now imported from './PetAnimations'
 
-export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetProps) => {
+export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress = false, initialSpeechText, onUpdate, feedingBounce }: PetProps) => {
     // State
     const navigation = useNavigation();
     const router = useRouter();
@@ -159,6 +164,9 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
     }, [pet?.mood]);
 
     const handlePetPress = () => {
+        // Disable interactions if prop is set (e.g., during onboarding)
+        if (disablePress) return;
+
         // Different haptics based on mood
         if (isSleeping) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
@@ -261,6 +269,15 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
             floating.stop();
         };
     }, [pet]);
+
+    // Show initial speech text if provided (e.g., for onboarding)
+    useEffect(() => {
+        if (initialSpeechText && pet) {
+            setSpeechBubbleText(initialSpeechText);
+            // Fast pop-in for immediate feedback
+            Animated.timing(speechFadeAnim, { toValue: 1, duration: 100, useNativeDriver: true }).start();
+        }
+    }, [initialSpeechText, pet]);
 
     // Handle XP / Level Changes
     useEffect(() => {
@@ -446,56 +463,59 @@ export const Pet = ({ pet, isFullView = false, onUpdate, feedingBounce }: PetPro
                 )}
             </View>
 
-            <GlassView glassEffectStyle="regular" style={styles.statsCard}>
-                {/* Level & Mood Header */}
-                <View style={styles.headerRow}>
-                    <View style={styles.levelBadge}>
-                        <Zap size={14} color="#facc15" />
-                        <Text style={styles.levelBadgeText}>Level {currentLevel}</Text>
-                    </View>
-                    <View style={styles.moodPill}>
-                        <Smile size={14} color={pet.mood === 'happy' ? '#22c55e' : pet.mood === 'sad' ? '#f87171' : '#a5b4fc'} />
-                        <Text style={styles.moodText}>{pet.mood.charAt(0).toUpperCase() + pet.mood.slice(1)}</Text>
-                    </View>
-                </View>
-
-                {/* Stats Bars */}
-                <View style={styles.barsContainer}>
-                    {/* Health Bar */}
-                    <View style={styles.statRow}>
-                        <View style={styles.statInfo}>
-                            <Heart size={14} color="#f87171" />
-                            <Text style={styles.statLabel}>Health</Text>
-                        </View>
-                        <View style={styles.barWrapper}>
-                            <View style={styles.barBg}>
-                                <View style={[styles.barFill, { width: `${pet.health}%`, backgroundColor: pet.health < 30 ? '#ef4444' : '#22c55e' }]} />
-                            </View>
-                            <Text style={styles.barValue}>{Math.round(pet.health)}%</Text>
-                        </View>
-                    </View>
-
-                    {/* XP Bar */}
-                    <View style={styles.statRow}>
-                        <View style={styles.statInfo}>
+            {/* Stats Card - hidden during onboarding hatching */}
+            {!hideStats && (
+                <GlassView glassEffectStyle="regular" style={styles.statsCard}>
+                    {/* Level & Mood Header */}
+                    <View style={styles.headerRow}>
+                        <View style={styles.levelBadge}>
                             <Zap size={14} color="#facc15" />
-                            <Text style={styles.statLabel}>XP</Text>
+                            <Text style={styles.levelBadgeText}>Level {currentLevel}</Text>
                         </View>
-                        <View style={styles.barWrapper}>
-                            <View style={styles.barBg}>
-                                <View style={[styles.barFill, { width: `${xpPercentage}%`, backgroundColor: '#facc15' }]} />
-                            </View>
-                            <Text style={styles.barValue}>{currentXp}/{xpToNextLevel}</Text>
+                        <View style={styles.moodPill}>
+                            <Smile size={14} color={pet.mood === 'happy' ? '#22c55e' : pet.mood === 'sad' ? '#f87171' : '#a5b4fc'} />
+                            <Text style={styles.moodText}>{pet.mood.charAt(0).toUpperCase() + pet.mood.slice(1)}</Text>
                         </View>
                     </View>
-                </View>
 
-                {/* Customize Button */}
-                <TouchableOpacity style={styles.customizeButton} onPress={() => router.push('/pet-customize')}>
-                    <Palette size={18} color="#fff" />
-                    <Text style={styles.customizeText}>Customize</Text>
-                </TouchableOpacity>
-            </GlassView>
+                    {/* Stats Bars */}
+                    <View style={styles.barsContainer}>
+                        {/* Health Bar */}
+                        <View style={styles.statRow}>
+                            <View style={styles.statInfo}>
+                                <Heart size={14} color="#f87171" />
+                                <Text style={styles.statLabel}>Health</Text>
+                            </View>
+                            <View style={styles.barWrapper}>
+                                <View style={styles.barBg}>
+                                    <View style={[styles.barFill, { width: `${pet.health}%`, backgroundColor: pet.health < 30 ? '#ef4444' : '#22c55e' }]} />
+                                </View>
+                                <Text style={styles.barValue}>{Math.round(pet.health)}%</Text>
+                            </View>
+                        </View>
+
+                        {/* XP Bar */}
+                        <View style={styles.statRow}>
+                            <View style={styles.statInfo}>
+                                <Zap size={14} color="#facc15" />
+                                <Text style={styles.statLabel}>XP</Text>
+                            </View>
+                            <View style={styles.barWrapper}>
+                                <View style={styles.barBg}>
+                                    <View style={[styles.barFill, { width: `${xpPercentage}%`, backgroundColor: '#facc15' }]} />
+                                </View>
+                                <Text style={styles.barValue}>{currentXp}/{xpToNextLevel}</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Customize Button */}
+                    <TouchableOpacity style={styles.customizeButton} onPress={() => router.push('/pet-customize')}>
+                        <Palette size={18} color="#fff" />
+                        <Text style={styles.customizeText}>Customize</Text>
+                    </TouchableOpacity>
+                </GlassView>
+            )}
 
 
         </View>
@@ -594,7 +614,7 @@ const styles = StyleSheet.create({
     // Speech Bubble
     speechBubble: {
         position: 'absolute',
-        top: -40,
+        top: 40, // Positioned near pet head (relative to petDisplay center)
         backgroundColor: '#fff',
         paddingHorizontal: 16,
         paddingVertical: 10,

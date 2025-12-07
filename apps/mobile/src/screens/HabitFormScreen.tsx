@@ -19,7 +19,12 @@ export const HabitFormScreen = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const router = useRouter();
     const route = useRoute<RouteProp<RootStackParamList, 'HabitForm'>>();
-    const editingHabit = route.params?.habit;
+    // Parse the habit from JSON string (passed as JSON.stringify from HomeScreen)
+    const editingHabit = route.params?.habit
+        ? (typeof route.params.habit === 'string'
+            ? JSON.parse(route.params.habit) as Habit
+            : route.params.habit)
+        : undefined;
 
     const [title, setTitle] = useState(editingHabit?.title || '');
     const [color, setColor] = useState(editingHabit?.color || HABIT_COLORS[0]);

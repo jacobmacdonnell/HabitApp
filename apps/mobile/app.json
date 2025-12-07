@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Habit App",
-    "slug": "habit-app",
+    "slug": "mobile",
     "version": "1.0.0",
     "scheme": "habitapp",
     "orientation": "portrait",
@@ -43,6 +43,7 @@
       "eas": {
         "projectId": "796d86cd-8cf6-4d0a-afed-f7ed3de677eb"
       }
-    }
+    },
+    "owner": "tornadothunder"
   }
 }

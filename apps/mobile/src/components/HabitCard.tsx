@@ -19,6 +19,8 @@ interface HabitCardProps {
     onDecrement?: () => void;
     onDelete?: () => void;
     onEdit?: () => void;
+    autoSwipeDemo?: boolean; // Trigger auto swipe tease animation
+    onSwipeDemoComplete?: () => void;
 }
 
 const TimeIcons: Record<string, LucideIcon> = {
@@ -35,12 +37,37 @@ const TimeLabels: Record<string, string> = {
     evening: 'Evening',
 };
 
-export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, onDecrement, onDelete, onEdit }: HabitCardProps) => {
+export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, onDecrement, onDelete, onEdit, autoSwipeDemo, onSwipeDemoComplete }: HabitCardProps) => {
     const Icon = TimeIcons[habit.timeOfDay] || Sparkles;
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const checkboxScaleAnim = useRef(new Animated.Value(1)).current;
     const swipeableRef = useRef<SwipeableType>(null);
+    const translateX = useRef(new Animated.Value(0)).current;
     const { showXP } = useXPNotification();
+
+    // Auto swipe demo - tease animation (2 bounces)
+    React.useEffect(() => {
+        if (autoSwipeDemo) {
+            const timer = setTimeout(() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                Animated.sequence([
+                    // First bounce
+                    Animated.timing(translateX, { toValue: -80, duration: 350, useNativeDriver: true }),
+                    Animated.delay(250),
+                    Animated.spring(translateX, { toValue: 0, friction: 6, tension: 100, useNativeDriver: true }),
+                    // Pause
+                    Animated.delay(600),
+                    // Second bounce (slightly bigger)
+                    Animated.timing(translateX, { toValue: -100, duration: 350, useNativeDriver: true }),
+                    Animated.delay(300),
+                    Animated.spring(translateX, { toValue: 0, friction: 6, tension: 100, useNativeDriver: true }),
+                ]).start(() => {
+                    // Don't dismiss immediately - let tooltip handle timing
+                });
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [autoSwipeDemo]);
 
     // --- INTERACTION HANDLERS ---
 
@@ -141,7 +168,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
     return (
         <Animated.View style={[
             styles.container,
-            { transform: [{ scale: scaleAnim }] }
+            { transform: [{ scale: scaleAnim }, { translateX: translateX }] }
         ]}>
             <Swipeable
                 ref={swipeableRef}
@@ -363,5 +390,23 @@ const styles = StyleSheet.create({
     },
     undoCircle: {
         backgroundColor: 'rgba(251, 146, 60, 0.8)',
+    },
+    swipeHint: {
+        position: 'absolute',
+        right: 16,
+        top: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+    },
+    swipeHintText: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#fff',
+        backgroundColor: 'rgba(52, 199, 89, 0.9)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 14,
+        overflow: 'hidden',
     },
 });

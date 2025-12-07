@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated, Easing } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHabit } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
 import { BlurView } from 'expo-blur';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
-import { ArrowRight, Check, Minus, Plus } from 'lucide-react-native';
+import { ArrowRight, Check, Minus, Plus, Sparkles } from 'lucide-react-native';
 import { GlassInput } from '../components/GlassInput';
 import { GlassButton } from '../components/GlassButton';
 import { router } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const PRESETS = [
     { id: 'water', title: 'Drink Water', icon: '💧', color: '#4ECDC4', defaultTarget: 3, defaultTime: 'anytime' },
@@ -22,7 +24,14 @@ const PRESETS = [
 
 export const OnboardingScreen = () => {
     const { resetPet, addHabit, setIsOnboarding } = useHabit();
+    const insets = useSafeAreaInsets();
     const [step, setStep] = useState(0);
+
+    // Animation values
+    const fadeAnim = useRef(new Animated.Value(1)).current;
+    const slideAnim = useRef(new Animated.Value(0)).current;
+    const eggPulse = useRef(new Animated.Value(1)).current;
+    const cardScales = useRef(PRESETS.map(() => new Animated.Value(1))).current;
 
     // Step 1: Pet Data
     const [petName, setPetName] = useState('');
@@ -36,10 +45,72 @@ export const OnboardingScreen = () => {
     const [targetCount, setTargetCount] = useState(1);
     const [timeOfDay, setTimeOfDay] = useState<'morning' | 'midday' | 'evening' | 'anytime'>('anytime');
 
-    const handleNext = () => setStep(s => s + 1);
-    const handleBack = () => setStep(s => s - 1);
+    // Egg pulse animation
+    useEffect(() => {
+        const pulse = Animated.loop(
+            Animated.sequence([
+                Animated.timing(eggPulse, { toValue: 1.05, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+                Animated.timing(eggPulse, { toValue: 1, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+            ])
+        );
+        pulse.start();
+        return () => pulse.stop();
+    }, []);
+
+    // Animate step transitions
+    const animateToStep = (newStep: number) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+        Animated.parallel([
+            Animated.timing(fadeAnim, { toValue: 0, duration: 150, useNativeDriver: true }),
+            Animated.timing(slideAnim, { toValue: newStep > step ? -30 : 30, duration: 150, useNativeDriver: true }),
+        ]).start(() => {
+            setStep(newStep);
+            slideAnim.setValue(newStep > step ? 30 : -30);
+            Animated.parallel([
+                Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
+                Animated.timing(slideAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+            ]).start();
+        });
+    };
+
+    const handleNext = () => animateToStep(step + 1);
+    const handleBack = () => animateToStep(step - 1);
+
+    // Card selection with haptic + scale animation
+    const handlePresetSelect = (presetId: string, index: number) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+        // Bounce the selected card
+        Animated.sequence([
+            Animated.timing(cardScales[index], { toValue: 0.95, duration: 50, useNativeDriver: true }),
+            Animated.spring(cardScales[index], { toValue: 1, friction: 3, tension: 200, useNativeDriver: true }),
+        ]).start();
+
+        const preset = PRESETS.find(p => p.id === presetId);
+        setSelectedPreset(presetId);
+        setCustomHabit('');
+        if (preset) {
+            setTargetCount(preset.defaultTarget);
+            setTimeOfDay(preset.defaultTime as any);
+        }
+    };
+
+    // Color selection haptic
+    const handleColorSelect = (color: string) => {
+        Haptics.selectionAsync();
+        setPetColor(color);
+    };
+
+    // Counter haptic
+    const handleCounterChange = (delta: number) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setTargetCount(prev => Math.max(1, Math.min(99, prev + delta)));
+    };
 
     const handleFinish = () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
         // 1. Create Pet
         resetPet(petName || 'Pet', petColor);
 
@@ -67,8 +138,9 @@ export const OnboardingScreen = () => {
             });
         }
 
-        setIsOnboarding(false);
-        router.replace('/home');
+        // Navigate to hatching screen for the pet reveal moment
+        // (isOnboarding is set to false in HatchingScreen after animation)
+        router.replace('/hatching');
     };
 
     return (
@@ -78,8 +150,8 @@ export const OnboardingScreen = () => {
             <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
-            {/* Progress Dots */}
-            <View style={styles.progressContainer}>
+            {/* Progress Dots - at top with safe area */}
+            <View style={[styles.progressContainer, { paddingTop: insets.top + 20 }]}>
                 {[0, 1, 2, 3].map(i => (
                     <View
                         key={i}
@@ -91,37 +163,43 @@ export const OnboardingScreen = () => {
                 ))}
             </View>
 
-            <ScrollView contentContainerStyle={styles.content} scrollEnabled={false} showsVerticalScrollIndicator={false}>
+            <View style={[styles.mainContent, { paddingBottom: insets.bottom + 32 }]}>
                 {/* STEP 0: WELCOME */}
                 {step === 0 && (
-                    <View style={styles.stepContainer}>
-                        <View style={styles.welcomeIcon}>
-                            <Text style={{ fontSize: 48 }}>✨</Text>
+                    <View style={styles.welcomeContainer}>
+                        <View style={styles.welcomeTop}>
+                            <View style={styles.welcomeIcon}>
+                                <Sparkles size={40} color="#fff" />
+                            </View>
+                            <Text style={styles.heroTitle}>Habit Companion</Text>
+                            <Text style={styles.heroSubtitle}>
+                                Build better habits with your digital pet. Complete habits, earn XP, and watch your companion grow!
+                            </Text>
                         </View>
-                        <Text style={styles.title}>Habit Companion</Text>
-                        <Text style={styles.subtitle}>
-                            Build better habits, track your progress, and grow alongside your digital companion.
-                        </Text>
-                        <GlassButton
-                            title="Get Started"
-                            onPress={handleNext}
-                            icon={<ArrowRight size={20} color="#000" />}
-                            style={{ marginTop: 16 }}
-                        />
+                        <View style={styles.welcomeBottom}>
+                            <GlassButton
+                                title="Get Started"
+                                onPress={handleNext}
+                                icon={<ArrowRight size={20} color="#000" />}
+                                style={{ width: '100%' }}
+                            />
+                        </View>
                     </View>
                 )}
 
                 {/* STEP 1: PET SETUP */}
                 {step === 1 && (
-                    <View style={styles.stepContainer}>
-                        <Text style={styles.title}>Choose a Companion</Text>
-                        <Text style={styles.subtitle}>This little friend will grow as you improve.</Text>
+                    <ScrollView style={styles.scrollContent} contentContainerStyle={styles.scrollInner} showsVerticalScrollIndicator={false}>
+                        <View style={styles.stepHeader}>
+                            <Text style={styles.title}>Name Your Companion</Text>
+                            <Text style={styles.subtitle}>This little friend will grow as you improve.</Text>
+                        </View>
 
                         <View style={styles.card}>
-                            {/* Egg Preview */}
-                            <View style={[styles.eggContainer, { backgroundColor: `${petColor}20`, borderColor: `${petColor}40` }]}>
-                                <Text style={{ fontSize: 48 }}>🥚</Text>
-                            </View>
+                            {/* Egg Preview with pulse */}
+                            <Animated.View style={[styles.eggContainer, { backgroundColor: `${petColor}20`, borderColor: `${petColor}40`, transform: [{ scale: eggPulse }] }]}>
+                                <Text style={{ fontSize: 56 }}>🥚</Text>
+                            </Animated.View>
 
                             <GlassInput
                                 placeholder="Name your pet..."
@@ -130,12 +208,13 @@ export const OnboardingScreen = () => {
                                 style={{ textAlign: 'center' }}
                             />
 
+                            <Text style={styles.colorLabel}>Choose a color</Text>
                             <View style={styles.colorRow}>
-                                {HABIT_COLORS.slice(0, 5).map((c) => (
+                                {HABIT_COLORS.slice(0, 6).map((c) => (
                                     <TouchableOpacity
                                         key={c}
                                         style={[styles.colorDot, { backgroundColor: c }, petColor === c && styles.colorSelected]}
-                                        onPress={() => setPetColor(c)}
+                                        onPress={() => handleColorSelect(c)}
                                     />
                                 ))}
                             </View>
@@ -155,43 +234,48 @@ export const OnboardingScreen = () => {
                                 style={{ flex: 1 }}
                             />
                         </View>
-                    </View>
+                    </ScrollView>
                 )}
 
                 {/* STEP 2: HABIT SELECTION */}
                 {step === 2 && (
-                    <View style={styles.stepContainer}>
-                        <Text style={styles.title}>Set Your First Goal</Text>
-                        <Text style={styles.subtitle}>Start small. Pick one habit to begin.</Text>
+                    <ScrollView style={styles.scrollContent} contentContainerStyle={styles.scrollInner} showsVerticalScrollIndicator={false}>
+                        <View style={styles.stepHeader}>
+                            <Text style={styles.title}>Pick Your First Habit</Text>
+                            <Text style={styles.subtitle}>Start small. You can add more later.</Text>
+                        </View>
 
                         <View style={styles.grid}>
-                            {PRESETS.map(preset => (
+                            {PRESETS.map((preset, index) => (
                                 <TouchableOpacity
                                     key={preset.id}
-                                    style={[
-                                        styles.presetCard,
-                                        selectedPreset === preset.id && styles.presetCardSelected
-                                    ]}
-                                    onPress={() => {
-                                        setSelectedPreset(preset.id);
-                                        setCustomHabit('');
-                                        setTargetCount(preset.defaultTarget);
-                                        setTimeOfDay(preset.defaultTime as any);
-                                    }}
+                                    activeOpacity={0.8}
+                                    onPress={() => handlePresetSelect(preset.id, index)}
+                                    style={{ width: '48%' }}
                                 >
-                                    <Text style={{ fontSize: 24, marginBottom: 8 }}>{preset.icon}</Text>
-                                    <Text style={[
-                                        styles.presetTitle,
-                                        selectedPreset === preset.id && { color: '#000' }
-                                    ]}>{preset.title}</Text>
+                                    <Animated.View style={[
+                                        styles.presetCard,
+                                        selectedPreset === preset.id && styles.presetCardSelected,
+                                        { transform: [{ scale: cardScales[index] }] }
+                                    ]}>
+                                        <Text style={{ fontSize: 28, marginBottom: 8 }}>{preset.icon}</Text>
+                                        <Text style={[
+                                            styles.presetTitle,
+                                            selectedPreset === preset.id && { color: '#000' }
+                                        ]}>{preset.title}</Text>
+                                    </Animated.View>
                                 </TouchableOpacity>
                             ))}
                         </View>
 
-                        <Text style={styles.orText}>OR CREATE CUSTOM</Text>
+                        <View style={styles.dividerRow}>
+                            <View style={styles.dividerLine} />
+                            <Text style={styles.orText}>OR</Text>
+                            <View style={styles.dividerLine} />
+                        </View>
 
                         <GlassInput
-                            placeholder="e.g. Meditate for 5 mins"
+                            placeholder="Create custom habit..."
                             value={customHabit}
                             onChangeText={(text) => {
                                 setCustomHabit(text);
@@ -215,48 +299,48 @@ export const OnboardingScreen = () => {
                                 style={{ flex: 1 }}
                             />
                         </View>
-                    </View>
+                    </ScrollView>
                 )}
 
                 {/* STEP 3: HABIT DETAILS */}
                 {step === 3 && (
-                    <View style={styles.stepContainer}>
-                        <Text style={styles.title}>Make it Specific</Text>
-                        <Text style={styles.subtitle}>When and how often?</Text>
+                    <ScrollView style={styles.scrollContent} contentContainerStyle={styles.scrollInner} showsVerticalScrollIndicator={false}>
+                        <View style={styles.stepHeader}>
+                            <Text style={styles.title}>Set Your Goal</Text>
+                            <Text style={styles.subtitle}>How often and when?</Text>
+                        </View>
 
                         <View style={styles.card}>
-                            <Text style={styles.label}>DAILY GOAL</Text>
+                            <Text style={styles.label}>DAILY TARGET</Text>
                             <View style={styles.counterRow}>
                                 <TouchableOpacity
                                     style={styles.counterButton}
-                                    onPress={() => setTargetCount(Math.max(1, targetCount - 1))}
+                                    onPress={() => handleCounterChange(-1)}
                                 >
                                     <Minus size={20} color="#fff" />
                                 </TouchableOpacity>
-                                <Text style={styles.counterValue}>{targetCount}</Text>
+                                <View style={styles.counterCenter}>
+                                    <Text style={styles.counterValue}>{targetCount}</Text>
+                                    <Text style={styles.counterUnit}>times per day</Text>
+                                </View>
                                 <TouchableOpacity
                                     style={styles.counterButton}
-                                    onPress={() => setTargetCount(Math.min(99, targetCount + 1))}
+                                    onPress={() => handleCounterChange(1)}
                                 >
                                     <Plus size={20} color="#fff" />
                                 </TouchableOpacity>
                             </View>
-                            <Text style={styles.helperText}>times per day</Text>
 
                             <Text style={[styles.label, { marginTop: 24 }]}>TIME OF DAY</Text>
-                            <View style={styles.grid}>
-                                <View style={{ marginTop: 8, width: '100%' }}>
-                                    <GlassSegmentedControl
-                                        values={['Morning', 'Noon', 'Evening', 'Anytime']}
-                                        selectedIndex={['morning', 'midday', 'evening', 'anytime'].indexOf(timeOfDay)}
-                                        onChange={(event: any) => {
-                                            const index = event.nativeEvent.selectedSegmentIndex;
-                                            const times = ['morning', 'midday', 'evening', 'anytime'] as const;
-                                            setTimeOfDay(times[index]);
-                                        }}
-                                    />
-                                </View>
-                            </View>
+                            <GlassSegmentedControl
+                                values={['Morning', 'Noon', 'Evening', 'Anytime']}
+                                selectedIndex={['morning', 'midday', 'evening', 'anytime'].indexOf(timeOfDay)}
+                                onChange={(event: any) => {
+                                    const index = event.nativeEvent.selectedSegmentIndex;
+                                    const times = ['morning', 'midday', 'evening', 'anytime'] as const;
+                                    setTimeOfDay(times[index]);
+                                }}
+                            />
                         </View>
 
                         <View style={styles.buttonRow}>
@@ -273,9 +357,9 @@ export const OnboardingScreen = () => {
                                 style={{ flex: 1 }}
                             />
                         </View>
-                    </View>
+                    </ScrollView>
                 )}
-            </ScrollView>
+            </View>
         </View>
     );
 };
@@ -296,88 +380,133 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 8,
-        paddingTop: 60,
         paddingBottom: 20,
     },
     progressDot: {
-        height: 6,
-        borderRadius: 3,
+        height: 8,
+        borderRadius: 4,
     },
     progressDotActive: {
-        width: 32,
+        width: 40,
         backgroundColor: '#fff',
     },
     progressDotInactive: {
-        width: 8,
+        width: 10,
         backgroundColor: 'rgba(255,255,255,0.2)',
     },
-    content: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        padding: 32,
+    mainContent: {
+        flex: 1,
+        paddingHorizontal: 24,
     },
-    stepContainer: {
-        gap: 16,
+    // Welcome screen - full height with content at top and button at bottom
+    welcomeContainer: {
+        flex: 1,
+        justifyContent: 'space-between',
     },
-    welcomeIcon: {
-        width: 96,
-        height: 96,
-        borderRadius: 32,
-        backgroundColor: '#6366f1',
+    welcomeTop: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        alignSelf: 'center',
+        paddingHorizontal: 16,
+    },
+    welcomeBottom: {
+        paddingBottom: 16,
+    },
+    welcomeIcon: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: 'rgba(99, 102, 241, 0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 32,
+        shadowColor: '#6366f1',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.5,
+        shadowRadius: 24,
+    },
+    heroTitle: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#fff',
+        textAlign: 'center',
         marginBottom: 16,
     },
+    heroSubtitle: {
+        fontSize: 17,
+        color: 'rgba(255,255,255,0.7)',
+        textAlign: 'center',
+        lineHeight: 26,
+        maxWidth: 300,
+    },
+    // Scrollable step container
+    scrollContent: {
+        flex: 1,
+    },
+    scrollInner: {
+        paddingBottom: 24,
+        gap: 20,
+    },
+    stepHeader: {
+        marginBottom: 8,
+    },
     title: {
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: '700',
         color: '#fff',
         textAlign: 'center',
+        marginBottom: 8,
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 15,
         color: 'rgba(255,255,255,0.6)',
         textAlign: 'center',
-        lineHeight: 24,
-        marginBottom: 16,
+        lineHeight: 22,
     },
     buttonRow: {
         flexDirection: 'row',
         gap: 12,
+        marginTop: 8,
     },
     card: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: 'rgba(255,255,255,0.08)',
         borderRadius: 24,
         padding: 24,
-        gap: 20,
+        gap: 16,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
     eggContainer: {
-        width: 100,
-        height: 100,
-        borderRadius: 32,
+        width: 120,
+        height: 120,
+        borderRadius: 40,
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
         borderWidth: 2,
     },
+    colorLabel: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: 'rgba(255,255,255,0.4)',
+        textAlign: 'center',
+        marginBottom: -8,
+    },
     colorRow: {
         flexDirection: 'row',
         justifyContent: 'center',
-        gap: 12,
+        gap: 16,
     },
     colorDot: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        borderWidth: 2,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        borderWidth: 3,
         borderColor: 'transparent',
     },
     colorSelected: {
         borderColor: '#fff',
-        transform: [{ scale: 1.2 }],
+        transform: [{ scale: 1.15 }],
     },
     grid: {
         flexDirection: 'row',
@@ -385,10 +514,9 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     presetCard: {
-        width: '48%',
         backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 16,
-        padding: 16,
+        borderRadius: 20,
+        padding: 20,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
@@ -398,18 +526,26 @@ const styles = StyleSheet.create({
         borderColor: '#fff',
     },
     presetTitle: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 13,
+        fontWeight: '600',
         color: 'rgba(255,255,255,0.7)',
         textAlign: 'center',
     },
+    dividerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginVertical: 4,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
     orText: {
-        textAlign: 'center',
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '700',
         color: 'rgba(255,255,255,0.3)',
-        marginTop: 12,
-        marginBottom: 12,
     },
     label: {
         fontSize: 12,
@@ -422,25 +558,28 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: 'rgba(0,0,0,0.2)',
-        padding: 8,
-        borderRadius: 16,
+        padding: 12,
+        borderRadius: 20,
     },
     counterButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        width: 48,
+        height: 48,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.15)',
         justifyContent: 'center',
         alignItems: 'center',
     },
+    counterCenter: {
+        alignItems: 'center',
+    },
     counterValue: {
-        fontSize: 24,
+        fontSize: 32,
         fontWeight: '700',
         color: '#fff',
     },
-    helperText: {
-        textAlign: 'center',
+    counterUnit: {
         fontSize: 12,
-        color: 'rgba(255,255,255,0.3)',
+        color: 'rgba(255,255,255,0.4)',
+        marginTop: 2,
     },
 });

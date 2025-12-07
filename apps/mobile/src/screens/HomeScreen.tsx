@@ -1,22 +1,24 @@
-import React, { useState, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Animated, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit, getLocalDateString } from '@habitapp/shared';
 import { HabitCard } from '../components/HabitCard';
-import { Pet } from '../components/Pet';
+import { Pet } from '../components/Pet/Pet';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { EmptyState } from '../components/EmptyState';
+import { SwipeTutorial } from '../components/SwipeTutorial';
 import { Plus, Eye, EyeOff } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
+import { GlassView } from 'expo-glass-effect';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
-import { GlassView } from 'expo-glass-effect';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RootStackParamList, TabParamList } from '../navigation/types';
 import { getGreeting } from '../data/greetings';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
     BottomTabNavigationProp<TabParamList>,
@@ -35,8 +37,16 @@ export const HomeScreen = () => {
 
     const [petBounce, setPetBounce] = useState(0);
     const confettiRef = useRef<any>(null);
+    const [hasSeenSwipeHint, setHasSeenSwipeHint] = useState(true); // Default true to not show until loaded
 
     const today = getLocalDateString();
+
+    // Load swipe hint preference
+    useEffect(() => {
+        AsyncStorage.getItem('hasSeenSwipeHint').then(value => {
+            setHasSeenSwipeHint(value === 'true');
+        });
+    }, []);
 
     useLayoutEffect(() => {
         // Clear native options since we are using a custom header
@@ -218,11 +228,19 @@ export const HomeScreen = () => {
         );
     };
 
-    const renderItem = ({ item }: { item: Habit }) => {
+    const handleSwipeHintDismiss = useCallback(() => {
+        setHasSeenSwipeHint(true);
+        AsyncStorage.setItem('hasSeenSwipeHint', 'true');
+    }, []);
+
+    const renderItem = ({ item, index }: { item: Habit; index: number }) => {
         const streak = getStreak(item.id);
         const dayProgress = progress.find(p => p.habitId === item.id && p.date === today);
         const current = dayProgress?.currentCount || 0;
         const isCompleted = !!dayProgress?.completed;
+
+        // Auto swipe demo only on first card for new users
+        const showDemo = index === 0 && !hasSeenSwipeHint;
 
         return (
             <HabitCard
@@ -232,18 +250,40 @@ export const HomeScreen = () => {
                 streak={streak}
                 onToggle={() => handleToggle(item)}
                 onDecrement={() => undoProgress(item.id, today)}
-                // Use router.push with object for serialization if needed, or params
                 onEdit={() => router.push({ pathname: '/habit-form', params: { habit: JSON.stringify(item) } })}
                 onDelete={() => handleDelete(item)}
+                autoSwipeDemo={showDemo}
+                onSwipeDemoComplete={handleSwipeHintDismiss}
             />
         );
     };
 
-    const insets = useSafeAreaInsets();
+    const insets = useSafeAreaInsets(); // Used for header padding
 
     const fabBottom = Platform.OS === 'ios'
-        ? insets.bottom + LiquidGlass.dock.bottomOffset + LiquidGlass.dock.height + 20
-        : 100;
+        ? insets.bottom + 49 + 16 // Align approx 16pt above standard Native Tab Bar (49pt)
+        : 80;
+
+    const fabScale = useRef(new Animated.Value(1)).current;
+
+    const handleFabPressIn = () => {
+        Animated.spring(fabScale, {
+            toValue: 0.92,
+            useNativeDriver: true,
+            speed: 50,
+            bounciness: 4,
+        }).start();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    };
+
+    const handleFabPressOut = () => {
+        Animated.spring(fabScale, {
+            toValue: 1,
+            useNativeDriver: true,
+            speed: 50,
+            bounciness: 4,
+        }).start();
+    };
 
     return (
         <View style={styles.container}>
@@ -344,19 +384,35 @@ export const HomeScreen = () => {
                 }}
             />
 
-            {/* iOS 26 Floating Action Button */}
-            <TouchableOpacity
-                style={[styles.fab, { bottom: fabBottom }]}
-                activeOpacity={0.8}
-                onPress={() => router.push('/habit-form')}
-            >
-                <GlassView
-                    style={styles.fabGlass}
-                    glassEffectStyle="regular"
+
+            {/* iOS 26 Floating Action Button - Liquid Glass Interaction */}
+            <Animated.View style={[
+                styles.fab,
+                { bottom: fabBottom, transform: [{ scale: fabScale }] }
+            ]}>
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPressIn={handleFabPressIn}
+                    onPressOut={handleFabPressOut}
+                    onPress={() => router.push('/habit-form')}
                 >
-                    <Plus size={28} color="#fff" strokeWidth={2.5} />
-                </GlassView>
-            </TouchableOpacity>
+                    <GlassView
+                        glassEffectStyle="regular"
+                        style={styles.fabGlass}
+                    >
+                        <Plus size={26} color="#fff" strokeWidth={2.5} strokeLinecap="round" />
+                    </GlassView>
+                </TouchableOpacity>
+            </Animated.View>
+
+
+            {/* Swipe Tutorial tooltip - appears with card auto-swipe */}
+            {!hasSeenSwipeHint && filteredHabits.length > 0 && (
+                <SwipeTutorial
+                    onDismiss={handleSwipeHintDismiss}
+                    cardTop={insets.top + 325}
+                />
+            )}
 
         </View>
     );
@@ -416,26 +472,23 @@ const styles = StyleSheet.create({
         paddingHorizontal: LiquidGlass.screenPadding,
         paddingBottom: 100,
     },
+
     fab: {
         position: 'absolute',
         right: LiquidGlass.screenPadding,
         width: 56,
         height: 56,
         borderRadius: 28,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-        elevation: 8,
+        borderCurve: 'continuous',
+        zIndex: 100, // Ensure it sits above list content
     },
     fabGlass: {
         width: 56,
         height: 56,
         borderRadius: 28,
+        borderCurve: 'continuous',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.15)',
         overflow: 'hidden',
     },
 });
