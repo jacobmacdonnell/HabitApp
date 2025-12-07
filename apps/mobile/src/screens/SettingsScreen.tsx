@@ -100,11 +100,9 @@ export const SettingsScreen = () => {
 
             <ScrollView
                 style={styles.container}
-                contentContainerStyle={[styles.content, { paddingTop: insets.top + LiquidGlass.header.contentTopPadding }]}
+                contentContainerStyle={[styles.content]}
+                contentInsetAdjustmentBehavior="automatic"
             >
-                <View style={styles.headerRow}>
-                    <Text style={styles.headerTitle}>Settings</Text>
-                </View>
 
                 {/* Preferences */}
                 <View style={styles.section}>
