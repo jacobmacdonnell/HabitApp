@@ -1,10 +1,10 @@
 # Project Vision: Habit Companion
 
 ## 1. Executive Summary
-**Habit Companion** is a gamified habit tracking application designed for **iOS 26**. It merges the utility of a robust habit tracker with the emotional engagement of a virtual pet simulator. By caring for themselves, users care for their digital companion, creating a positive feedback loop that encourages consistency.
+**Habit Companion** is a gamified habit tracking application designed for **Modern iOS**. It merges the utility of a robust habit tracker with the emotional engagement of a virtual pet simulator. By caring for themselves, users care for their digital companion, creating a positive feedback loop that encourages consistency.
 
 ## 2. Design Philosophy: "Liquid Glass"
-The app is built on a futuristic **iOS 26** aesthetic, characterized by:
+The app is built on a futuristic **Modern iOS** aesthetic, characterized by:
 - **Deep Depth**: Heavy use of `backdrop-filter: blur()`, multi-layered translucency, and glassmorphism.
 - **Vibrant Energy**: Rich, flowing gradients (Indigo/Purple/Pink) that feel alive.
 - **Fluid Motion**: Bouncy, physics-based animations for the pet and UI elements.
