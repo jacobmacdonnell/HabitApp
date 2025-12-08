@@ -11,6 +11,7 @@ import { ThemeProvider } from '../src/context/ThemeContext';
 import { migrateFromAsyncStorage } from '../src/services/storage';
 import { useMigrationHelper } from '../src/db/migrate';
 import { Stack, SplashScreen } from 'expo-router';
+import { ThemeProvider as NavThemeProvider, DarkTheme } from '@react-navigation/native';
 import { LiquidGlass } from '../src/theme/theme';
 
 // Initialize notification handler
@@ -38,8 +39,17 @@ const ThemedRoot = () => {
             settings.theme === 'dark' ? 'light' :
                 'auto';
 
+    // Force dark theme for navigation to prevent white flashes
+    const NavTheme = {
+        ...DarkTheme,
+        colors: {
+            ...DarkTheme.colors,
+            background: LiquidGlass.backgroundColor,
+        },
+    };
+
     return (
-        <>
+        <NavThemeProvider value={NavTheme}>
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: LiquidGlass.backgroundColor } }}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
@@ -66,7 +76,7 @@ const ThemedRoot = () => {
                 <Stack.Screen name="index" options={{ headerShown: false }} />
             </Stack>
             <StatusBar style={statusBarStyle === 'auto' ? 'light' : statusBarStyle} />
-        </>
+        </NavThemeProvider>
     );
 };
 

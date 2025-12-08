@@ -166,7 +166,7 @@ export const HatchingScreen = () => {
             {/* Ambient Background */}
             <View style={[styles.blob, { backgroundColor: pet?.color || '#FF6B6B', top: -100, left: -100 }]} />
             <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
-            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
+
 
             <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 32 }]}>
                 {/* Title */}

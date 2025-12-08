@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, NativeSyntheticEvent } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, NativeSyntheticEvent, TextInput } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
@@ -9,7 +9,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { ScreenWrapper } from '../components/ScreenWrapper';
-import { GlassInput } from '../components/GlassInput';
+
 import { GlassButton } from '../components/GlassButton';
 import { LiquidGlass } from '../theme/theme';
 import { useRouter } from 'expo-router';
@@ -102,40 +102,43 @@ export const HabitFormScreen = () => {
         <ScreenWrapper keyboardAvoiding isModal>
             {/* Title Input */}
             <View style={styles.section}>
-                <GlassInput
-                    label="HABIT TITLE"
-                    placeholder="e.g. Drink Water"
-                    value={title}
-                    onChangeText={setTitle}
-                />
+                <Text style={styles.label}>HABIT TITLE</Text>
+                <View style={styles.inputRow}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="e.g. Drink Water"
+                        placeholderTextColor="rgba(255,255,255,0.3)"
+                        value={title}
+                        onChangeText={setTitle}
+                    />
+                </View>
             </View>
 
             {/* Daily Target */}
             <View style={styles.section}>
                 <Text style={styles.label}>DAILY TARGET</Text>
-                <View style={styles.inputRow}>
+                <View style={styles.counterRow}>
                     <TouchableOpacity
-                        style={styles.stepperBtn}
+                        style={styles.counterButton}
                         onPress={() => {
                             setTargetCount(Math.max(1, targetCount - 1));
                             Haptics.selectionAsync();
                         }}
-                        activeOpacity={0.7}
                     >
-                        <Minus size={24} color="#fff" strokeWidth={2.5} />
+                        <Minus size={20} color="#fff" />
                     </TouchableOpacity>
-
-                    <Text style={styles.targetValue}>{targetCount}</Text>
-
+                    <View style={styles.counterCenter}>
+                        <Text style={styles.counterValue}>{targetCount}</Text>
+                        <Text style={styles.counterUnit}>times per day</Text>
+                    </View>
                     <TouchableOpacity
-                        style={styles.stepperBtn}
+                        style={styles.counterButton}
                         onPress={() => {
                             setTargetCount(targetCount + 1);
                             Haptics.selectionAsync();
                         }}
-                        activeOpacity={0.7}
                     >
-                        <Plus size={24} color="#fff" strokeWidth={2.5} />
+                        <Plus size={20} color="#fff" />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -277,28 +280,48 @@ const styles = StyleSheet.create({
         borderColor: '#fff',
     },
     inputRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: 'rgba(255,255,255,0.1)', // Uniform background
+        backgroundColor: 'rgba(255,255,255,0.1)',
         borderRadius: LiquidGlass.radius.lg,
         // @ts-ignore
         cornerCurve: 'continuous',
-        padding: 4, // Tight padding for buttons
+        padding: 4,
+        minHeight: 52,
     },
-    targetValue: {
-        fontSize: 22,
-        fontWeight: '600',
-        color: '#fff',
-        fontVariant: ['tabular-nums'],
+    counterRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        padding: 12,
+        borderRadius: 20,
     },
-    stepperBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        backgroundColor: 'transparent', // Blend into container
+    counterButton: {
+        width: 48,
+        height: 48,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.15)',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    counterCenter: {
+        alignItems: 'center',
+    },
+    counterValue: {
+        fontSize: 32,
+        fontWeight: '700',
+        color: '#fff',
+    },
+    counterUnit: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.4)',
+        marginTop: 2,
+    },
+    input: {
+        flex: 1,
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#fff',
+        padding: 12,
     },
     footer: {
         marginTop: 20,

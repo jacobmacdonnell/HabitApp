@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, ViewStyle, StyleProp, KeyboardAvoidingView, Platform } from 'react-native';
-import { LiquidGlassView } from '@callstack/liquid-glass';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
 
@@ -60,8 +59,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 
     return (
         <View style={styles.wrapper}>
-            {/* Ambient Background */}
-            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
+
 
             {keyboardAvoiding ? (
                 <KeyboardAvoidingView

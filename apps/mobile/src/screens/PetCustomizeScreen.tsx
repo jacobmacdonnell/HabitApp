@@ -8,7 +8,7 @@ import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Rect } from 'react-na
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { ScreenWrapper } from '../components/ScreenWrapper';
-import { GlassInput } from '../components/GlassInput';
+
 import { useRouter } from 'expo-router';
 import { validatePetName } from '../utils/validation';
 
@@ -232,13 +232,17 @@ export const PetCustomizeScreen = () => {
 
             {/* Name Input */}
             <View style={styles.section}>
-                <GlassInput
-                    label="NAME"
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="Pet Name"
-                    maxLength={20}
-                />
+                <Text style={styles.label}>NAME</Text>
+                <View style={styles.inputRow}>
+                    <TextInput
+                        style={styles.input}
+                        value={name}
+                        onChangeText={setName}
+                        placeholder="Pet Name"
+                        placeholderTextColor="rgba(255,255,255,0.3)"
+                        maxLength={20}
+                    />
+                </View>
             </View>
 
             {/* Color Picker */}
@@ -334,12 +338,21 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         marginLeft: 4,
     },
+    inputRow: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 16,
+        padding: 4,
+        minHeight: 52,
+        // @ts-ignore
+        cornerCurve: 'continuous',
+    },
     input: {
-        // backgroundColor: 'rgba(255,255,255,0.1)',
-        // borderRadius: 12,
-        // padding: 16,
-        // color: '#fff',
-        // fontSize: 18,
+        flex: 1,
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#fff',
+        padding: 12,
+        textAlign: 'center',
     },
     colorRow: {
         gap: 12,

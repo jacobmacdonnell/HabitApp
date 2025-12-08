@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated, Easing, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHabit } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
 import { LiquidGlassView } from '@callstack/liquid-glass';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { ArrowRight, Check, Minus, Plus, Sparkles } from 'lucide-react-native';
-import { GlassInput } from '../components/GlassInput';
+
 import { GlassButton } from '../components/GlassButton';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -163,7 +163,7 @@ export const OnboardingScreen = () => {
             {/* Ambient Background */}
             <View style={[styles.blob, { backgroundColor: petColor, top: -100, left: -100 }]} />
             <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
-            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
+
 
             {/* Progress Dots - at top with safe area */}
             <View style={[styles.progressContainer, { paddingTop: insets.top + 20 }]}>
@@ -216,12 +216,15 @@ export const OnboardingScreen = () => {
                                 <Text style={{ fontSize: 56 }}>🥚</Text>
                             </Animated.View>
 
-                            <GlassInput
-                                placeholder="Name your pet..."
-                                value={petName}
-                                onChangeText={setPetName}
-                                style={{ textAlign: 'center' }}
-                            />
+                            <View style={styles.inputRow}>
+                                <TextInput
+                                    placeholder="Name your pet..."
+                                    placeholderTextColor="rgba(255,255,255,0.3)"
+                                    value={petName}
+                                    onChangeText={setPetName}
+                                    style={styles.input}
+                                />
+                            </View>
 
                             <Text style={styles.colorLabel}>Choose a color</Text>
                             <View style={styles.colorRow}>
@@ -289,16 +292,19 @@ export const OnboardingScreen = () => {
                             <View style={styles.dividerLine} />
                         </View>
 
-                        <GlassInput
-                            placeholder="Create custom habit..."
-                            value={customHabit}
-                            onChangeText={(text) => {
-                                setCustomHabit(text);
-                                setSelectedPreset(null);
-                                setTargetCount(1);
-                            }}
-                            style={customHabit ? { borderColor: '#fff' } : undefined}
-                        />
+                        <View style={[styles.inputRow, customHabit ? { borderColor: '#fff', borderWidth: 1 } : { borderWidth: 1, borderColor: 'transparent' }]}>
+                            <TextInput
+                                placeholder="Create custom habit..."
+                                placeholderTextColor="rgba(255,255,255,0.3)"
+                                value={customHabit}
+                                onChangeText={(text: string) => {
+                                    setCustomHabit(text);
+                                    setSelectedPreset(null);
+                                    setTargetCount(1);
+                                }}
+                                style={styles.input}
+                            />
+                        </View>
 
                         <View style={styles.buttonRow}>
                             <GlassButton
@@ -596,5 +602,21 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: 'rgba(255,255,255,0.4)',
         marginTop: 2,
+    },
+    inputRow: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 16,
+        padding: 4,
+        minHeight: 52,
+        // @ts-ignore
+        cornerCurve: 'continuous',
+    },
+    input: {
+        flex: 1,
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#fff',
+        padding: 12,
+        textAlign: 'center',
     },
 });

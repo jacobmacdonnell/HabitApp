@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { LiquidGlassView } from '@callstack/liquid-glass';
+
 import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon, Trash2, Edit2, Undo2, Zap } from 'lucide-react-native';
 import { Habit } from '@habitapp/shared';
 import * as Haptics from 'expo-haptics';
@@ -180,8 +180,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                 <TouchableOpacity
                     activeOpacity={0.95}
                 >
-                    <LiquidGlassView
-                        interactive={true}
+                    <View
                         style={[styles.blur, isCompleted && styles.completedCard]}
                     >
                         <View style={styles.content}>
@@ -245,7 +244,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    </LiquidGlassView>
+                    </View>
                 </TouchableOpacity>
             </Swipeable>
         </Animated.View>

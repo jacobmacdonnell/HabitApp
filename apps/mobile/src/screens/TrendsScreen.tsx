@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { useHabit, getLocalDateString } from '@habitapp/shared';
-import { LiquidGlassView } from '@callstack/liquid-glass';
+
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -165,7 +165,7 @@ export const TrendsScreen = () => {
                     </View>
 
                     {habitWeeklyStatus.map(habit => (
-                        <LiquidGlassView key={habit.id} interactive={true} style={styles.habitRowCard}>
+                        <View key={habit.id} style={styles.habitRowCard}>
                             <View style={styles.habitInfo}>
                                 <Text style={styles.habitTitle} numberOfLines={1}>{habit.title}</Text>
                                 <Text style={styles.streakLabel}>{getStreak(habit.id)} day streak</Text>
@@ -187,7 +187,7 @@ export const TrendsScreen = () => {
                                     </View>
                                 ))}
                             </View>
-                        </LiquidGlassView>
+                        </View>
                     ))}
                 </>
             )}
@@ -273,8 +273,7 @@ export const TrendsScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Ambient Background - Clean Dark Theme */}
-            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
+
 
             <ScrollView
                 style={styles.scrollView}

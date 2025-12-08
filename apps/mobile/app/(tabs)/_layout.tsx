@@ -11,7 +11,7 @@ export default function TabLayout() {
             // Native styling options
             tintColor={themeColors.accent} // Dynamic pet color
             backgroundColor={null} // Transparent to allow blur
-            blurEffect="systemMaterial" // The "Liquid Glass" effect
+            blurEffect="systemThickMaterialDark" // The "Liquid Glass" effect
             shadowColor="transparent" // Clean look
         >
             <NativeTabs.Trigger

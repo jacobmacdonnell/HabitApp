@@ -1,45 +1,21 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
-import { LiquidGlassContainerView, LiquidGlassView } from '@callstack/liquid-glass';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import { SymbolView } from 'expo-symbols';
+import { useRouter } from 'expo-router';
 
-const AnimatedGlass = Animated.createAnimatedComponent(LiquidGlassView);
+
 
 export const LiquidFab = () => {
-    const isOpen = useSharedValue(0);
-
-    const toggleMenu = () => {
-        isOpen.value = withSpring(isOpen.value === 0 ? 1 : 0);
-    };
-
-    const itemStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                { translateY: withSpring(isOpen.value === 1 ? -70 : 0) },
-                { scale: withSpring(isOpen.value === 1 ? 1 : 0) }
-            ],
-            opacity: withSpring(isOpen.value)
-        };
-    });
+    const router = useRouter();
 
     return (
         <View style={styles.container}>
-            <LiquidGlassContainerView style={styles.morphContainer}>
-                {/* Menu Item: Add Habit */}
-                <AnimatedGlass style={[styles.fabItem, itemStyle]} interactive={true}>
-                    <Pressable style={styles.content}>
-                        <SymbolView name="plus" tintColor="#fff" size={24} />
-                    </Pressable>
-                </AnimatedGlass>
-
-                {/* Main FAB Trigger */}
-                <Pressable onPress={toggleMenu}>
-                    <LiquidGlassView style={styles.fabMain} interactive={true}>
-                        <SymbolView name="sparkles" tintColor="#fff" size={28} />
-                    </LiquidGlassView>
-                </Pressable>
-            </LiquidGlassContainerView>
+            <Pressable onPress={() => router.push('/habit-form')}>
+                <LiquidGlassView style={styles.fabMain} interactive={true}>
+                    <SymbolView name="plus" tintColor="#fff" size={28} />
+                </LiquidGlassView>
+            </Pressable>
         </View>
     );
 };

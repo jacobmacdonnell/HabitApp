@@ -8,7 +8,7 @@ import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { EmptyState } from '../components/EmptyState';
 import { SwipeTutorial } from '../components/SwipeTutorial';
 import { Plus, Eye, EyeOff } from 'lucide-react-native';
-import { LiquidGlassView } from '@callstack/liquid-glass';
+
 import { LiquidFab } from '../components/LiquidFab';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -287,8 +287,7 @@ export const HomeScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Ambient Background - Clean Dark Theme */}
-            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} pointerEvents="none" />
+
 
             {/* Custom Fixed Header */}
             <View style={{ paddingTop: insets.top + (LiquidGlass.header.contentTopPadding || 20), paddingHorizontal: LiquidGlass.screenPadding }}>

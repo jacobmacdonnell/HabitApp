@@ -31,16 +31,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
         onPress();
     };
 
-    const getVariantStyle = () => {
-        switch (variant) {
-            case 'secondary':
-                return styles.secondary;
-            case 'danger':
-                return styles.danger;
-            default:
-                return styles.primary;
-        }
-    };
+
 
     const getTextStyle = () => {
         switch (variant) {
@@ -58,7 +49,9 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
             style={[
                 styles.button,
                 // Apply layout/size styles to valid container
-                variant !== 'secondary' && getVariantStyle(),
+                variant === 'primary' && styles.primary,
+                variant === 'danger' && styles.danger,
+                variant === 'secondary' && styles.secondaryBorder,
                 disabled && styles.disabled,
                 style
             ]}
@@ -70,10 +63,12 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
             accessibilityState={{ disabled: disabled || loading }}
         >
             {variant === 'secondary' && (
-                <LiquidGlassView style={StyleSheet.absoluteFill} interactive={true} />
+                <View style={[StyleSheet.absoluteFill, { borderRadius: LiquidGlass.radius.xxl, overflow: 'hidden' }]}>
+                    <LiquidGlassView style={StyleSheet.absoluteFill} interactive={true} />
+                </View>
             )}
 
-            <View style={[styles.contentContainer, variant === 'secondary' && styles.secondaryBorder]}>
+            <View style={styles.contentContainer}>
                 {loading ? (
                     <ActivityIndicator color={variant === 'primary' ? LiquidGlass.colors.black : LiquidGlass.colors.white} />
                 ) : (
@@ -114,9 +109,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: LiquidGlass.colors.glassBorder,
         borderRadius: LiquidGlass.radius.xxl,
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
     },
     contentContainer: {
         flexDirection: 'row',
