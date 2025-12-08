@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert, Pl
 import { useHabit } from '@habitapp/shared';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Moon, Sun, Volume2, Bell, Shield, Trash2, ChevronRight } from 'lucide-react-native';
-import { BlurView } from 'expo-blur';
-import { GlassView } from 'expo-glass-effect';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NotificationService } from '../services/notifications';
 import { LiquidGlass } from '../theme/theme';
@@ -98,7 +97,7 @@ export const SettingsScreen = () => {
     return (
         <View style={styles.wrapper}>
             {/* Ambient Background */}
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
 
             <ScrollView
                 style={styles.container}
@@ -115,7 +114,7 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>PREFERENCES</Text>
                     <View style={[styles.card, { overflow: 'hidden' }]}>
-                        <BlurView intensity={60} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
+                        <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
                         <View style={{ position: 'relative', zIndex: 1 }}>
                             {/* Sound */}
                             <View style={styles.row}>
@@ -158,7 +157,7 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>SLEEP SCHEDULE</Text>
                     <View style={[styles.card, { overflow: 'hidden' }]}>
-                        <BlurView intensity={60} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
+                        <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
                         <View style={{ position: 'relative', zIndex: 1 }}>
                             {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color={LiquidGlass.colors.sleep} />, LiquidGlass.colors.sleep, LiquidGlass.colors.glassBackground)}
                             <View style={styles.separator} />
@@ -171,7 +170,7 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>DATA & PRIVACY</Text>
                     <View style={[styles.card, { overflow: 'hidden' }]}>
-                        <BlurView intensity={60} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
+                        <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
                         <View style={{ position: 'relative', zIndex: 1 }}>
                             <TouchableOpacity style={styles.row}>
                                 <View style={styles.iconLabel}>

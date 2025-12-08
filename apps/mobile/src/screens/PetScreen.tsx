@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
 import { useHabit } from '@habitapp/shared';
 import { Pet } from '../components/Pet';
-import { BlurView } from 'expo-blur';
-import { GlassView } from 'expo-glass-effect';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import { Egg } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
@@ -39,7 +38,7 @@ export const PetScreen = () => {
                     <Text style={styles.eggTitle}>Hatch Your Companion</Text>
                     <Text style={styles.eggSubtitle}>Complete habits to help them grow!</Text>
 
-                    <GlassView glassEffectStyle="regular" style={styles.formCard}>
+                    <LiquidGlassView interactive={true} style={styles.formCard}>
                         <TextInput
                             style={styles.input}
                             placeholder="Name your pet..."
@@ -61,7 +60,7 @@ export const PetScreen = () => {
                         <TouchableOpacity style={styles.hatchButton} onPress={handleHatch}>
                             <Text style={styles.hatchText}>Hatch Egg</Text>
                         </TouchableOpacity>
-                    </GlassView>
+                    </LiquidGlassView>
                 </View>
             </View>
         );
@@ -70,7 +69,7 @@ export const PetScreen = () => {
     return (
         <View style={styles.wrapper}>
             {/* Pet component has its own glow effect */}
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
 
             <ScrollView
                 style={styles.container}

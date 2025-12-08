@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Anima
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHabit } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
-import { BlurView } from 'expo-blur';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { ArrowRight, Check, Minus, Plus, Sparkles } from 'lucide-react-native';
 import { GlassInput } from '../components/GlassInput';
@@ -163,7 +163,7 @@ export const OnboardingScreen = () => {
             {/* Ambient Background */}
             <View style={[styles.blob, { backgroundColor: petColor, top: -100, left: -100 }]} />
             <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
 
             {/* Progress Dots - at top with safe area */}
             <View style={[styles.progressContainer, { paddingTop: insets.top + 20 }]}>

@@ -8,8 +8,8 @@ import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { EmptyState } from '../components/EmptyState';
 import { SwipeTutorial } from '../components/SwipeTutorial';
 import { Plus, Eye, EyeOff } from 'lucide-react-native';
-import { BlurView } from 'expo-blur';
-import { GlassView } from 'expo-glass-effect';
+import { LiquidGlassView } from '@callstack/liquid-glass';
+import { LiquidFab } from '../components/LiquidFab';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -288,7 +288,7 @@ export const HomeScreen = () => {
     return (
         <View style={styles.container}>
             {/* Ambient Background - Clean Dark Theme */}
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} pointerEvents="none" />
+            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} pointerEvents="none" />
 
             {/* Custom Fixed Header */}
             <View style={{ paddingTop: insets.top + (LiquidGlass.header.contentTopPadding || 20), paddingHorizontal: LiquidGlass.screenPadding }}>
@@ -386,24 +386,7 @@ export const HomeScreen = () => {
 
 
             {/* iOS 26 Floating Action Button - Liquid Glass Interaction */}
-            <Animated.View style={[
-                styles.fab,
-                { bottom: fabBottom, transform: [{ scale: fabScale }] }
-            ]}>
-                <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPressIn={handleFabPressIn}
-                    onPressOut={handleFabPressOut}
-                    onPress={() => router.push('/habit-form')}
-                >
-                    <GlassView
-                        glassEffectStyle="regular"
-                        style={styles.fabGlass}
-                    >
-                        <Plus size={26} color="#fff" strokeWidth={2.5} strokeLinecap="round" />
-                    </GlassView>
-                </TouchableOpacity>
-            </Animated.View>
+            <LiquidFab />
 
 
             {/* Swipe Tutorial tooltip - appears with card auto-swipe */}

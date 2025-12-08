@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHabit } from '@habitapp/shared';
 import { router } from 'expo-router';
@@ -166,7 +166,7 @@ export const HatchingScreen = () => {
             {/* Ambient Background */}
             <View style={[styles.blob, { backgroundColor: pet?.color || '#FF6B6B', top: -100, left: -100 }]} />
             <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <LiquidGlassView interactive={true} style={StyleSheet.absoluteFill} />
 
             <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 32 }]}>
                 {/* Title */}
