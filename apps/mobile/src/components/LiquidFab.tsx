@@ -12,7 +12,10 @@ export const LiquidFab = () => {
     return (
         <View style={styles.container}>
             <Pressable onPress={() => router.push('/habit-form')}>
-                <LiquidGlassView style={styles.fabMain} interactive={true}>
+                <LiquidGlassView
+                    style={[styles.fabMain, { backgroundColor: 'rgba(28,28,30,0.5)' }]} // Manual dark tint
+                    interactive={true}
+                >
                     <SymbolView name="plus" tintColor="#fff" size={28} />
                 </LiquidGlassView>
             </Pressable>
