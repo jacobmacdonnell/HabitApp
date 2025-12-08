@@ -36,7 +36,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         <>
             {scrollable ? (
                 <ScrollView
-                    style={containerStyles}
+                    style={[containerStyles, { backgroundColor: LiquidGlass.backgroundColor }]}
                     contentContainerStyle={[
                         styles.scrollContent,
                         isModal && { paddingTop: 32 }, // Visual top padding for modals
