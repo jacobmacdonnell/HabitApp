@@ -70,19 +70,10 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
     // Blinking state for awake animations
     const [isBlinking, setIsBlinking] = useState(false);
 
+
     // Peeking state - one eye open when doing habits while sleeping
     const [isPeeking, setIsPeeking] = useState(false);
-    const [pupilY, setPupilY] = useState(85); // Track pupil Y position for SVG
     const eyeLookAnim = useRef(new Animated.Value(0)).current; // 0 = center, 1 = looking down
-
-    // Listen to eyeLookAnim changes and update pupilY for SVG
-    useEffect(() => {
-        const listenerId = eyeLookAnim.addListener(({ value }) => {
-            // Interpolate: 0 -> 85 (center), 1 -> 92 (looking down)
-            setPupilY(85 + (value * 7));
-        });
-        return () => eyeLookAnim.removeListener(listenerId);
-    }, []);
 
     // Late night habit completion - pet peeks with one eye
     // Trigger on feedingBounce OR XP changes while sleeping
@@ -348,7 +339,7 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                         <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGrad)" stroke={pet.color} strokeWidth="2" />
                         <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
                         <G transform="translate(0, 10)">
-                            <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} pupilY={pupilY} />
+                            <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} eyeLookAnim={eyeLookAnim} />
                             <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
                             <PetHat hat={pet.hat} />
                         </G>
@@ -414,7 +405,7 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                                 <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGradFull)" stroke={pet.color} strokeWidth="2" />
                                 <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
                                 <G transform="translate(0, 10)">
-                                    <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} pupilY={pupilY} />
+                                    <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} eyeLookAnim={eyeLookAnim} />
                                     <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
                                     {!isSick && (
                                         <G>

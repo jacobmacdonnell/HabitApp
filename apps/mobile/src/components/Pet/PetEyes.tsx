@@ -1,21 +1,36 @@
 import React from 'react';
+import { Animated } from 'react-native';
 import { Path, Circle, G } from 'react-native-svg';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface PetEyesProps {
     isSleeping: boolean;
     isPeeking: boolean;
     isBlinking: boolean;
-    pupilY: number;
+    eyeLookAnim: Animated.Value;
 }
 
-export const PetEyes = ({ isSleeping, isPeeking, isBlinking, pupilY }: PetEyesProps) => {
+export const PetEyes = ({ isSleeping, isPeeking, isBlinking, eyeLookAnim }: PetEyesProps) => {
+    // Interpolate pupil position
+    // 0 = center (85), 1 = looking down (92)
+    const pupilY = eyeLookAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [85, 92]
+    });
+
+    const glintY = eyeLookAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [81, 88] // 85-4=81, 92-4=88
+    });
+
     // Peeking - one eye open while sleeping (late night habit)
     if (isSleeping && isPeeking) return (
         <G>
             <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
             <Circle cx="130" cy="85" r="16" fill="white" />
-            <Circle cx="130" cy={pupilY} r="6" fill="black" />
-            <Circle cx="133" cy={pupilY - 4} r="2" fill="white" fillOpacity="0.8" />
+            <AnimatedCircle cx="130" cy={pupilY} r="6" fill="black" />
+            <AnimatedCircle cx="133" cy={glintY} r="2" fill="white" fillOpacity="0.8" />
         </G>
     );
 
