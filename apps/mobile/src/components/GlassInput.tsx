@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps, StyleProp, ViewStyle, TextStyle } from 'react-native';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import { LiquidGlass } from '../theme/theme';
 
 interface GlassInputProps extends TextInputProps {
@@ -20,13 +21,16 @@ export const GlassInput: React.FC<GlassInputProps> = ({
     return (
         <View style={[styles.container, containerStyle]}>
             {label && <Text style={styles.label}>{label}</Text>}
-            <TextInput
-                style={[styles.input, error ? styles.inputError : null, style]}
-                placeholderTextColor={LiquidGlass.text.tertiary}
-                selectionColor={LiquidGlass.colors.white}
-                accessibilityLabel={label}
-                {...props}
-            />
+            <View style={[styles.inputContainer, style]}>
+                <LiquidGlassView style={StyleSheet.absoluteFill} interactive={true} />
+                <TextInput
+                    style={[styles.input, error ? styles.inputError : null]}
+                    placeholderTextColor={LiquidGlass.text.tertiary}
+                    selectionColor={LiquidGlass.colors.white}
+                    accessibilityLabel={label}
+                    {...props}
+                />
+            </View>
             {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
     );
@@ -45,11 +49,13 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
-    input: {
-        backgroundColor: 'rgba(255,255,255,0.05)',
+    inputContainer: {
         borderRadius: LiquidGlass.radius.lg,
+        overflow: 'hidden',
         // @ts-ignore
         cornerCurve: 'continuous',
+    },
+    input: {
         padding: LiquidGlass.spacing.lg,
         fontSize: LiquidGlass.typography.size.body,
         fontWeight: LiquidGlass.typography.weight.semibold,

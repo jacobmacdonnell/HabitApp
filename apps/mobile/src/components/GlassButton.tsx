@@ -1,6 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, StyleProp, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet, ActivityIndicator, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import { LiquidGlass } from '../theme/theme';
 
 interface GlassButtonProps {
@@ -56,7 +57,8 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
         <TouchableOpacity
             style={[
                 styles.button,
-                getVariantStyle(),
+                // Apply layout/size styles to valid container
+                variant !== 'secondary' && getVariantStyle(),
                 disabled && styles.disabled,
                 style
             ]}
@@ -67,16 +69,22 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
             accessibilityLabel={title}
             accessibilityState={{ disabled: disabled || loading }}
         >
-            {loading ? (
-                <ActivityIndicator color={variant === 'primary' ? LiquidGlass.colors.black : LiquidGlass.colors.white} />
-            ) : (
-                <>
-                    {icon}
-                    <Text style={[styles.text, getTextStyle(), textStyle, icon ? { marginLeft: 8 } : null]}>
-                        {title}
-                    </Text>
-                </>
+            {variant === 'secondary' && (
+                <LiquidGlassView style={StyleSheet.absoluteFill} interactive={true} />
             )}
+
+            <View style={[styles.contentContainer, variant === 'secondary' && styles.secondaryBorder]}>
+                {loading ? (
+                    <ActivityIndicator color={variant === 'primary' ? LiquidGlass.colors.black : LiquidGlass.colors.white} />
+                ) : (
+                    <>
+                        {icon}
+                        <Text style={[styles.text, getTextStyle(), textStyle, icon ? { marginLeft: 8 } : null]}>
+                            {title}
+                        </Text>
+                    </>
+                )}
+            </View>
         </TouchableOpacity>
     );
 };
@@ -102,10 +110,23 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2,
     },
-    secondary: {
-        backgroundColor: LiquidGlass.colors.glassBackground,
+    secondaryBorder: {
         borderWidth: 1,
         borderColor: LiquidGlass.colors.glassBorder,
+        borderRadius: LiquidGlass.radius.xxl,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+    },
+    contentContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+    },
+    secondary: {
+        // Background handled by LiquidGlassView
     },
     danger: {
         backgroundColor: 'rgba(239, 68, 68, 0.15)',
