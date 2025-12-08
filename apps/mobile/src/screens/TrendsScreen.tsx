@@ -283,7 +283,7 @@ export const TrendsScreen = () => {
             >
                 {/* Custom Fixed Header */}
                 <View style={[styles.headerRow, { marginTop: 20 }]}>
-                    <Text style={styles.headerTitle}>Trends</Text>
+                    <Text style={styles.headerTitle}>Streaks</Text>
                 </View>
 
                 <View style={styles.toggleContainer}>

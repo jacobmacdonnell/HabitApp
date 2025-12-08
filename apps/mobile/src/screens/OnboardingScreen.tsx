@@ -10,6 +10,8 @@ import { GlassInput } from '../components/GlassInput';
 import { GlassButton } from '../components/GlassButton';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { validatePetName } from '../utils/validation';
+import { Alert } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -74,7 +76,20 @@ export const OnboardingScreen = () => {
         });
     };
 
-    const handleNext = () => animateToStep(step + 1);
+    const handleNext = () => {
+        if (step === 1) {
+            const validation = validatePetName(petName);
+            if (!validation.isValid) {
+                Alert.alert(
+                    validation.error?.includes('under 12') ? 'Too Long' :
+                        validation.error?.includes('friendly') ? 'Whoops!' : 'Name Required',
+                    validation.error
+                );
+                return;
+            }
+        }
+        animateToStep(step + 1);
+    };
     const handleBack = () => animateToStep(step - 1);
 
     // Card selection with haptic + scale animation

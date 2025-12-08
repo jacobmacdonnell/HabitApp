@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, TextInput, Alert } from 'react-native';
 import { Check, Lock } from 'lucide-react-native';
 import { useHabit } from '@habitapp/shared';
 import * as Haptics from 'expo-haptics';
@@ -10,6 +10,7 @@ import { RootStackParamList } from '../navigation/types';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { GlassInput } from '../components/GlassInput';
 import { useRouter } from 'expo-router';
+import { validatePetName } from '../utils/validation';
 
 const { width } = Dimensions.get('window');
 
@@ -193,7 +194,18 @@ export const PetCustomizeScreen = () => {
     }, [navigation, name, selectedColor, selectedHat]);
 
     const handleSave = () => {
-        updatePet({ name, color: selectedColor, hat: selectedHat });
+        const validation = validatePetName(name);
+
+        if (!validation.isValid) {
+            Alert.alert(
+                validation.error?.includes('under 12') ? 'Too Long' :
+                    validation.error?.includes('friendly') ? 'Whoops!' : 'Required',
+                validation.error
+            );
+            return;
+        }
+
+        updatePet({ name: name.trim(), color: selectedColor, hat: selectedHat });
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         router.back();
     };

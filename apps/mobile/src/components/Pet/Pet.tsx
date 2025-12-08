@@ -331,13 +331,13 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
     // Compact View (Header) - with subtle animations
     if (!isFullView) {
-        // Compact animations - breathing (more noticeable)
-        const compactScale = breathVal.interpolate({ inputRange: [0, 1], outputRange: [1, 1.1] });
-        const compactGlowOpacity = breathVal.interpolate({ inputRange: [0, 1], outputRange: [0.3, 0.7] });
+        // Compact animations - consistent with full view but scaled
+        const compactScale = breathVal.interpolate({ inputRange: [0, 1], outputRange: [1, 1.03] }); // Matching full view's subtler breathing
+        const compactFloatY = floatVal.interpolate({ inputRange: [0, 1], outputRange: [0, -6] }); // Scaled down float (full is -12)
 
         return (
             <View style={[styles.compactContainer]}>
-                <Animated.View style={{ transform: [{ scale: compactScale }] }}>
+                <Animated.View style={{ transform: [{ translateY: compactFloatY }, { scale: compactScale }] }}>
                     <Svg viewBox="0 0 200 200" style={styles.svg}>
                         <Defs>
                             <RadialGradient id="bodyGrad" cx="30%" cy="30%" r="80%">
@@ -395,37 +395,51 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                     </Svg>
                 </Animated.View>
 
-                <TouchableOpacity activeOpacity={1} onPress={handlePetPress}>
-                    <Animated.View style={[styles.petSvgContainer, {
-                        transform: [
-                            { translateY: petFloatY },
-                            { scale: petScale },
-                            { scale: interactionScale }
-                        ]
-                    }]}>
-                        <Svg viewBox="0 0 200 200" style={styles.svg}>
-                            <Defs>
-                                <RadialGradient id="bodyGradFull" cx="30%" cy="30%" r="80%">
-                                    <Stop offset="0%" stopColor={pet.color} stopOpacity="1" />
-                                    <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
-                                </RadialGradient>
-                            </Defs>
-                            <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGradFull)" stroke={pet.color} strokeWidth="2" />
-                            <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
-                            <G transform="translate(0, 10)">
-                                <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} pupilY={pupilY} />
-                                <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
-                                {!isSick && (
-                                    <G>
-                                        <Circle cx="60" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
-                                        <Circle cx="140" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
-                                    </G>
-                                )}
-                                <PetHat hat={pet.hat} />
-                            </G>
-                        </Svg>
-                    </Animated.View>
-                </TouchableOpacity>
+                <View style={styles.petAnchor}>
+                    <TouchableOpacity activeOpacity={1} onPress={handlePetPress}>
+                        <Animated.View style={[styles.petSvgContainer, {
+                            transform: [
+                                { translateY: petFloatY },
+                                { scale: petScale },
+                                { scale: interactionScale }
+                            ]
+                        }]}>
+                            <Svg viewBox="0 0 200 200" style={styles.svg}>
+                                <Defs>
+                                    <RadialGradient id="bodyGradFull" cx="30%" cy="30%" r="80%">
+                                        <Stop offset="0%" stopColor={pet.color} stopOpacity="1" />
+                                        <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
+                                    </RadialGradient>
+                                </Defs>
+                                <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGradFull)" stroke={pet.color} strokeWidth="2" />
+                                <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
+                                <G transform="translate(0, 10)">
+                                    <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} pupilY={pupilY} />
+                                    <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
+                                    {!isSick && (
+                                        <G>
+                                            <Circle cx="60" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
+                                            <Circle cx="140" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
+                                        </G>
+                                    )}
+                                    <PetHat hat={pet.hat} />
+                                </G>
+                            </Svg>
+                        </Animated.View>
+                    </TouchableOpacity>
+
+                    {/* Speech Bubble anchored to pet frame */}
+                    {speechBubbleText && (
+                        <Animated.View style={[
+                            styles.speechBubble,
+                            { opacity: speechFadeAnim },
+                            hideStats && { top: -60 } // Override for hatching screen
+                        ]}>
+                            <Text style={styles.speechText}>{speechBubbleText}</Text>
+                            <View style={styles.speechArrow} />
+                        </Animated.View>
+                    )}
+                </View>
 
                 {/* Shadow under pet */}
                 <View style={styles.petShadow} />
@@ -453,14 +467,6 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                     <Text style={styles.levelText}>LEVEL UP!</Text>
                     <Text style={styles.levelSubText}>Lvl {pet.level}</Text>
                 </Animated.View>
-
-                {/* Speech Bubble */}
-                {speechBubbleText && (
-                    <Animated.View style={[styles.speechBubble, { opacity: speechFadeAnim }]}>
-                        <Text style={styles.speechText}>{speechBubbleText}</Text>
-                        <View style={styles.speechArrow} />
-                    </Animated.View>
-                )}
             </View>
 
             {/* Stats Card - hidden during onboarding hatching */}
@@ -524,8 +530,8 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
 const styles = StyleSheet.create({
     compactContainer: {
-        width: 100,
-        height: 100,
+        width: 120,
+        height: 120,
         position: 'relative',
         overflow: 'visible',
     },
@@ -562,6 +568,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 24, // Add spacing between pet and stats card
+    },
+    petAnchor: {
+        width: 200,
+        height: 200,
+        justifyContent: 'center',
+        alignItems: 'center',
+        // backgroundColor: 'rgba(255,0,0,0.1)', // Debug
     },
     glowContainer: {
         position: 'absolute',
@@ -614,7 +627,7 @@ const styles = StyleSheet.create({
     // Speech Bubble
     speechBubble: {
         position: 'absolute',
-        top: 40, // Positioned near pet head (relative to petDisplay center)
+        top: -40, // Default position
         backgroundColor: '#fff',
         paddingHorizontal: 16,
         paddingVertical: 10,

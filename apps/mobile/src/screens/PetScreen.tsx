@@ -8,6 +8,8 @@ import { Egg } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
 
+import { validatePetName } from '../utils/validation';
+
 export const PetScreen = () => {
     const { pet, resetPet, updatePet } = useHabit();
     const [name, setName] = useState('');
@@ -15,11 +17,18 @@ export const PetScreen = () => {
     const insets = useSafeAreaInsets();
 
     const handleHatch = () => {
-        if (!name.trim()) {
-            Alert.alert('Name Required', 'Please name your pet!');
+        console.log('Validating hatch name:', name);
+        const validation = validatePetName(name);
+        if (!validation.isValid) {
+            Alert.alert(
+                validation.error?.includes('under 12') ? 'Too Long' :
+                    validation.error?.includes('friendly') ? 'Whoops!' : 'Name Required',
+                validation.error
+            );
             return;
         }
-        resetPet(name, color);
+
+        resetPet(name.trim(), color);
     };
 
     if (!pet) {

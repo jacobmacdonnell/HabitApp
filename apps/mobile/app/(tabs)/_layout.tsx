@@ -1,8 +1,10 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTheme } from '../../src/context/ThemeContext';
+import { useHabit } from '@habitapp/shared';
 
 export default function TabLayout() {
     const { colors: themeColors } = useTheme();
+    const { pet } = useHabit();
 
     return (
         <NativeTabs
@@ -24,25 +26,25 @@ export default function TabLayout() {
             <NativeTabs.Trigger
                 name="pet"
                 options={{
-                    title: 'Pet',
-                    icon: { sf: 'pawprint.fill' },
-                    selectedIcon: { sf: 'pawprint.fill' },
+                    title: pet?.name || 'Pet',
+                    icon: { sf: 'pawprint.circle.fill' },
+                    selectedIcon: { sf: 'pawprint.circle.fill' },
                 }}
             />
             <NativeTabs.Trigger
                 name="trends"
                 options={{
-                    title: 'Trends',
-                    icon: { sf: 'chart.xyaxis.line' },
-                    selectedIcon: { sf: 'chart.xyaxis.line' },
+                    title: 'Streaks',
+                    icon: { sf: 'flame.fill' },
+                    selectedIcon: { sf: 'flame.fill' },
                 }}
             />
             <NativeTabs.Trigger
                 name="settings"
                 options={{
                     title: 'Settings',
-                    icon: { sf: 'gearshape.fill' },
-                    selectedIcon: { sf: 'gearshape.fill' },
+                    icon: { sf: 'slider.horizontal.3' }, // "Control Center" vibe
+                    selectedIcon: { sf: 'slider.horizontal.3' },
                 }}
             />
         </NativeTabs>

@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     // Custom Header Styles
     headerRow: {
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: LiquidGlass.header.marginBottom,
     },
@@ -447,8 +447,10 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     petGlass: {
-        width: 110,
-        height: 110,
+        width: 130,
+        height: 130,
+        marginTop: -20, // Pull it up into the header space more
+        marginRight: -10, // Pull it to the right edge
         overflow: 'visible',
         alignItems: 'center',
         justifyContent: 'center',
