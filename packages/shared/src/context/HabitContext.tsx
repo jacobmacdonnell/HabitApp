@@ -320,6 +320,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             xp: 0,
             mood: 'happy',
             history: [],
+            inventory: [], // Init empty inventory
             lastInteraction: new Date().toISOString()
         };
         setPet(newPet);
@@ -406,6 +407,32 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         return all.filter(p => p.date >= start && p.date <= end);
     };
 
+    const buyItem = async (itemId: string, price: number): Promise<boolean> => {
+        if (!pet) return false;
+
+        // check balance
+        if ((pet.xp || 0) < price) return false;
+
+        // check inventory
+        const currentInventory = pet.inventory || [];
+        if (currentInventory.includes(itemId)) return true; // Already owned
+
+        const newXp = (pet.xp || 0) - price;
+        const newInventory = [...currentInventory, itemId];
+
+        const updatedPet = { ...pet, xp: newXp, inventory: newInventory };
+        setPet(updatedPet);
+        await storage.savePet(updatedPet);
+        return true;
+    };
+
+    const equipHat = async (hatId: string) => {
+        if (!pet) return;
+        const updatedPet = { ...pet, hat: hatId };
+        setPet(updatedPet);
+        await storage.savePet(updatedPet); // Ensure equipment persists
+    };
+
     return (
         <HabitContext.Provider value={{
             habits,
@@ -424,7 +451,9 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             resetData,
             settings,
             updateSettings,
-            getHistoricalProgress
+            getHistoricalProgress,
+            buyItem,
+            equipHat
         }}>
             {children}
         </HabitContext.Provider>

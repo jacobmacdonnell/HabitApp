@@ -505,11 +505,18 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                         </View>
                     </View>
 
-                    {/* Customize Button */}
-                    <TouchableOpacity style={styles.customizeButton} onPress={() => router.push('/pet-customize')}>
-                        <Palette size={18} color="#fff" />
-                        <Text style={styles.customizeText}>Customize</Text>
-                    </TouchableOpacity>
+                    {/* Action Buttons */}
+                    <View style={styles.actionButtonsRow}>
+                        <TouchableOpacity style={[styles.actionButton, styles.customizeButton]} onPress={() => router.push('/pet-customize')}>
+                            <Palette size={18} color="#fff" />
+                            <Text style={styles.actionButtonText}>Customize</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={[styles.actionButton, styles.shopButton]} onPress={() => router.push('/hat-shop')}>
+                            <Zap size={18} color="#1a1a1a" fill="#1a1a1a" />
+                            <Text style={[styles.actionButtonText, { color: '#1a1a1a' }]}>Hat Shop</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             )}
 
@@ -757,17 +764,27 @@ const styles = StyleSheet.create({
         width: 55,
         textAlign: 'right',
     },
-    customizeButton: {
-        width: '100%',
+    actionButtonsRow: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 8,
+    },
+    actionButton: {
+        flex: 1,
         height: 44,
-        backgroundColor: 'rgba(255,255,255,0.1)',
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
         gap: 8,
     },
-    customizeText: {
+    customizeButton: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
+    shopButton: {
+        backgroundColor: '#facc15',
+    },
+    actionButtonText: {
         fontSize: 15,
         fontWeight: '600',
         color: '#fff',

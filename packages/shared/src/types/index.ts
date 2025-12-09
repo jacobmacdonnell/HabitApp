@@ -27,6 +27,7 @@ export type PetMood = 'happy' | 'neutral' | 'sad' | 'sick' | 'sleeping';
 export interface Pet {
     name: string;
     hat?: string;
+    inventory: string[]; // List of unlocked hat IDs
     color: string; // Hex code
     health: number; // 0-100
     maxHealth: number; // Default 100
@@ -84,4 +85,7 @@ export interface HabitContextType {
     settings: Settings;
     updateSettings: (settings: Partial<Settings>) => void;
     getHistoricalProgress: (start: string, end: string) => Promise<DailyProgress[]>;
+    // Pet Economy
+    buyItem: (itemId: string, price: number) => Promise<boolean>;
+    equipHat: (hatId: string) => void;
 }

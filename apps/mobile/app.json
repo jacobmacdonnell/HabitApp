@@ -46,6 +46,15 @@
             "deploymentTarget": "26.0"
           }
         }
+      ],
+      [
+        "./plugins/withWidget.js"
+      ],
+      [
+        "./plugins/withAppGroup.js",
+        {
+          "groupIdentifier": "group.com.habitapp.cyb3rmac"
+        }
       ]
     ],
     "extra": {

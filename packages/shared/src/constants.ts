@@ -17,3 +17,11 @@ export const HABIT_ICONS = [
     '✨', '💪', '📚', '🧘', '💧', '🏃', '🎯', '💤', '🥗',
     '📝', '💊', '🧹', '🎨', '🎸', '💰', // Additional from mobile
 ];
+
+export const HAT_ITEMS = [
+    { id: 'none', name: 'No Hat', price: 0, icon: '🚫' },
+    { id: 'party', name: 'Party Hat', price: 50, icon: '🎉' },
+    { id: 'cowboy', name: 'Cowboy Hat', price: 150, icon: '🤠' },
+    { id: 'tophat', name: 'Gentleman', price: 300, icon: '🎩' },
+    { id: 'crown', name: 'Royal Crown', price: 1000, icon: '👑' },
+];

@@ -38,6 +38,7 @@ export const pet = sqliteTable('pet', {
     xp: integer('xp').notNull(),
     mood: text('mood').notNull(),
     history: text('history', { mode: 'json' }), // Stores JSON string of Pet history
+    inventory: text('inventory', { mode: 'json' }), // Stores JSON string of unlocked tokens
     lastInteraction: text('last_interaction').notNull(),
 });
 
