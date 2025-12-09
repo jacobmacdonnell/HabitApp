@@ -253,21 +253,29 @@ export const SQLiteStorageService: StorageServiceType = {
         // Optimized methods like logSingleProgress should be used for frequent updates.
 
         try {
-            console.warn('Performance Warning: saveProgress() performs a full table rewrite. Use logSingleProgress() for atomic updates.');
+            console.warn('Optimized saveProgress: Using Upsert Strategy');
             await db.transaction(async (tx) => {
-                await tx.delete(dailyProgress);
-
                 if (progressList.length > 0) {
-                    // Insert in chunks of 50 to avoid SQL variable limits
+                    // Upsert in chunks
                     const CHUNK_SIZE = 50;
                     for (let i = 0; i < progressList.length; i += CHUNK_SIZE) {
                         const chunk = progressList.slice(i, i + CHUNK_SIZE);
-                        await tx.insert(dailyProgress).values(chunk.map(p => ({
-                            habitId: p.habitId,
-                            date: p.date,
-                            currentCount: p.currentCount,
-                            completed: p.completed
-                        })));
+
+                        // We use ON CONFLICT DO UPDATE to update existing records without deleting
+                        await tx.insert(dailyProgress)
+                            .values(chunk.map(p => ({
+                                habitId: p.habitId,
+                                date: p.date,
+                                currentCount: p.currentCount,
+                                completed: p.completed
+                            })))
+                            .onConflictDoUpdate({
+                                target: [dailyProgress.habitId, dailyProgress.date],
+                                set: {
+                                    currentCount: sql`excluded.current_count`,
+                                    completed: sql`excluded.completed`
+                                }
+                            });
                     }
                 }
             });

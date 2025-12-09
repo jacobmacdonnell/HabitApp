@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 // Habits Table
 export const habits = sqliteTable('habits', {
@@ -22,7 +22,8 @@ export const dailyProgress = sqliteTable('daily_progress', {
 }, (table) => ({
     habitIdIdx: index('habit_id_idx').on(table.habitId),
     dateIdx: index('date_idx').on(table.date),
-    compositeIdx: index('habit_date_idx').on(table.habitId, table.date),
+    // Composite Unique Index for Upsert support
+    compositeUniqueIdx: uniqueIndex('habit_date_unique_idx').on(table.habitId, table.date),
 }));
 
 // Pet Table (Single Row usually)

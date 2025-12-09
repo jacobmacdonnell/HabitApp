@@ -17,7 +17,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "UIDesignRequiresCompatibility": false,
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserNotificationsUsageDescription": "We use notifications to remind you to complete your daily habits and to celebrate your progress."
       },
       "bundleIdentifier": "com.habitapp.cyb3rmac"
     },

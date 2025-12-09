@@ -146,6 +146,13 @@ export const LiquidGlass = {
         levelUp: '#a855f7',      // Purple for level up
         sleep: '#c084fc',        // Light purple for sleep
         health: '#f87171',       // Health red
+
+        // Components
+        card: 'rgba(255,255,255,0.08)',
+        cardBorder: 'rgba(255,255,255,0.15)',
+        surface: 'rgba(255,255,255,0.05)',
+        surfaceHighlight: 'rgba(255,255,255,0.1)',
+        border: 'rgba(255,255,255,0.1)',
     },
 
     segmentedControl: {

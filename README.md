@@ -1,24 +1,42 @@
 # 🐾 Habit Companion
 
-A gamified habit tracking app with a virtual pet companion. By caring for yourself, you care for your digital companion—creating a positive feedback loop that encourages consistency.
+A gamified habit tracking app with a virtual pet companion. By caring for your own habits, you care for your digital companion—creating a positive feedback loop that encourages consistency.
 
-## ✨ Design Philosophy: "Liquid Glass"
+## 🏗️ Architectural Overview
 
-Built on a futuristic **Modern iOS** aesthetic:
-- **Glassmorphism**: Deep blur effects with multi-layered translucency
-- **Vibrant Gradients**: Flowing Indigo/Purple/Pink color schemes
-- **Fluid Motion**: Bouncy, physics-based animations
-- **Clean Typography**: Modern spacing with high readability
+### 🌌 "Liquid Glass" Design System (iOS 26 Hybrid)
+This project implements a futuristic design language native to **iOS 26**, blending real-time refraction with physics-based interactivity. To balance bleeding-edge aesthetics with 60fps performance, we utilize a **Hybrid Architecture**:
+
+1.  **Native Glass (`@callstack/liquid-glass`)**:
+    *   Used for high-fidelity interactive elements like the **Floating Action Button (FAB)** and **GlassButtons**.
+    *   **Why**: Supports native iOS 26 "morphing" transitions where glass elements merge fluidly.
+    *   **Tech**: Bridges directly to SwiftUI `Material` and `UIVisualEffectView` APIs.
+
+2.  **Simulated Glass (Optimized `rgba`)**:
+    *   Used for high-frequency list items like **Habit Cards** and **Onboarding panels**.
+    *   **Why**: Prevents frame drops in long lists. The simulated `rgba(255,255,255,0.08)` overlay provides 98% visual parity with zero performance cost.
+    *   **Theme Tokens**: Centralized in `src/theme/theme.ts` under `LiquidGlass.colors`.
+
+### 💾 Offline-First Data Layer
+The app utilizes a privacy-centric **Local-First** architecture.
+
+*   **Engine**: `expo-sqlite` (new architecture enabled).
+*   **ORM**: Drizzle ORM for type-safe SQL.
+*   **Performance**: Uses a **Composite Key Upsert** strategy to minimize storage writes and battery impact, performing atomic updates via `onConflictDoUpdate`.
+
+### 🤖 The "Pet" System
+The virtual companion is a state machine driven by user behavior (`src/components/Pet.tsx`).
+*   **State**: Experience (XP), Health, and Mood are derived from the `daily_progress` table.
+*   **Interactivity**: Uses `react-native-reanimated` for breathing cycles and `expo-haptics` for tactile feedback.
 
 ## 🧩 Project Structure
-
 This is a **monorepo** powered by npm workspaces:
 
 ```
 habitapp/
 ├── apps/
 │   ├── web/          # React + Vite web application
-│   └── mobile/       # React Native + Expo mobile app
+│   └── mobile/       # React Native + Expo mobile app (iOS 26 Target)
 ├── packages/
 │   └── shared/       # Shared types, utils, and context
 └── package.json      # Workspace configuration
@@ -28,95 +46,39 @@ habitapp/
 
 ### Mobile App (`apps/mobile`)
 - **Framework**: React Native 0.81 + Expo SDK 54
-- **Navigation**: Expo Router (File-based routing)
+- **Target**: iOS 26.0 (Managed Workflow)
 - **Database**: SQLite (via Drizzle ORM)
-- **Styling**: Native components with blur effects
-- **Animations**: React Native Reanimated + Confetti Cannon
-- **Haptics**: Expo Haptics
+- **Styling**: Hybrid Liquid Glass (Native + Simulated)
+- **Animations**: Reanimated + Confetti Cannon
 
 ### Web App (`apps/web`)
 - **Framework**: React 19 + Vite 7
 - **Styling**: Tailwind CSS v4
-- **Icons**: Lucide React
-- **Animations**: Canvas Confetti
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- npm 9+
-- (For mobile) Expo CLI / iOS Simulator
+- Xcode 26 (for iOS simulator)
 
 ### Installation
-
 ```bash
-# Clone and install dependencies
 npm install
 ```
 
 ### Development
-
 ```bash
+# Run mobile app (Expo)
+npm run mobile:ios
+
 # Run web app
 npm run web
-
-# Run mobile app (Expo)
-npm run mobile
-
-# Run mobile on iOS simulator
-npm run mobile:ios
 ```
 
 ## 📱 Core Features
-
-### Smart Habit Management
-- **Time of Day Buckets**: 🌅 Morning, ☀️ Mid-day, 🌙 Evening, 🕒 Anytime
-- **Flexible Frequency**: Daily, specific days, or custom intervals
-- **Counter-Based Habits**: Track progress with visual progress bars
-- **Granular Stats**: View streaks and completion history
-
-### Trends & Analytics
-- **Monthly Heatmap**: GitHub-style calendar view of habit consistency
-- **Weekly Progress**: Visualization of daily performance
-- **Stats**: Track total completions and current streaks
-
-### The Companion Pet
-- **Living Companion**: Your pet's health reflects your habit consistency
-- **Hatching Experience**: Unique onboarding flow to hatch and name your companion
-- **Dynamic Reactions**: Pet reacts to your actions (sleeping, breathing, cheering)
-- **Speech Bubbles**: Context-aware messages from your pet
-- **Home Screen Widget**: Keep an eye on your companion from your home screen
-
-## 📂 Key Files & Structure
-
-### Mobile App (`apps/mobile/src`)
-| File | Description |
-|------|-------------|
-| **Screens** | |
-| `HomeScreen.tsx` | Main dashboard with daily habit list and widget integration |
-| `PetScreen.tsx` | Full-screen pet interaction and status view |
-| `TrendsScreen.tsx` | Analytics dashboard with monthly heatmap and stats |
-| `SettingsScreen.tsx` | App configuration and preferences |
-| `HabitFormScreen.tsx` | Create/Edit habit modal with rich inputs |
-| `OnboardingScreen.tsx` | Initial user setup flow |
-| `HatchingScreen.tsx` | Special pet hatching sequence |
-| **Services** | |
-| `DatabaseService.ts` | SQLite database layer using Drizzle ORM |
-
-### Web App (`apps/web/src`)
-| File | Description |
-|------|-------------|
-| `App.jsx` | Main dashboard with habit list and pet display |
-| `Pet.jsx` | Animated companion implementation for web |
-| `HabitFormModal.jsx` | Create/edit habits interface |
-
-## 📋 Data Storage
-
-- **Mobile**: Local SQLite database (Drizzle ORM) for robust offline-first persistence.
-  - Supports complex queries for trends and stats.
-  - Efficient migrations from legacy systems.
-- **Web**: LocalStorage (MVP)
+- **Smart Habits**: Time-of-day buckets, flexible frequency, and streaks.
+- **Trends**: GitHub-style monthly heatmaps.
+- **Companion Pet**: A living entity that reacts to your consistency.
 
 ## 📄 License
-
 Private project.

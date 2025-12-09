@@ -260,11 +260,11 @@ const styles = StyleSheet.create({
     blur: {
         paddingVertical: 16,
         paddingHorizontal: 16,
-        backgroundColor: 'rgba(44, 44, 46, 0.4)', // Semi-transparent for glass effect
+        backgroundColor: 'rgba(44, 44, 46, 0.4)', // Keep slight tint for readability
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 0.5,
-        borderColor: 'rgba(255,255,255,0.15)',
+        borderColor: LiquidGlass.colors.cardBorder,
     },
     content: {
         flexDirection: 'row',
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     badge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: LiquidGlass.colors.card,
         paddingHorizontal: 6,
         paddingVertical: 3,
         borderRadius: 6,

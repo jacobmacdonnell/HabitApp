@@ -15,6 +15,13 @@
       "when": 1765091159712,
       "tag": "0001_simple_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1765246319660,
+      "tag": "0002_broken_sleepwalker",
+      "breakpoints": true
     }
   ]
 }

@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { validatePetName } from '../utils/validation';
 import { Alert } from 'react-native';
+import { LiquidGlass } from '../theme/theme';
 
 const { width, height } = Dimensions.get('window');
 
@@ -413,7 +414,7 @@ const styles = StyleSheet.create({
     },
     progressDotInactive: {
         width: 10,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: LiquidGlass.colors.border,
     },
     mainContent: {
         flex: 1,
@@ -490,12 +491,12 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     card: {
-        backgroundColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: LiquidGlass.colors.card,
         borderRadius: 24,
         padding: 24,
         gap: 16,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: LiquidGlass.colors.border,
     },
     eggContainer: {
         width: 120,
@@ -535,12 +536,12 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     presetCard: {
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: LiquidGlass.colors.surface,
         borderRadius: 20,
         padding: 20,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: LiquidGlass.colors.border,
     },
     presetCardSelected: {
         backgroundColor: '#fff',
@@ -561,7 +562,7 @@ const styles = StyleSheet.create({
     dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: LiquidGlass.colors.border,
     },
     orText: {
         fontSize: 11,
@@ -586,7 +587,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.15)',
+        backgroundColor: LiquidGlass.colors.cardBorder,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -604,7 +605,7 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
     inputRow: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: LiquidGlass.colors.surfaceHighlight,
         borderRadius: 16,
         padding: 4,
         minHeight: 52,
