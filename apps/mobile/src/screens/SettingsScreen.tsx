@@ -26,7 +26,7 @@ export const SettingsScreen = () => {
         );
     };
 
-    const onTimeChange = (type: 'bedtime' | 'wakeup', event: any, date?: Date) => {
+    const onTimeChange = (type: 'bedtime' | 'wakeup', event: { type: string; nativeEvent: any }, date?: Date) => {
         if (date) {
             const timeString = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
             if (type === 'bedtime') {
@@ -75,7 +75,7 @@ export const SettingsScreen = () => {
 
     const insets = useSafeAreaInsets();
 
-    const renderTimePicker = (label: string, time: string, type: 'bedtime' | 'wakeup', icon: any, color: string, bg: string) => (
+    const renderTimePicker = (label: string, time: string, type: 'bedtime' | 'wakeup', icon: React.ReactNode, color: string, bg: string) => (
         <View style={styles.timeRow}>
             <View style={styles.iconLabel}>
                 <View style={[styles.iconContainer, { backgroundColor: bg }]}>

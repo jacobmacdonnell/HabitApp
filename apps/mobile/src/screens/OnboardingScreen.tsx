@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView, Animated, Easing, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useHabit } from '@habitapp/shared';
+import { useHabit, TimeOfDay } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
 import { LiquidGlassView } from '@callstack/liquid-glass';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
@@ -107,7 +107,7 @@ export const OnboardingScreen = () => {
         setCustomHabit('');
         if (preset) {
             setTargetCount(preset.defaultTarget);
-            setTimeOfDay(preset.defaultTime as any);
+            setTimeOfDay(preset.defaultTime as TimeOfDay);
         }
     };
 
@@ -356,7 +356,7 @@ export const OnboardingScreen = () => {
                             <GlassSegmentedControl
                                 values={['Morning', 'Noon', 'Evening', 'Anytime']}
                                 selectedIndex={['morning', 'midday', 'evening', 'anytime'].indexOf(timeOfDay)}
-                                onChange={(event: any) => {
+                                onChange={(event: { nativeEvent: { selectedSegmentIndex: number } }) => {
                                     const index = event.nativeEvent.selectedSegmentIndex;
                                     const times = ['morning', 'midday', 'evening', 'anytime'] as const;
                                     setTimeOfDay(times[index]);

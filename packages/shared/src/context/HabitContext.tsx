@@ -397,6 +397,15 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         storage.savePet(updatedPet);
     };
 
+    const getHistoricalProgress = async (start: string, end: string) => {
+        if (storage.getProgressForRange) {
+            return await storage.getProgressForRange(start, end);
+        }
+        // Fallback for storage that doesn't support range
+        const all = await storage.getProgress();
+        return all.filter(p => p.date >= start && p.date <= end);
+    };
+
     return (
         <HabitContext.Provider value={{
             habits,
@@ -414,7 +423,8 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             getStreak,
             resetData,
             settings,
-            updateSettings
+            updateSettings,
+            getHistoricalProgress
         }}>
             {children}
         </HabitContext.Provider>

@@ -83,4 +83,5 @@ export interface HabitContextType {
     resetData: () => void;
     settings: Settings;
     updateSettings: (settings: Partial<Settings>) => void;
+    getHistoricalProgress: (start: string, end: string) => Promise<DailyProgress[]>;
 }

@@ -37,7 +37,7 @@ const TimeLabels: Record<string, string> = {
     evening: 'Evening',
 };
 
-export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, onDecrement, onDelete, onEdit, autoSwipeDemo, onSwipeDemoComplete }: HabitCardProps) => {
+export const HabitCard = React.memo(({ habit, isCompleted, currentCount, streak, onToggle, onDecrement, onDelete, onEdit, autoSwipeDemo, onSwipeDemoComplete }: HabitCardProps) => {
     const Icon = TimeIcons[habit.timeOfDay] || Sparkles;
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const checkboxScaleAnim = useRef(new Animated.Value(1)).current;
@@ -249,7 +249,7 @@ export const HabitCard = ({ habit, isCompleted, currentCount, streak, onToggle, 
             </Swipeable>
         </Animated.View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

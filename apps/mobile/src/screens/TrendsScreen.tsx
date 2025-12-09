@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
-import { useHabit, getLocalDateString } from '@habitapp/shared';
+import { useHabit, getLocalDateString, DailyProgress } from '@habitapp/shared';
 
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -13,9 +13,51 @@ const { width } = Dimensions.get('window');
 type ViewMode = 'weekly' | 'monthly';
 
 export const TrendsScreen = () => {
-    const { habits, progress, getStreak } = useHabit();
+    const { habits, progress, getStreak, getHistoricalProgress } = useHabit();
     const [viewMode, setViewMode] = useState<ViewMode>('weekly');
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [historicalProgress, setHistoricalProgress] = useState<DailyProgress[]>([]);
+
+    useEffect(() => {
+        const loadMonthData = async () => {
+            const now = new Date();
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(now.getDate() - 89); // Safety margin
+
+            // If we are viewing a month that is entirely safely inside the 90 day window, rely on Context
+            // The window moves, so "currentDate" (which is usually 1st of month by default or just some date in month)
+            // We need to check the END of the viewed month.
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const endOfMonth = new Date(year, month + 1, 0);
+
+            if (endOfMonth < ninetyDaysAgo) {
+                // Fetch!
+                const startStr = getLocalDateString(new Date(year, month, 1));
+                const endStr = getLocalDateString(endOfMonth);
+                try {
+                    const data = await getHistoricalProgress(startStr, endStr);
+                    setHistoricalProgress(data);
+                } catch (e) {
+                    console.error('Failed to load history', e);
+                }
+            } else {
+                setHistoricalProgress([]); // Clear to use global
+            }
+        };
+        loadMonthData();
+    }, [currentDate, getHistoricalProgress]);
+
+    // Merge logic: If historicalProgress is present, use it. But wait, what if we are at the boundary?
+    // Safest: Use global 'progress' for recent days, 'historical' for older.
+    // Or simpler: If we decided to fetch, USE the fetched data.
+    // The if (endOfMonth < ninetyDaysAgo) check implies we ONLY fetch if we are deep in the past.
+    // So 'historicalProgress' will be populated ONLY when we are deep in the past.
+    // When populated, use IT. When empty, use 'progress'.
+
+    const activeProgress = useMemo(() => {
+        return historicalProgress.length > 0 ? historicalProgress : progress;
+    }, [historicalProgress, progress]);
 
     // --- Data Processing: Weekly ---
     const last7Days = useMemo(() => {
@@ -33,6 +75,7 @@ export const TrendsScreen = () => {
     const habitWeeklyStatus = useMemo(() => {
         return habits.map(habit => {
             const history = last7Days.map(day => {
+                // Weekly view always uses global progress (recent)
                 const entry = progress.find(p => p.date === day.dateStr && p.habitId === habit.id);
                 // Handle both boolean true and old string/number values if any exist, though types say boolean
                 const isCompleted = !!entry?.completed;
@@ -76,7 +119,7 @@ export const TrendsScreen = () => {
             ].join('-');
 
             // Get stats for this day
-            const dayProgress = progress.filter(p => p.date === dateStr);
+            const dayProgress = activeProgress.filter(p => p.date === dateStr);
             const totalHabits = habits.length || 1;
 
             // Count distinct habits completed
@@ -94,7 +137,7 @@ export const TrendsScreen = () => {
         }
 
         return days;
-    }, [currentDate, progress, habits]);
+    }, [currentDate, activeProgress, habits]);
 
     const changeMonth = (increment: number) => {
         Haptics.selectionAsync();
@@ -112,8 +155,18 @@ export const TrendsScreen = () => {
     }, [habits, getStreak]);
 
     const totalCompletions = useMemo(() => {
-        return progress.filter(p => p.completed).length;
-    }, [progress]);
+        // Total stats should probably respect the view... BUT 'totalCompletions' usually implies ALL TIME.
+        // The previous code filtered 'progress' which was just 90 days.
+        // The stats on the monthly view usually refer to the month?
+        // Let's look at UI... "Total Done". 
+        // If it's "Total Done", strictly speaking it should be from DB stats.
+        // But for now, let's keep it consistent with the View context or revert to global?
+        // Actually, if we use 'activeProgress', it will correct "Total Done" to be "Total Done This Month" if we viewed a past month?
+        // No, 'progress' was 90 days list. 'activeProgress' is 1 month list (if historical).
+        // So this metric changes meaning dynamically.
+        // Let's assume it means "Total Done (Visible)".
+        return activeProgress.filter(p => p.completed).length;
+    }, [activeProgress]);
 
     const consistencyScore = useMemo(() => {
         if (habits.length === 0) return 0;

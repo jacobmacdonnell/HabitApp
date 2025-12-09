@@ -17,7 +17,7 @@ export const migrateFromAsyncStorage = async () => {
         // Check if we already have data in SQLite
         const existingHabits = await db.select().from(habits).limit(1);
         if (existingHabits.length > 0) {
-            console.log('Migration skipped: Data already exists in SQLite');
+            // console.log('Migration skipped: Data already exists in SQLite');
             return;
         }
 
@@ -134,7 +134,7 @@ export const SQLiteStorageService: StorageServiceType = {
         } else {
             await db.insert(pet).values({
                 ...newPet,
-                history: newPet.history || []
+                history: newPet.history ?? []
             });
         }
     },
@@ -253,6 +253,7 @@ export const SQLiteStorageService: StorageServiceType = {
         // Optimized methods like logSingleProgress should be used for frequent updates.
 
         try {
+            console.warn('Performance Warning: saveProgress() performs a full table rewrite. Use logSingleProgress() for atomic updates.');
             await db.transaction(async (tx) => {
                 await tx.delete(dailyProgress);
 
@@ -335,8 +336,9 @@ export const SQLiteStorageService: StorageServiceType = {
     },
 
     updateHabit: async (id: string, updates: Partial<Habit>) => {
+        const { id: _, ...safeUpdates } = updates;
         await db.update(habits)
-            .set(updates as any) // Drizzle types are complex with partials
+            .set(safeUpdates)
             .where(eq(habits.id, id));
     },
 
