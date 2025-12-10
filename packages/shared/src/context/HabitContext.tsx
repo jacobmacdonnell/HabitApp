@@ -91,7 +91,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             }
         };
 
-        const interval = setInterval(checkSleepState, 1000); // Check every second
+        const interval = setInterval(checkSleepState, 60000); // Check every minute (Battery Optimized)
         checkSleepState(); // Check immediately
 
         return () => clearInterval(interval);
