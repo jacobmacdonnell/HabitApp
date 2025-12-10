@@ -173,9 +173,6 @@ export const OnboardingScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Ambient Background */}
-            <View style={[styles.blob, { backgroundColor: petColor, top: -100, left: -100 }]} />
-            <View style={[styles.blob, { backgroundColor: LiquidGlass.colors.secondary, bottom: -100, right: -100 }]} />
 
             {/* Progress Dots - at top with safe area */}
             <View style={[styles.progressContainer, { paddingTop: insets.top + 20 }]}>
@@ -415,14 +412,7 @@ export const OnboardingScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
-    },
-    blob: {
-        position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        opacity: 0.4,
+        backgroundColor: LiquidGlass.backgroundColor,
     },
     progressContainer: {
         flexDirection: 'row',

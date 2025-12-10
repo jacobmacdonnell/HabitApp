@@ -116,8 +116,9 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     secondaryBorder: {
-        borderWidth: 1,
-        borderColor: LiquidGlass.colors.glassBorder,
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.25)',
+        backgroundColor: 'rgba(255,255,255,0.08)',
         borderRadius: LiquidGlass.radius.xxl,
     },
     contentContainer: {

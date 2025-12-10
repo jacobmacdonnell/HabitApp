@@ -101,6 +101,8 @@ export const SettingsScreen = () => {
                 style={styles.container}
                 contentContainerStyle={[styles.content]}
                 contentInsetAdjustmentBehavior="automatic"
+                bounces={true}
+                alwaysBounceVertical={true}
             >
                 {/* Custom Fixed Header */}
                 <View style={[styles.headerRow, { marginTop: 20 }]}>

@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
         marginBottom: LiquidGlass.header.marginBottom,
     },
     headerTitle: {
-        fontSize: LiquidGlass.typography.size.headline,
+        fontSize: LiquidGlass.header.titleSize,
         fontWeight: LiquidGlass.header.titleWeight,
         color: LiquidGlass.header.titleColor,
         letterSpacing: LiquidGlass.header.titleLetterSpacing,
