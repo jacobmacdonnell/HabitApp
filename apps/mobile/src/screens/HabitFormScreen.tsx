@@ -1,4 +1,5 @@
 import { useHabit, Habit } from '@habitapp/shared';
+import { HeaderButton } from '../components/HeaderButton';
 import { HABIT_COLORS, HABIT_ICONS, HABIT_PRESETS } from '@habitapp/shared/src/constants';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -71,16 +72,8 @@ export const HabitFormScreen = () => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: editingHabit ? 'Edit Habit' : 'New Habit',
-            headerLeft: () => (
-                <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 16 }}>
-                    <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
-                </TouchableOpacity>
-            ),
-            headerRight: () => (
-                <TouchableOpacity onPress={handleSave} style={{ paddingHorizontal: 16 }}>
-                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Save</Text>
-                </TouchableOpacity>
-            ),
+            headerLeft: () => <HeaderButton title="Cancel" onPress={() => router.back()} variant="cancel" />,
+            headerRight: () => <HeaderButton title="Save" onPress={handleSave} variant="primary" />,
         });
     }, [navigation, editingHabit, title, color, icon, timeOfDay, frequencyIndex, targetCount]);
 

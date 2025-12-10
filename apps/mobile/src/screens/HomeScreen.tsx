@@ -5,7 +5,7 @@ import { useNavigation, CompositeNavigationProp } from '@react-navigation/native
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { Plus, Eye, EyeOff } from 'lucide-react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState, useMemo, useLayoutEffect, useCallback, useRef, useEffect } from 'react';
 import {
     View,
@@ -27,6 +27,7 @@ import { HabitCard } from '../components/HabitCard';
 import { LiquidFab } from '../components/LiquidFab';
 import { Pet } from '../components/Pet/Pet';
 import { SwipeTutorial } from '../components/SwipeTutorial';
+import { useToast } from '../components/Toast';
 import { getGreeting } from '../data/greetings';
 import { RootStackParamList, TabParamList } from '../navigation/types';
 import { LiquidGlass } from '../theme/theme';
@@ -48,13 +49,18 @@ export const HomeScreen = () => {
 
     const [petBounce, setPetBounce] = useState(0);
     const [hasSeenSwipeHint, setHasSeenSwipeHint] = useState(true); // Default true to not show until loaded
+    const [hasEverCompleted, setHasEverCompleted] = useState(true); // Default true until we check
+    const { showToast } = useToast();
 
     const today = getLocalDateString();
 
-    // Load swipe hint preference
+    // Load preferences
     useEffect(() => {
         AsyncStorage.getItem('hasSeenSwipeHint').then((value) => {
             setHasSeenSwipeHint(value === 'true');
+        });
+        AsyncStorage.getItem('hasEverCompletedHabit').then((value) => {
+            setHasEverCompleted(value === 'true');
         });
     }, []);
 
@@ -199,12 +205,44 @@ export const HomeScreen = () => {
             if (isCompleted) {
                 undoProgress(habit.id, today);
             } else {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                // Check if this is user's first-ever completion
+                const isFirstEverCompletion = !hasEverCompleted;
+                const willComplete =
+                    habit.targetCount === 1 ||
+                    (habit.targetCount > 1 &&
+                        (progress.find((p) => p.habitId === habit.id && p.date === today)?.currentCount || 0) + 1 >=
+                            habit.targetCount);
+
+                // FOR TESTING: Always trigger celebration on every completion
+                if (willComplete) {
+                    // First-ever completion celebration logic (now runs every time for testing)
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    setTimeout(() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                    }, 150);
+                    // Bounce the pet widget
+                    setPetBounce((prev) => prev + 1);
+                    // Mark as completed forever
+                    setHasEverCompleted(true);
+                    AsyncStorage.setItem('hasEverCompletedHabit', 'true');
+
+                    // Show toast with optimized delay (Pro timing: 250ms)
+                    setTimeout(() => {
+                        showToast({
+                            message: 'You did it! Your first habit!',
+                            icon: '🎉',
+                            type: 'success',
+                            duration: 4000,
+                        });
+                    }, 250); // Snappy "1-2 Punch" timing with XP popup
+                } else {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                }
 
                 logProgress(habit.id, today);
             }
         },
-        [progress, today, logProgress, undoProgress, habits]
+        [progress, today, logProgress, undoProgress, habits, hasEverCompleted, showToast]
     );
 
     const handleDelete = (habit: Habit) => {

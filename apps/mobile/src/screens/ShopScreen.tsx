@@ -1,9 +1,10 @@
 import { useHabit, HAT_ITEMS } from '@habitapp/shared';
+import { HeaderButton } from '../components/HeaderButton';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { Check, Lock, Zap } from 'lucide-react-native';
+import { Check, Lock, Zap, Sparkles } from 'lucide-react-native';
 import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 
@@ -33,16 +34,13 @@ export const ShopScreen = () => {
                 </View>
             ),
             headerRight: () => (
-                <TouchableOpacity
+                <HeaderButton
+                    title="Done"
                     onPress={() => router.back()}
-                    style={{ paddingHorizontal: 16, justifyContent: 'center', alignItems: 'flex-end', minWidth: 60 }}
+                    variant="primary"
                     accessibilityLabel="Close shop"
                     accessibilityRole="button"
-                >
-                    <Text style={{ color: '#fff', fontSize: LiquidGlass.typography.size.headline, fontWeight: '600' }}>
-                        Done
-                    </Text>
-                </TouchableOpacity>
+                />
             ),
         });
     }, [navigation, router, pet?.xp]);
@@ -76,68 +74,93 @@ export const ShopScreen = () => {
     const renderContent = () => {
         if (selectedCategoryIndex === 0) {
             // HATS
+            // Check if user can afford the cheapest non-free item
+            const cheapestPrice = Math.min(...HAT_ITEMS.filter((i) => i.price > 0).map((i) => i.price));
+            const userXP = pet?.xp || 0;
+            const needsGuidance = userXP < cheapestPrice;
+            const xpNeeded = cheapestPrice - userXP;
+
             return (
-                <View style={styles.grid}>
-                    {HAT_ITEMS.map((item) => {
-                        const isOwned = pet?.inventory?.includes(item.id) || item.id === 'none';
-                        const isEquipped = pet?.hat === item.id || (item.id === 'none' && !pet?.hat);
-                        const canAfford = (pet?.xp || 0) >= item.price;
-
-                        return (
-                            <TouchableOpacity
-                                key={item.id}
-                                style={[
-                                    styles.card,
-                                    isEquipped && styles.cardEquipped,
-                                    !isOwned && !canAfford && styles.cardLocked,
-                                ]}
-                                onPress={() => {
-                                    if (isOwned && !isEquipped) handleEquip(item.id);
-                                    else if (!isOwned) handleBuy(item);
-                                }}
-                                activeOpacity={0.8}
-                                accessibilityLabel={`${item.name}, ${isEquipped ? 'equipped' : isOwned ? 'owned, tap to equip' : `${item.price} XP to buy`}`}
-                                accessibilityRole="button"
-                            >
-                                <HatIcon type={item.id} />
-                                <Text style={styles.itemName} numberOfLines={1}>
-                                    {item.name}
+                <View>
+                    {/* XP Guidance Banner */}
+                    {needsGuidance && (
+                        <View style={styles.guidanceBanner}>
+                            <View style={styles.guidanceIcon}>
+                                <Sparkles size={20} color={LiquidGlass.colors.currency} />
+                            </View>
+                            <View style={styles.guidanceText}>
+                                <Text style={styles.guidanceTitle}>Earn XP to unlock items!</Text>
+                                <Text style={styles.guidanceSubtitle}>
+                                    Complete habits to earn XP. You need {xpNeeded} more XP for your first item.
                                 </Text>
+                            </View>
+                        </View>
+                    )}
 
-                                {/* Action / Price */}
-                                <View style={styles.actionContainer}>
-                                    {isEquipped ? (
-                                        <View style={styles.badgeEquipped}>
-                                            <Check size={10} color="#000" strokeWidth={3} />
-                                            <Text style={styles.badgeText}>On</Text>
-                                        </View>
-                                    ) : isOwned ? (
-                                        <View style={styles.badgeOwned}>
-                                            <Text style={[styles.badgeText, { color: '#fff' }]}>Owned</Text>
-                                        </View>
-                                    ) : (
-                                        <View style={styles.priceContainer}>
-                                            <Zap
-                                                size={10}
-                                                color={
-                                                    canAfford ? LiquidGlass.colors.currency : 'rgba(255,255,255,0.4)'
-                                                }
-                                                fill={canAfford ? LiquidGlass.colors.currency : 'none'}
-                                            />
-                                            <Text
-                                                style={[
-                                                    styles.priceText,
-                                                    !canAfford && { color: 'rgba(255,255,255,0.4)' },
-                                                ]}
-                                            >
-                                                {item.price}
-                                            </Text>
-                                        </View>
-                                    )}
-                                </View>
-                            </TouchableOpacity>
-                        );
-                    })}
+                    <View style={styles.grid}>
+                        {HAT_ITEMS.map((item) => {
+                            const isOwned = pet?.inventory?.includes(item.id) || item.id === 'none';
+                            const isEquipped = pet?.hat === item.id || (item.id === 'none' && !pet?.hat);
+                            const canAfford = (pet?.xp || 0) >= item.price;
+
+                            return (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={[
+                                        styles.card,
+                                        isEquipped && styles.cardEquipped,
+                                        !isOwned && !canAfford && styles.cardLocked,
+                                    ]}
+                                    onPress={() => {
+                                        if (isOwned && !isEquipped) handleEquip(item.id);
+                                        else if (!isOwned) handleBuy(item);
+                                    }}
+                                    activeOpacity={0.8}
+                                    accessibilityLabel={`${item.name}, ${isEquipped ? 'equipped' : isOwned ? 'owned, tap to equip' : `${item.price} XP to buy`}`}
+                                    accessibilityRole="button"
+                                >
+                                    <HatIcon type={item.id} />
+                                    <Text style={styles.itemName} numberOfLines={1}>
+                                        {item.name}
+                                    </Text>
+
+                                    {/* Action / Price */}
+                                    <View style={styles.actionContainer}>
+                                        {isEquipped ? (
+                                            <View style={styles.badgeEquipped}>
+                                                <Check size={10} color="#000" strokeWidth={3} />
+                                                <Text style={styles.badgeText}>On</Text>
+                                            </View>
+                                        ) : isOwned ? (
+                                            <View style={styles.badgeOwned}>
+                                                <Text style={[styles.badgeText, { color: '#fff' }]}>Owned</Text>
+                                            </View>
+                                        ) : (
+                                            <View style={styles.priceContainer}>
+                                                <Zap
+                                                    size={10}
+                                                    color={
+                                                        canAfford
+                                                            ? LiquidGlass.colors.currency
+                                                            : 'rgba(255,255,255,0.4)'
+                                                    }
+                                                    fill={canAfford ? LiquidGlass.colors.currency : 'none'}
+                                                />
+                                                <Text
+                                                    style={[
+                                                        styles.priceText,
+                                                        !canAfford && { color: 'rgba(255,255,255,0.4)' },
+                                                    ]}
+                                                >
+                                                    {item.price}
+                                                </Text>
+                                            </View>
+                                        )}
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
                 </View>
             );
         }
@@ -198,7 +221,39 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 12,
-        // paddingHorizontal: 20, // Removed to avoid double padding with ScreenWrapper
+    },
+    guidanceBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 204, 0, 0.1)',
+        borderRadius: 16,
+        padding: LiquidGlass.spacing.lg,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 204, 0, 0.2)',
+        gap: 12,
+    },
+    guidanceIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255, 204, 0, 0.15)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    guidanceText: {
+        flex: 1,
+    },
+    guidanceTitle: {
+        fontSize: LiquidGlass.typography.size.subheadline,
+        fontWeight: '700',
+        color: LiquidGlass.colors.currency,
+        marginBottom: 2,
+    },
+    guidanceSubtitle: {
+        fontSize: LiquidGlass.typography.size.caption1,
+        color: 'rgba(255,255,255,0.6)',
+        lineHeight: 18,
     },
     card: {
         width: Math.floor((width - 40 - 24) / 3),

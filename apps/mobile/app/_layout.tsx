@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SmartNotificationController } from '../src/components/SmartNotificationController';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
+import { ToastProvider } from '../src/components/Toast';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { XPNotificationProvider } from '../src/context/XPNotificationContext';
 import { useMigrationHelper } from '../src/db/migrate';
@@ -105,15 +106,16 @@ export default function RootLayout() {
     if (!success && !error) return null;
 
     return (
-
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
                 <ErrorBoundary>
                     <HabitProvider storage={MobileStorageService} widgetService={WidgetService}>
                         <ThemeProvider>
                             <XPNotificationProvider>
-                                <SmartNotificationController />
-                                <ThemedRoot />
+                                <ToastProvider>
+                                    <SmartNotificationController />
+                                    <ThemedRoot />
+                                </ToastProvider>
                             </XPNotificationProvider>
                         </ThemeProvider>
                     </HabitProvider>

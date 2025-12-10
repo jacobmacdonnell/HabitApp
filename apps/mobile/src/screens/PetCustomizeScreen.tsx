@@ -1,4 +1,5 @@
 import { useHabit, HAT_ITEMS } from '@habitapp/shared';
+import { HeaderButton } from '../components/HeaderButton';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
@@ -60,16 +61,8 @@ export const PetCustomizeScreen = () => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: activeTab === 'identity' ? 'Identity' : 'Wardrobe',
-            headerLeft: () => (
-                <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 16 }}>
-                    <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
-                </TouchableOpacity>
-            ),
-            headerRight: () => (
-                <TouchableOpacity onPress={handleSave} style={{ paddingHorizontal: 16 }}>
-                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Save</Text>
-                </TouchableOpacity>
-            ),
+            headerLeft: () => <HeaderButton title="Cancel" onPress={() => router.back()} variant="cancel" />,
+            headerRight: () => <HeaderButton title="Save" onPress={handleSave} variant="primary" />,
         });
     }, [navigation, router, handleSave, activeTab]);
 

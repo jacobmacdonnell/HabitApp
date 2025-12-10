@@ -179,6 +179,7 @@ export const SettingsScreen = () => {
                             )}
                         </View>
                     </View>
+                    <Text style={styles.helperText}>Your pet sleeps during these hours and wakes up with you!</Text>
                 </View>
 
                 {/* Data & Privacy */}
@@ -258,6 +259,13 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.5)',
         marginBottom: 8,
         marginLeft: 12,
+    },
+    helperText: {
+        fontSize: LiquidGlass.typography.size.caption1,
+        color: 'rgba(255,255,255,0.4)',
+        marginTop: 8,
+        marginLeft: 12,
+        fontStyle: 'italic',
     },
     card: {
         borderRadius: 24,

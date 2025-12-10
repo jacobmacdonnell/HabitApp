@@ -24,6 +24,7 @@ interface PetProps {
     hideStats?: boolean; // Hide the stats card (for onboarding hatching screen)
     disablePress?: boolean; // Disable tap interactions (for onboarding)
     initialSpeechText?: string; // Show a speech bubble with this text on mount
+    speechOverride?: string; // Override speech bubble text temporarily (for celebrations)
     onUpdate?: (updates: Partial<PetType>) => void;
     feedingBounce?: number; // Increment to trigger bounce animation
 }
@@ -36,6 +37,7 @@ export const Pet = ({
     hideStats = false,
     disablePress = false,
     initialSpeechText,
+    speechOverride,
     onUpdate,
     feedingBounce,
 }: PetProps) => {
@@ -294,6 +296,19 @@ export const Pet = ({
             Animated.timing(speechFadeAnim, { toValue: 1, duration: 100, useNativeDriver: true }).start();
         }
     }, [initialSpeechText, pet]);
+
+    // Handle speechOverride (for celebrations like first completion)
+    useEffect(() => {
+        if (speechOverride) {
+            setSpeechBubbleText(speechOverride);
+            Animated.timing(speechFadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+        } else if (speechBubbleText && !initialSpeechText) {
+            // Only fade out if there's no permanent initialSpeechText
+            Animated.timing(speechFadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
+                if (!speechOverride) setSpeechBubbleText(null);
+            });
+        }
+    }, [speechOverride]);
 
     // Handle XP / Level Changes
     useEffect(() => {
@@ -633,6 +648,46 @@ const styles = StyleSheet.create({
         right: 35,
         width: 25,
         height: 30,
+    },
+    compactSpeechBubble: {
+        position: 'absolute',
+        top: -20,
+        left: '50%',
+        marginLeft: -60,
+        backgroundColor: '#fff',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 4,
+        minWidth: 120,
+        maxWidth: 140,
+        zIndex: 100,
+    },
+    compactSpeechText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#000',
+        textAlign: 'center',
+    },
+    compactSpeechArrow: {
+        position: 'absolute',
+        bottom: -5,
+        left: '50%',
+        marginLeft: -5,
+        width: 0,
+        height: 0,
+        backgroundColor: 'transparent',
+        borderStyle: 'solid',
+        borderLeftWidth: 5,
+        borderRightWidth: 5,
+        borderTopWidth: 5,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderTopColor: '#fff',
     },
     svg: {
         width: '100%',

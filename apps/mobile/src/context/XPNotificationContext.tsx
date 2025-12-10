@@ -51,7 +51,7 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
                     sound.unloadAsync();
                 }
             });
-        } catch (error) { }
+        } catch (error) {}
     };
 
     const showXP = useCallback(
@@ -70,57 +70,57 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
 
             setNotifications((prev) => [...prev, notification]);
 
-            // Animate in with overshoot bounce
+            // Animate in with softer, floatier bounce
             Animated.parallel([
                 Animated.timing(opacity, {
                     toValue: 1,
-                    duration: 100,
+                    duration: 200, // Slightly slower fade in
                     useNativeDriver: true,
                 }),
                 Animated.spring(translateY, {
                     toValue: 0,
-                    friction: 6,
-                    tension: 120,
+                    friction: 8, // Less bouncy, more floaty
+                    tension: 60,
                     useNativeDriver: true,
                 }),
                 Animated.spring(scale, {
-                    toValue: 1.1, // Overshoot then settle
-                    friction: 4,
-                    tension: 180,
+                    toValue: 1.05, // Subtle overshoot
+                    friction: 6,
+                    tension: 100,
                     useNativeDriver: true,
                 }),
             ]).start(() => {
-                // Settle back to 1.0
+                // Settle
                 Animated.spring(scale, {
                     toValue: 1,
-                    friction: 6,
-                    tension: 100,
+                    friction: 8,
+                    tension: 80,
                     useNativeDriver: true,
                 }).start();
             });
 
-            // Animate out quickly
+            // Animate out slowly - linger for user to see
             setTimeout(() => {
                 Animated.parallel([
                     Animated.timing(opacity, {
                         toValue: 0,
-                        duration: 200,
+                        duration: 400, // Slower fade out
                         useNativeDriver: true,
                     }),
                     Animated.timing(translateY, {
-                        toValue: -20,
-                        duration: 200,
+                        toValue: -50, // Float up more as it fades
+                        duration: 400,
                         useNativeDriver: true,
                     }),
                     Animated.timing(scale, {
-                        toValue: 0.8,
-                        duration: 200,
+                        toValue: 0.9,
+                        duration: 400,
                         useNativeDriver: true,
                     }),
                 ]).start(() => {
                     setNotifications((prev) => prev.filter((n) => n.id !== id));
                 });
-            }, 700);
+            }, 1500); // Linger for 1.5s (was 0.7s) for better readability
         },
         [settings.sound]
     );
@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 9999,
     },
-
 
     notification: {
         flexDirection: 'row',
