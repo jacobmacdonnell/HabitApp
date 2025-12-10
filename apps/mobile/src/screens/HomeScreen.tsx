@@ -47,7 +47,6 @@ export const HomeScreen = () => {
     const [showCompleted, setShowCompleted] = useState(false);
 
     const [petBounce, setPetBounce] = useState(0);
-    const confettiRef = useRef<any>(null);
     const [hasSeenSwipeHint, setHasSeenSwipeHint] = useState(true); // Default true to not show until loaded
 
     const today = getLocalDateString();
@@ -204,22 +203,6 @@ export const HomeScreen = () => {
 
                 logProgress(habit.id, today);
 
-                // Check if this completion finishes the entire day
-                const willBeCompleted = current + 1 >= habit.targetCount;
-
-                if (willBeCompleted) {
-                    const otherHabits = habits.filter((h) => h.id !== habit.id);
-                    // Check if all other habits (filtered by time or global?)
-                    // Ideally check global, but for visual celebration, global makes sense.
-                    const allOthersDone = otherHabits.every((h) => {
-                        const p = progress.find((prog) => prog.habitId === h.id && prog.date === today);
-                        return (p?.currentCount || 0) >= h.targetCount;
-                    });
-
-                    if (allOthersDone) {
-                        confettiRef.current?.start();
-                    }
-                }
             }
         },
         [progress, today, logProgress, undoProgress, habits]
