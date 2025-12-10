@@ -1,18 +1,28 @@
-import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, NativeSyntheticEvent, TextInput } from 'react-native';
 import { useHabit, Habit } from '@habitapp/shared';
 import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
-import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
-import { Trash2, Minus, Plus, Check } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-import { ScreenWrapper } from '../components/ScreenWrapper';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import { Trash2, Minus, Plus, Check } from 'lucide-react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    ScrollView,
+    Alert,
+    Platform,
+    NativeSyntheticEvent,
+    TextInput,
+} from 'react-native';
 
 import { GlassButton } from '../components/GlassButton';
+import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
+import { ScreenWrapper } from '../components/ScreenWrapper';
+import { RootStackParamList } from '../navigation/types';
 import { LiquidGlass } from '../theme/theme';
-import { useRouter } from 'expo-router';
 
 export const HabitFormScreen = () => {
     const { addHabit, updateHabit, deleteHabit } = useHabit();
@@ -21,9 +31,9 @@ export const HabitFormScreen = () => {
     const route = useRoute<RouteProp<RootStackParamList, 'HabitForm'>>();
     // Parse the habit from JSON string (passed as JSON.stringify from HomeScreen)
     const editingHabit = route.params?.habit
-        ? (typeof route.params.habit === 'string'
-            ? JSON.parse(route.params.habit) as Habit
-            : route.params.habit)
+        ? typeof route.params.habit === 'string'
+            ? (JSON.parse(route.params.habit) as Habit)
+            : route.params.habit
         : undefined;
 
     const [title, setTitle] = useState(editingHabit?.title || '');
@@ -61,18 +71,12 @@ export const HabitFormScreen = () => {
         navigation.setOptions({
             title: editingHabit ? 'Edit Habit' : 'New Habit',
             headerLeft: () => (
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    style={{ paddingHorizontal: 16 }}
-                >
+                <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 16 }}>
                     <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
                 </TouchableOpacity>
             ),
             headerRight: () => (
-                <TouchableOpacity
-                    onPress={handleSave}
-                    style={{ paddingHorizontal: 16 }}
-                >
+                <TouchableOpacity onPress={handleSave} style={{ paddingHorizontal: 16 }}>
                     <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Save</Text>
                 </TouchableOpacity>
             ),
@@ -81,21 +85,17 @@ export const HabitFormScreen = () => {
 
     const handleDelete = () => {
         if (!editingHabit) return;
-        Alert.alert(
-            'Delete Habit',
-            'Are you sure you want to delete this habit?',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: () => {
-                        deleteHabit(editingHabit.id);
-                        router.back();
-                    }
-                }
-            ]
-        );
+        Alert.alert('Delete Habit', 'Are you sure you want to delete this habit?', [
+            { text: 'Cancel', style: 'cancel' },
+            {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: () => {
+                    deleteHabit(editingHabit.id);
+                    router.back();
+                },
+            },
+        ]);
     };
 
     return (
@@ -167,13 +167,13 @@ export const HabitFormScreen = () => {
                     contentContainerStyle={styles.iconRow}
                     style={{ marginHorizontal: -12 }}
                 >
-                    {HABIT_ICONS.map(i => (
+                    {HABIT_ICONS.map((i) => (
                         <TouchableOpacity
                             key={i}
                             style={[
                                 styles.iconButton,
                                 icon === i && { backgroundColor: color },
-                                icon === i && styles.iconSelected
+                                icon === i && styles.iconSelected,
                             ]}
                             onPress={() => {
                                 setIcon(i);
@@ -195,14 +195,10 @@ export const HabitFormScreen = () => {
                     contentContainerStyle={styles.colorRow}
                     style={{ marginHorizontal: -12 }}
                 >
-                    {HABIT_COLORS.map(c => (
+                    {HABIT_COLORS.map((c) => (
                         <TouchableOpacity
                             key={c}
-                            style={[
-                                styles.colorDot,
-                                { backgroundColor: c },
-                                color === c && styles.colorSelected
-                            ]}
+                            style={[styles.colorDot, { backgroundColor: c }, color === c && styles.colorSelected]}
                             onPress={() => {
                                 setColor(c);
                                 Haptics.selectionAsync();

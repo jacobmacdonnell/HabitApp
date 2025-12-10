@@ -1,7 +1,7 @@
+import { Habit } from '@habitapp/shared';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NavigatorScreenParams, CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { Habit } from '@habitapp/shared';
 
 // --- Root Stack ---
 export type RootStackParamList = {
@@ -11,10 +11,7 @@ export type RootStackParamList = {
     PetCustomize: undefined;
 };
 
-export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<
-    RootStackParamList,
-    T
->;
+export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, T>;
 
 // --- Main Tab ---
 export type TabParamList = {
@@ -32,6 +29,6 @@ export type RootTabScreenProps<T extends keyof TabParamList> = CompositeScreenPr
 // --- Helper for useNavigation ---
 declare global {
     namespace ReactNavigation {
-        interface RootParamList extends RootStackParamList { }
+        interface RootParamList extends RootStackParamList {}
     }
 }

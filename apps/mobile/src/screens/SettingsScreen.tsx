@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useHabit } from '@habitapp/shared';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Moon, Sun, Volume2, Bell, Shield, Trash2, ChevronRight } from 'lucide-react-native';
-
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useTheme } from '../context/ThemeContext';
 import { NotificationService } from '../services/notifications';
 import { LiquidGlass } from '../theme/theme';
-import { useTheme } from '../context/ThemeContext';
 
 export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
@@ -16,14 +16,10 @@ export const SettingsScreen = () => {
     const [sound, setSound] = useState(settings.sound ?? true);
 
     const handleReset = () => {
-        Alert.alert(
-            'Reset All Data',
-            'Are you sure? This will delete all your habits and pet progress.',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive', onPress: resetData },
-            ]
-        );
+        Alert.alert('Reset All Data', 'Are you sure? This will delete all your habits and pet progress.', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Delete', style: 'destructive', onPress: resetData },
+        ]);
     };
 
     const onTimeChange = (type: 'bedtime' | 'wakeup', event: { type: string; nativeEvent: unknown }, date?: Date) => {
@@ -75,12 +71,17 @@ export const SettingsScreen = () => {
 
     const insets = useSafeAreaInsets();
 
-    const renderTimePicker = (label: string, time: string, type: 'bedtime' | 'wakeup', icon: React.ReactNode, color: string, bg: string) => (
+    const renderTimePicker = (
+        label: string,
+        time: string,
+        type: 'bedtime' | 'wakeup',
+        icon: React.ReactNode,
+        color: string,
+        bg: string
+    ) => (
         <View style={styles.timeRow}>
             <View style={styles.iconLabel}>
-                <View style={[styles.iconContainer, { backgroundColor: bg }]}>
-                    {icon}
-                </View>
+                <View style={[styles.iconContainer, { backgroundColor: bg }]}>{icon}</View>
                 <Text style={styles.label}>{label}</Text>
             </View>
             <DateTimePicker
@@ -96,14 +97,11 @@ export const SettingsScreen = () => {
 
     return (
         <View style={styles.wrapper}>
-
-
             <ScrollView
                 style={styles.container}
                 contentContainerStyle={[styles.content]}
                 contentInsetAdjustmentBehavior="automatic"
             >
-
                 {/* Custom Fixed Header */}
                 <View style={[styles.headerRow, { marginTop: 20 }]}>
                     <Text style={styles.headerTitle}>Settings</Text>
@@ -113,7 +111,6 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>PREFERENCES</Text>
                     <View style={[styles.card, { overflow: 'hidden' }]}>
-
                         <View style={{ position: 'relative', zIndex: 1 }}>
                             {/* Sound */}
                             <View style={styles.row}>
@@ -156,11 +153,24 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>SLEEP SCHEDULE</Text>
                     <View style={[styles.card, { overflow: 'hidden' }]}>
-
                         <View style={{ position: 'relative', zIndex: 1 }}>
-                            {renderTimePicker('Bedtime', settings.sleepStart || '23:00', 'bedtime', <Moon size={20} color={LiquidGlass.colors.sleep} />, LiquidGlass.colors.sleep, LiquidGlass.colors.glassBackground)}
+                            {renderTimePicker(
+                                'Bedtime',
+                                settings.sleepStart || '23:00',
+                                'bedtime',
+                                <Moon size={20} color={LiquidGlass.colors.sleep} />,
+                                LiquidGlass.colors.sleep,
+                                LiquidGlass.colors.glassBackground
+                            )}
                             <View style={styles.separator} />
-                            {renderTimePicker('Wake Up', settings.sleepEnd || '07:00', 'wakeup', <Sun size={20} color={LiquidGlass.colors.tertiary} />, LiquidGlass.colors.tertiary, LiquidGlass.colors.glassBackground)}
+                            {renderTimePicker(
+                                'Wake Up',
+                                settings.sleepEnd || '07:00',
+                                'wakeup',
+                                <Sun size={20} color={LiquidGlass.colors.tertiary} />,
+                                LiquidGlass.colors.tertiary,
+                                LiquidGlass.colors.glassBackground
+                            )}
                         </View>
                     </View>
                 </View>
@@ -169,11 +179,12 @@ export const SettingsScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionHeader}>DATA & PRIVACY</Text>
                     <View style={[styles.card, { overflow: 'hidden' }]}>
-
                         <View style={{ position: 'relative', zIndex: 1 }}>
                             <TouchableOpacity style={styles.row}>
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}>
+                                    <View
+                                        style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}
+                                    >
                                         <Shield size={20} color="#60a5fa" />
                                     </View>
                                     <Text style={styles.label}>Privacy Policy</Text>

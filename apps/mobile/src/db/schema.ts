@@ -13,18 +13,24 @@ export const habits = sqliteTable('habits', {
 });
 
 // Daily Progress Table (The Scalability Fix)
-export const dailyProgress = sqliteTable('daily_progress', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    habitId: text('habit_id').references(() => habits.id, { onDelete: 'cascade' }).notNull(),
-    date: text('date').notNull(), // ISO Date YYYY-MM-DD
-    currentCount: integer('current_count').notNull().default(0),
-    completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
-}, (table) => ({
-    habitIdIdx: index('habit_id_idx').on(table.habitId),
-    dateIdx: index('date_idx').on(table.date),
-    // Composite Unique Index for Upsert support
-    compositeUniqueIdx: uniqueIndex('habit_date_unique_idx').on(table.habitId, table.date),
-}));
+export const dailyProgress = sqliteTable(
+    'daily_progress',
+    {
+        id: integer('id').primaryKey({ autoIncrement: true }),
+        habitId: text('habit_id')
+            .references(() => habits.id, { onDelete: 'cascade' })
+            .notNull(),
+        date: text('date').notNull(), // ISO Date YYYY-MM-DD
+        currentCount: integer('current_count').notNull().default(0),
+        completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
+    },
+    (table) => ({
+        habitIdIdx: index('habit_id_idx').on(table.habitId),
+        dateIdx: index('date_idx').on(table.date),
+        // Composite Unique Index for Upsert support
+        compositeUniqueIdx: uniqueIndex('habit_date_unique_idx').on(table.habitId, table.date),
+    })
+);
 
 // Pet Table (Single Row usually)
 export const pet = sqliteTable('pet', {

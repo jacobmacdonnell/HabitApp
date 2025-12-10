@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
 import { useHabit, HabitProvider } from '@habitapp/shared';
-import { MobileStorageService } from '../src/services/storage';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
-import * as Notifications from 'expo-notifications';
-import { ErrorBoundary } from '../src/components/ErrorBoundary';
-import { XPNotificationProvider } from '../src/context/XPNotificationContext';
-import { ThemeProvider } from '../src/context/ThemeContext';
-import { migrateFromAsyncStorage } from '../src/services/storage';
-import { useMigrationHelper } from '../src/db/migrate';
-import { Stack, SplashScreen } from 'expo-router';
 import { ThemeProvider as NavThemeProvider, DarkTheme } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
+import { Stack, SplashScreen } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { ErrorBoundary } from '../src/components/ErrorBoundary';
+import { ThemeProvider } from '../src/context/ThemeContext';
+import { XPNotificationProvider } from '../src/context/XPNotificationContext';
+import { useMigrationHelper } from '../src/db/migrate';
+import { MobileStorageService, migrateFromAsyncStorage } from '../src/services/storage';
 import { LiquidGlass } from '../src/theme/theme';
 
 // Initialize notification handler
@@ -34,10 +34,7 @@ const ThemedRoot = () => {
     const { settings } = useHabit();
 
     // Determine status bar style
-    const statusBarStyle =
-        settings.theme === 'light' ? 'dark' :
-            settings.theme === 'dark' ? 'light' :
-                'auto';
+    const statusBarStyle = settings.theme === 'light' ? 'dark' : settings.theme === 'dark' ? 'light' : 'auto';
 
     // Force dark theme for navigation to prevent white flashes
     const NavTheme = {
@@ -50,7 +47,9 @@ const ThemedRoot = () => {
 
     return (
         <NavThemeProvider value={NavTheme}>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: LiquidGlass.backgroundColor } }}>
+            <Stack
+                screenOptions={{ headerShown: false, contentStyle: { backgroundColor: LiquidGlass.backgroundColor } }}
+            >
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
                     name="habit-form"

@@ -54,7 +54,7 @@ export const ZParticle = ({ delay, xOffset, size = 24 }: ZParticleProps) => {
                         easing: Easing.inOut(Easing.ease),
                         useNativeDriver: true,
                     }),
-                ])
+                ]),
             ]).start(() => animate());
         };
         animate();
@@ -62,21 +62,19 @@ export const ZParticle = ({ delay, xOffset, size = 24 }: ZParticleProps) => {
 
     const rotate = rotateAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: ['-15deg', '15deg']
+        outputRange: ['-15deg', '15deg'],
     });
 
     return (
-        <Animated.View style={{
-            position: 'absolute',
-            left: xOffset,
-            top: 50,
-            opacity: fadeAnim,
-            transform: [
-                { translateY: liftAnim },
-                { scale: scaleAnim },
-                { rotate: rotate }
-            ]
-        }}>
+        <Animated.View
+            style={{
+                position: 'absolute',
+                left: xOffset,
+                top: 50,
+                opacity: fadeAnim,
+                transform: [{ translateY: liftAnim }, { scale: scaleAnim }, { rotate }],
+            }}
+        >
             <Text style={[styles.zText, { fontSize: size }]}>z</Text>
         </Animated.View>
     );

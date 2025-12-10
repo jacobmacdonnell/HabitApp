@@ -1,25 +1,35 @@
-import React, { useState, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, TextInput, Alert } from 'react-native';
-import { Check, Lock } from 'lucide-react-native';
 import { useHabit } from '@habitapp/shared';
-import * as Haptics from 'expo-haptics';
 import { useNavigation } from '@react-navigation/native';
-import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Rect } from 'react-native-svg';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-import { ScreenWrapper } from '../components/ScreenWrapper';
-
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import { Check, Lock } from 'lucide-react-native';
+import React, { useState, useLayoutEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, TextInput, Alert } from 'react-native';
+import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Rect } from 'react-native-svg';
+
+import { ScreenWrapper } from '../components/ScreenWrapper';
+import { RootStackParamList } from '../navigation/types';
 import { validatePetName } from '../utils/validation';
 
 const { width } = Dimensions.get('window');
 
 // Pet colors - excludes app semantic colors (green, gold) to avoid confusion
 const COLORS = [
-    '#f97316', '#f59e0b', '#eab308', // Warm oranges/yellows
-    '#84cc16', '#10b981', '#06b6d4', // Teals/greens (not the primary green)
-    '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', // Blues/indigos
-    '#a855f7', '#d946ef', '#ec4899', '#f43f5e', // Purples/pinks
+    '#f97316',
+    '#f59e0b',
+    '#eab308', // Warm oranges/yellows
+    '#84cc16',
+    '#10b981',
+    '#06b6d4', // Teals/greens (not the primary green)
+    '#0ea5e9',
+    '#3b82f6',
+    '#6366f1',
+    '#8b5cf6', // Blues/indigos
+    '#a855f7',
+    '#d946ef',
+    '#ec4899',
+    '#f43f5e', // Purples/pinks
     '#ef4444', // Red (kept for variety)
 ];
 
@@ -39,12 +49,25 @@ const PetPreview = ({ color, hat, mood }: { color: string; hat: string; mood: st
     const isSick = mood === 'sick';
 
     const renderEyes = () => {
-        if (isSleeping) return (
-            <G>
-                <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-                <Path d="M 120 85 Q 130 95 140 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-            </G>
-        );
+        if (isSleeping)
+            return (
+                <G>
+                    <Path
+                        d="M 60 85 Q 70 95 80 85"
+                        stroke="rgba(0,0,0,0.8)"
+                        strokeWidth="4"
+                        fill="none"
+                        strokeLinecap="round"
+                    />
+                    <Path
+                        d="M 120 85 Q 130 95 140 85"
+                        stroke="rgba(0,0,0,0.8)"
+                        strokeWidth="4"
+                        fill="none"
+                        strokeLinecap="round"
+                    />
+                </G>
+            );
         return (
             <G>
                 <Circle cx="70" cy="85" r="16" fill="white" />
@@ -58,16 +81,44 @@ const PetPreview = ({ color, hat, mood }: { color: string; hat: string; mood: st
     };
 
     const renderMouth = () => {
-        if (isHappy) return <Path d="M 70 120 Q 100 150 130 120" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />;
-        if (isSad || isSick) return <Path d="M 70 140 Q 100 110 130 140" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />;
-        return <Path d="M 70 130 L 130 130" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />;
+        if (isHappy)
+            return (
+                <Path
+                    d="M 70 120 Q 100 150 130 120"
+                    stroke="rgba(0,0,0,0.8)"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeLinecap="round"
+                />
+            );
+        if (isSad || isSick)
+            return (
+                <Path
+                    d="M 70 140 Q 100 110 130 140"
+                    stroke="rgba(0,0,0,0.8)"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeLinecap="round"
+                />
+            );
+        return (
+            <Path d="M 70 130 L 130 130" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />
+        );
     };
 
     const renderHat = () => {
         if (!hat || hat === 'none') return null;
         return (
             <G transform="translate(60, 10) scale(0.8)">
-                {hat === 'party' && <Path d="M50 10 L80 70 L20 70 Z" fill="#facc15" stroke="white" strokeWidth="2" strokeLinejoin="round" />}
+                {hat === 'party' && (
+                    <Path
+                        d="M50 10 L80 70 L20 70 Z"
+                        fill="#facc15"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                    />
+                )}
                 {hat === 'cowboy' && (
                     <G transform="translate(-10, -10)">
                         <Path d="M10 60 Q50 30 90 60" fill="#78350f" stroke="white" strokeWidth="2" />
@@ -83,7 +134,13 @@ const PetPreview = ({ color, hat, mood }: { color: string; hat: string; mood: st
                 )}
                 {hat === 'crown' && (
                     <G transform="translate(0, -10)">
-                        <Path d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z" fill="#fbbf24" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+                        <Path
+                            d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z"
+                            fill="#fbbf24"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinejoin="round"
+                        />
                     </G>
                 )}
             </G>
@@ -113,8 +170,19 @@ const PetPreview = ({ color, hat, mood }: { color: string; hat: string; mood: st
                         <Stop offset="100%" stopColor={color} stopOpacity="0.8" />
                     </RadialGradient>
                 </Defs>
-                <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#previewBodyGrad)" stroke={color} strokeWidth="2" />
-                <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" />
+                <Path
+                    d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z"
+                    fill="url(#previewBodyGrad)"
+                    stroke={color}
+                    strokeWidth="2"
+                />
+                <Path
+                    d="M90,50 Q100,10 115,45 Q125,15 135,50"
+                    fill="none"
+                    stroke={color}
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                />
                 <G transform="translate(0, 10)">
                     {renderEyes()}
                     {renderMouth()}
@@ -154,7 +222,13 @@ const HatIcon = ({ type }: { type: string }) => {
                 </G>
             )}
             {type === 'crown' && (
-                <Path d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z" fill="#fbbf24" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+                <Path
+                    d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z"
+                    fill="#fbbf24"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                />
             )}
         </Svg>
     );
@@ -165,41 +239,20 @@ export const PetCustomizeScreen = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const router = useRouter();
 
-    if (!pet) return null;
+    const [name, setName] = useState(pet?.name || '');
+    const [selectedColor, setSelectedColor] = useState(pet?.color || COLORS[0]);
+    const [selectedHat, setSelectedHat] = useState(pet?.hat || 'none');
 
-    const [name, setName] = useState(pet.name);
-    const [selectedColor, setSelectedColor] = useState(pet.color);
-    const [selectedHat, setSelectedHat] = useState(pet.hat || 'none');
-
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            title: 'Customize Pet',
-            headerLeft: () => (
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    style={{ paddingHorizontal: 16 }}
-                >
-                    <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
-                </TouchableOpacity>
-            ),
-            headerRight: () => (
-                <TouchableOpacity
-                    onPress={handleSave}
-                    style={{ paddingHorizontal: 16 }}
-                >
-                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Save</Text>
-                </TouchableOpacity>
-            ),
-        });
-    }, [navigation, name, selectedColor, selectedHat]);
-
-    const handleSave = () => {
+    const handleSave = useCallback(() => {
         const validation = validatePetName(name);
 
         if (!validation.isValid) {
             Alert.alert(
-                validation.error?.includes('under 12') ? 'Too Long' :
-                    validation.error?.includes('friendly') ? 'Whoops!' : 'Required',
+                validation.error?.includes('under 12')
+                    ? 'Too Long'
+                    : validation.error?.includes('friendly')
+                        ? 'Whoops!'
+                        : 'Required',
                 validation.error
             );
             return;
@@ -208,7 +261,25 @@ export const PetCustomizeScreen = () => {
         updatePet({ name: name.trim(), color: selectedColor, hat: selectedHat });
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         router.back();
-    };
+    }, [name, selectedColor, selectedHat, updatePet, router]);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: 'Customize Pet',
+            headerLeft: () => (
+                <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 16 }}>
+                    <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
+                </TouchableOpacity>
+            ),
+            headerRight: () => (
+                <TouchableOpacity onPress={handleSave} style={{ paddingHorizontal: 16 }}>
+                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Save</Text>
+                </TouchableOpacity>
+            ),
+        });
+    }, [navigation, router, handleSave]);
+
+    if (!pet) return null;
 
     const handleColorSelect = (color: string) => {
         setSelectedColor(color);
@@ -226,7 +297,6 @@ export const PetCustomizeScreen = () => {
 
     return (
         <ScreenWrapper keyboardAvoiding isModal contentContainerStyle={styles.content}>
-
             {/* Live Pet Preview */}
             <PetPreview color={selectedColor} hat={selectedHat} mood={pet.mood} />
 
@@ -260,7 +330,7 @@ export const PetCustomizeScreen = () => {
                             style={[
                                 styles.colorDot,
                                 { backgroundColor: color },
-                                selectedColor === color && styles.colorSelected
+                                selectedColor === color && styles.colorSelected,
                             ]}
                             onPress={() => handleColorSelect(color)}
                         >
@@ -281,11 +351,7 @@ export const PetCustomizeScreen = () => {
                         return (
                             <TouchableOpacity
                                 key={hat.id}
-                                style={[
-                                    styles.hatCard,
-                                    isSelected && styles.hatSelected,
-                                    isLocked && styles.hatLocked
-                                ]}
+                                style={[styles.hatCard, isSelected && styles.hatSelected, isLocked && styles.hatLocked]}
                                 onPress={() => handleHatSelect(hat.id, isLocked)}
                                 activeOpacity={0.8}
                             >

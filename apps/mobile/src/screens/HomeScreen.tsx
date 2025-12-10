@@ -1,24 +1,35 @@
-import React, { useState, useMemo, useLayoutEffect, useCallback, useRef, useEffect } from 'react';
-import { useRouter } from 'expo-router';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, LayoutAnimation, Animated, Platform, Alert, Dimensions } from 'react-native';
 import { useHabit, Habit, getLocalDateString } from '@habitapp/shared';
-import { HabitCard } from '../components/HabitCard';
-import { Pet } from '../components/Pet/Pet';
-import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
-import { EmptyState } from '../components/EmptyState';
-import { SwipeTutorial } from '../components/SwipeTutorial';
-import { Plus, Eye, EyeOff } from 'lucide-react-native';
-
-import { LiquidFab } from '../components/LiquidFab';
-import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LiquidGlass } from '../theme/theme';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { RootStackParamList, TabParamList } from '../navigation/types';
-import { getGreeting } from '../data/greetings';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import { Plus, Eye, EyeOff } from 'lucide-react-native';
+import React, { useState, useMemo, useLayoutEffect, useCallback, useRef, useEffect } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    FlatList,
+    TouchableOpacity,
+    LayoutAnimation,
+    Animated,
+    Platform,
+    Alert,
+    Dimensions,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { EmptyState } from '../components/EmptyState';
+import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
+import { HabitCard } from '../components/HabitCard';
+import { LiquidFab } from '../components/LiquidFab';
+import { Pet } from '../components/Pet/Pet';
+import { SwipeTutorial } from '../components/SwipeTutorial';
+import { getGreeting } from '../data/greetings';
+import { RootStackParamList, TabParamList } from '../navigation/types';
+import { LiquidGlass } from '../theme/theme';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
     BottomTabNavigationProp<TabParamList>,
@@ -43,7 +54,7 @@ export const HomeScreen = () => {
 
     // Load swipe hint preference
     useEffect(() => {
-        AsyncStorage.getItem('hasSeenSwipeHint').then(value => {
+        AsyncStorage.getItem('hasSeenSwipeHint').then((value) => {
             setHasSeenSwipeHint(value === 'true');
         });
     }, []);
@@ -79,32 +90,34 @@ export const HomeScreen = () => {
     // ... (filteredHabits, hasCompletedHabits logic remains same) ...
 
     const filteredHabits = useMemo(() => {
-        return habits.filter(habit => {
-            // Time filter
-            if (timeFilter !== 'all' && habit.timeOfDay !== timeFilter && habit.timeOfDay !== 'anytime') {
-                return false;
-            }
+        return habits
+            .filter((habit) => {
+                // Time filter
+                if (timeFilter !== 'all' && habit.timeOfDay !== timeFilter && habit.timeOfDay !== 'anytime') {
+                    return false;
+                }
 
-            // Completed filter
-            if (!showCompleted) {
-                const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
-                const current = dayProgress?.currentCount || 0;
-                const isCompleted = current >= habit.targetCount;
-                if (isCompleted) return false;
-            }
+                // Completed filter
+                if (!showCompleted) {
+                    const dayProgress = progress.find((p) => p.habitId === habit.id && p.date === today);
+                    const current = dayProgress?.currentCount || 0;
+                    const isCompleted = current >= habit.targetCount;
+                    if (isCompleted) return false;
+                }
 
-            return true;
-        }).sort((a, b) => {
-            // Sort by Time of Day precedence
-            const order: Record<string, number> = { anytime: 0, morning: 1, midday: 2, evening: 3 };
-            return (order[a.timeOfDay] || 0) - (order[b.timeOfDay] || 0);
-        });
+                return true;
+            })
+            .sort((a, b) => {
+                // Sort by Time of Day precedence
+                const order: Record<string, number> = { anytime: 0, morning: 1, midday: 2, evening: 3 };
+                return (order[a.timeOfDay] || 0) - (order[b.timeOfDay] || 0);
+            });
     }, [habits, timeFilter, showCompleted, progress]); // Removed 'today' if it's constant, but it's likely fine. Ensure 'progress' isn't a new array every render.
 
     // Check if there are any completed habits today
     const hasCompletedHabits = useMemo(() => {
-        return habits.some(habit => {
-            const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
+        return habits.some((habit) => {
+            const dayProgress = progress.find((p) => p.habitId === habit.id && p.date === today);
             const current = dayProgress?.currentCount || 0;
             return current >= habit.targetCount;
         });
@@ -143,7 +156,7 @@ export const HomeScreen = () => {
                     useNativeDriver: false,
                     tension: 50,
                     friction: 7,
-                })
+                }),
             ]).start();
         } else {
             // Hide
@@ -169,7 +182,7 @@ export const HomeScreen = () => {
                     toValue: 0,
                     duration: 250,
                     useNativeDriver: false,
-                })
+                }),
             ]).start(({ finished }) => {
                 if (finished) {
                     setShowCompleted(false);
@@ -178,54 +191,53 @@ export const HomeScreen = () => {
         }
     }, [hasCompletedHabits]);
 
-    const handleToggle = useCallback((habit: Habit) => {
-        const dayProgress = progress.find(p => p.habitId === habit.id && p.date === today);
-        const current = dayProgress?.currentCount || 0;
-        const isCompleted = current >= habit.targetCount;
+    const handleToggle = useCallback(
+        (habit: Habit) => {
+            const dayProgress = progress.find((p) => p.habitId === habit.id && p.date === today);
+            const current = dayProgress?.currentCount || 0;
+            const isCompleted = current >= habit.targetCount;
 
-        if (isCompleted) {
-            undoProgress(habit.id, today);
-        } else {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            if (isCompleted) {
+                undoProgress(habit.id, today);
+            } else {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-            logProgress(habit.id, today);
+                logProgress(habit.id, today);
 
-            // Check if this completion finishes the entire day
-            const willBeCompleted = current + 1 >= habit.targetCount;
+                // Check if this completion finishes the entire day
+                const willBeCompleted = current + 1 >= habit.targetCount;
 
-            if (willBeCompleted) {
-                const otherHabits = habits.filter(h => h.id !== habit.id);
-                // Check if all other habits (filtered by time or global?)
-                // Ideally check global, but for visual celebration, global makes sense.
-                const allOthersDone = otherHabits.every(h => {
-                    const p = progress.find(prog => prog.habitId === h.id && prog.date === today);
-                    return (p?.currentCount || 0) >= h.targetCount;
-                });
+                if (willBeCompleted) {
+                    const otherHabits = habits.filter((h) => h.id !== habit.id);
+                    // Check if all other habits (filtered by time or global?)
+                    // Ideally check global, but for visual celebration, global makes sense.
+                    const allOthersDone = otherHabits.every((h) => {
+                        const p = progress.find((prog) => prog.habitId === h.id && prog.date === today);
+                        return (p?.currentCount || 0) >= h.targetCount;
+                    });
 
-                if (allOthersDone) {
-                    confettiRef.current?.start();
+                    if (allOthersDone) {
+                        confettiRef.current?.start();
+                    }
                 }
             }
-        }
-    }, [progress, today, logProgress, undoProgress, habits]);
+        },
+        [progress, today, logProgress, undoProgress, habits]
+    );
 
     const handleDelete = (habit: Habit) => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        Alert.alert(
-            'Delete Habit',
-            `Are you sure you want to delete "${habit.title}"?`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: () => {
-                        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-                        deleteHabit(habit.id);
-                    }
-                }
-            ]
-        );
+        Alert.alert('Delete Habit', `Are you sure you want to delete "${habit.title}"?`, [
+            { text: 'Cancel', style: 'cancel' },
+            {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: () => {
+                    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+                    deleteHabit(habit.id);
+                },
+            },
+        ]);
     };
 
     const handleSwipeHintDismiss = useCallback(() => {
@@ -235,7 +247,7 @@ export const HomeScreen = () => {
 
     const renderItem = ({ item, index }: { item: Habit; index: number }) => {
         const streak = getStreak(item.id);
-        const dayProgress = progress.find(p => p.habitId === item.id && p.date === today);
+        const dayProgress = progress.find((p) => p.habitId === item.id && p.date === today);
         const current = dayProgress?.currentCount || 0;
         const isCompleted = !!dayProgress?.completed;
 
@@ -260,9 +272,10 @@ export const HomeScreen = () => {
 
     const insets = useSafeAreaInsets(); // Used for header padding
 
-    const fabBottom = Platform.OS === 'ios'
-        ? insets.bottom + 49 + 16 // Align approx 16pt above standard Native Tab Bar (49pt)
-        : 80;
+    const fabBottom =
+        Platform.OS === 'ios'
+            ? insets.bottom + 49 + 16 // Align approx 16pt above standard Native Tab Bar (49pt)
+            : 80;
 
     const fabScale = useRef(new Animated.Value(1)).current;
 
@@ -287,10 +300,13 @@ export const HomeScreen = () => {
 
     return (
         <View style={styles.container}>
-
-
             {/* Custom Fixed Header */}
-            <View style={{ paddingTop: insets.top + (LiquidGlass.header.contentTopPadding || 20), paddingHorizontal: LiquidGlass.screenPadding }}>
+            <View
+                style={{
+                    paddingTop: insets.top + (LiquidGlass.header.contentTopPadding || 20),
+                    paddingHorizontal: LiquidGlass.screenPadding,
+                }}
+            >
                 <View style={styles.headerRow}>
                     <View style={{ flex: 1 }}>
                         <Text style={styles.greeting}>{greeting}</Text>
@@ -323,15 +339,17 @@ export const HomeScreen = () => {
                         </View>
 
                         {/* Animated Eye Toggle */}
-                        <Animated.View style={{
-                            width: animWidth,
-                            marginLeft: animMargin,
-                            opacity: animOpacity,
-                            transform: [{ scale: animScale }],
-                            overflow: 'hidden',
-                            zIndex: 0,
-                            alignItems: 'flex-end',
-                        }}>
+                        <Animated.View
+                            style={{
+                                width: animWidth,
+                                marginLeft: animMargin,
+                                opacity: animOpacity,
+                                transform: [{ scale: animScale }],
+                                overflow: 'hidden',
+                                zIndex: 0,
+                                alignItems: 'flex-end',
+                            }}
+                        >
                             <TouchableOpacity
                                 onPress={() => {
                                     Haptics.selectionAsync();
@@ -355,18 +373,19 @@ export const HomeScreen = () => {
             <FlatList
                 data={filteredHabits}
                 renderItem={renderItem}
-                keyExtractor={item => item.id}
+                keyExtractor={(item) => item.id}
                 contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]}
                 showsVerticalScrollIndicator={false}
                 contentInsetAdjustmentBehavior="never" // Disable native adjustment since we have a fixed header view
                 ListEmptyComponent={() => {
                     // Determine why it's empty
                     // Check if there ARE habits for this filter that are just hidden because completed
-                    const hasHiddenCompleted = habits.some(h => {
+                    const hasHiddenCompleted = habits.some((h) => {
                         // Time match
-                        if (timeFilter !== 'all' && h.timeOfDay !== timeFilter && h.timeOfDay !== 'anytime') return false;
+                        if (timeFilter !== 'all' && h.timeOfDay !== timeFilter && h.timeOfDay !== 'anytime')
+                            return false;
                         // Is it completed?
-                        const dayProgress = progress.find(p => p.habitId === h.id && p.date === today);
+                        const dayProgress = progress.find((p) => p.habitId === h.id && p.date === today);
                         const current = dayProgress?.currentCount || 0;
                         return current >= h.targetCount;
                     });
@@ -383,19 +402,13 @@ export const HomeScreen = () => {
                 }}
             />
 
-
             {/* iOS 26 Floating Action Button - Liquid Glass Interaction */}
             <LiquidFab />
 
-
             {/* Swipe Tutorial tooltip - appears with card auto-swipe */}
             {!hasSeenSwipeHint && filteredHabits.length > 0 && (
-                <SwipeTutorial
-                    onDismiss={handleSwipeHintDismiss}
-                    cardTop={insets.top + 325}
-                />
+                <SwipeTutorial onDismiss={handleSwipeHintDismiss} cardTop={insets.top + 325} />
             )}
-
         </View>
     );
 };

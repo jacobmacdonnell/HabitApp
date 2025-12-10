@@ -60,7 +60,9 @@ export interface StorageServiceType {
     saveSettings: (settings: Settings) => Promise<void>;
     getProgressForRange?: (startDate: string, endDate: string) => Promise<DailyProgress[]>;
     logSingleProgress?: (item: DailyProgress) => Promise<void>;
-    getHabitStats?: (habitId: string) => Promise<{ currentStreak: number; bestStreak?: number; totalCompletions: number }>;
+    getHabitStats?: (
+        habitId: string
+    ) => Promise<{ currentStreak: number; bestStreak?: number; totalCompletions: number }>;
     // Atomic habit operations for O(1) performance
     addHabit?: (habit: Habit) => Promise<void>;
     updateHabit?: (id: string, updates: Partial<Habit>) => Promise<void>;

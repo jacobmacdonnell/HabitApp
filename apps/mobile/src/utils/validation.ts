@@ -9,14 +9,29 @@ export const validatePetName = (name: string): { isValid: boolean; error?: strin
     }
 
     // Basic profanity filter
-    const FORBIDDEN = ['fuck', 'shit', 'bitch', 'ass', 'cunt', 'dick', 'cock', 'pussy', 'whore', 'slut', 'nigger', 'faggot', 'bastard', 'prick'];
+    const FORBIDDEN = [
+        'fuck',
+        'shit',
+        'bitch',
+        'ass',
+        'cunt',
+        'dick',
+        'cock',
+        'pussy',
+        'whore',
+        'slut',
+        'nigger',
+        'faggot',
+        'bastard',
+        'prick',
+    ];
     const lowerName = trimmedName.toLowerCase();
 
     // Check for whole words or obvious substrings
-    const hasProfanity = FORBIDDEN.some(word => lowerName.includes(word));
+    const hasProfanity = FORBIDDEN.some((word) => lowerName.includes(word));
 
     if (hasProfanity) {
-        return { isValid: false, error: 'Let\'s keep the name friendly for everyone.' };
+        return { isValid: false, error: "Let's keep the name friendly for everyone." };
     }
 
     return { isValid: true };

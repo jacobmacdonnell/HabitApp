@@ -1,12 +1,12 @@
+import { useHabit, getLocalDateString, DailyProgress } from '@habitapp/shared';
+import * as Haptics from 'expo-haptics';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
-import { useHabit, getLocalDateString, DailyProgress } from '@habitapp/shared';
-
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LiquidGlass } from '../theme/theme';
+
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
+import { LiquidGlass } from '../theme/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -67,16 +67,16 @@ export const TrendsScreen = () => {
             return {
                 dateStr: getLocalDateString(d),
                 dayName: d.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
-                isToday: i === 6
+                isToday: i === 6,
             };
         });
     }, []);
 
     const habitWeeklyStatus = useMemo(() => {
-        return habits.map(habit => {
-            const history = last7Days.map(day => {
+        return habits.map((habit) => {
+            const history = last7Days.map((day) => {
                 // Weekly view always uses global progress (recent)
-                const entry = progress.find(p => p.date === day.dateStr && p.habitId === habit.id);
+                const entry = progress.find((p) => p.date === day.dateStr && p.habitId === habit.id);
                 // Handle both boolean true and old string/number values if any exist, though types say boolean
                 const isCompleted = !!entry?.completed;
                 const isPartiallyDone = (entry?.currentCount || 0) > 0;
@@ -115,15 +115,15 @@ export const TrendsScreen = () => {
             const dateStr = [
                 d.getFullYear(),
                 String(d.getMonth() + 1).padStart(2, '0'),
-                String(d.getDate()).padStart(2, '0')
+                String(d.getDate()).padStart(2, '0'),
             ].join('-');
 
             // Get stats for this day
-            const dayProgress = activeProgress.filter(p => p.date === dateStr);
+            const dayProgress = activeProgress.filter((p) => p.date === dateStr);
             const totalHabits = habits.length || 1;
 
             // Count distinct habits completed
-            const completedCount = dayProgress.filter(p => p.completed).length;
+            const completedCount = dayProgress.filter((p) => p.completed).length;
             const intensity = completedCount / totalHabits;
 
             days.push({
@@ -132,7 +132,7 @@ export const TrendsScreen = () => {
                 intensity,
                 completedCount,
                 isToday: dateStr === todayStr,
-                isEmpty: false
+                isEmpty: false,
             });
         }
 
@@ -141,7 +141,7 @@ export const TrendsScreen = () => {
 
     const changeMonth = (increment: number) => {
         Haptics.selectionAsync();
-        setCurrentDate(prev => {
+        setCurrentDate((prev) => {
             const newDate = new Date(prev);
             newDate.setMonth(prev.getMonth() + increment);
             return newDate;
@@ -151,31 +151,32 @@ export const TrendsScreen = () => {
     // --- Stats ---
     const bestStreak = useMemo(() => {
         if (habits.length === 0) return 0;
-        return Math.max(...habits.map(h => getStreak(h.id)));
+        return Math.max(...habits.map((h) => getStreak(h.id)));
     }, [habits, getStreak]);
 
     const totalCompletions = useMemo(() => {
         // Total stats should probably respect the view... BUT 'totalCompletions' usually implies ALL TIME.
         // The previous code filtered 'progress' which was just 90 days.
         // The stats on the monthly view usually refer to the month?
-        // Let's look at UI... "Total Done". 
+        // Let's look at UI... "Total Done".
         // If it's "Total Done", strictly speaking it should be from DB stats.
         // But for now, let's keep it consistent with the View context or revert to global?
         // Actually, if we use 'activeProgress', it will correct "Total Done" to be "Total Done This Month" if we viewed a past month?
         // No, 'progress' was 90 days list. 'activeProgress' is 1 month list (if historical).
         // So this metric changes meaning dynamically.
         // Let's assume it means "Total Done (Visible)".
-        return activeProgress.filter(p => p.completed).length;
+        return activeProgress.filter((p) => p.completed).length;
     }, [activeProgress]);
 
     const consistencyScore = useMemo(() => {
         if (habits.length === 0) return 0;
         // Consistency across the currently viewed month
-        const filledDays = calendarData.filter(d => !d.isEmpty);
+        const filledDays = calendarData.filter((d) => !d.isEmpty);
         if (filledDays.length === 0) return 0;
 
         const now = new Date();
-        const viewingFutureMonth = currentDate.getFullYear() > now.getFullYear() ||
+        const viewingFutureMonth =
+            currentDate.getFullYear() > now.getFullYear() ||
             (currentDate.getFullYear() === now.getFullYear() && currentDate.getMonth() > now.getMonth());
 
         if (viewingFutureMonth) return 0;
@@ -192,7 +193,6 @@ export const TrendsScreen = () => {
         const sumIntensity = validDays.reduce((acc, curr) => acc + (curr.intensity || 0), 0);
         return Math.round((sumIntensity / daysToCount) * 100);
     }, [calendarData, habits.length, currentDate]);
-
 
     // --- Render Views ---
 
@@ -217,22 +217,37 @@ export const TrendsScreen = () => {
                         </View>
                     </View>
 
-                    {habitWeeklyStatus.map(habit => (
+                    {habitWeeklyStatus.map((habit) => (
                         <View key={habit.id} style={styles.habitRowCard}>
                             <View style={styles.habitInfo}>
-                                <Text style={styles.habitTitle} numberOfLines={1}>{habit.title}</Text>
+                                <Text style={styles.habitTitle} numberOfLines={1}>
+                                    {habit.title}
+                                </Text>
                                 <Text style={styles.streakLabel}>{getStreak(habit.id)} day streak</Text>
                             </View>
                             <View style={styles.daysRow}>
                                 {habit.history.map((day, i) => (
                                     <View key={i} style={styles.statusBubbleContainer}>
                                         {day.isCompleted ? (
-                                            <View style={[styles.statusBubble, { backgroundColor: LiquidGlass.colors.primary }]}>
+                                            <View
+                                                style={[
+                                                    styles.statusBubble,
+                                                    { backgroundColor: LiquidGlass.colors.primary },
+                                                ]}
+                                            >
                                                 <Check size={10} color="#fff" strokeWidth={4} />
                                             </View>
                                         ) : day.isPartiallyDone ? (
-                                            <View style={[styles.statusBubble, styles.partialBubble, { borderColor: LiquidGlass.colors.primary }]}>
-                                                <Text style={{ fontSize: 8, color: LiquidGlass.colors.primary }}>•</Text>
+                                            <View
+                                                style={[
+                                                    styles.statusBubble,
+                                                    styles.partialBubble,
+                                                    { borderColor: LiquidGlass.colors.primary },
+                                                ]}
+                                            >
+                                                <Text style={{ fontSize: 8, color: LiquidGlass.colors.primary }}>
+                                                    •
+                                                </Text>
                                             </View>
                                         ) : (
                                             <View style={[styles.statusBubble, styles.emptyBubble]} />
@@ -269,16 +284,23 @@ export const TrendsScreen = () => {
 
             {/* Calendar Card */}
             <View style={styles.calendarContainer}>
-
                 {/* Month Navigation Header */}
                 <View style={styles.monthNavRow}>
-                    <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.navButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                    <TouchableOpacity
+                        onPress={() => changeMonth(-1)}
+                        style={styles.navButton}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
                         <ChevronLeft size={24} color={LiquidGlass.text.secondary} />
                     </TouchableOpacity>
                     <Text style={styles.monthTitle}>
                         {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                     </Text>
-                    <TouchableOpacity onPress={() => changeMonth(1)} style={styles.navButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                    <TouchableOpacity
+                        onPress={() => changeMonth(1)}
+                        style={styles.navButton}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
                         <ChevronRight size={24} color={LiquidGlass.text.secondary} />
                     </TouchableOpacity>
                 </View>
@@ -286,7 +308,9 @@ export const TrendsScreen = () => {
                 {/* Weekday Headers */}
                 <View style={styles.weekDaysGrid}>
                     {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-                        <Text key={i} style={styles.calendarDayHeader}>{day}</Text>
+                        <Text key={i} style={styles.calendarDayHeader}>
+                            {day}
+                        </Text>
                     ))}
                 </View>
 
@@ -296,20 +320,26 @@ export const TrendsScreen = () => {
                         <View key={day.id ?? i} style={styles.dayCell}>
                             {!day.isEmpty && (
                                 <View style={styles.dayContent}>
-                                    <View style={[
-                                        styles.intensityCircle,
-                                        {
-                                            backgroundColor: (day.intensity ?? 0) > 0
-                                                ? LiquidGlass.colors.primary
-                                                : 'rgba(255,255,255,0.03)',
-                                            opacity: (day.intensity ?? 0) > 0 ? Math.max(0.4, day.intensity ?? 0) : 1
-                                        }
-                                    ]}>
-                                        <Text style={[
-                                            styles.dayNum,
-                                            (day.intensity ?? 0) > 0.6 && { color: '#000', fontWeight: '700' }, // Dark text on bright backgrounds
-                                            day.isToday && styles.todayNum
-                                        ]}>
+                                    <View
+                                        style={[
+                                            styles.intensityCircle,
+                                            {
+                                                backgroundColor:
+                                                    (day.intensity ?? 0) > 0
+                                                        ? LiquidGlass.colors.primary
+                                                        : 'rgba(255,255,255,0.03)',
+                                                opacity:
+                                                    (day.intensity ?? 0) > 0 ? Math.max(0.4, day.intensity ?? 0) : 1,
+                                            },
+                                        ]}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.dayNum,
+                                                (day.intensity ?? 0) > 0.6 && { color: '#000', fontWeight: '700' }, // Dark text on bright backgrounds
+                                                day.isToday && styles.todayNum,
+                                            ]}
+                                        >
                                             {day.dayNum}
                                         </Text>
                                     </View>
@@ -326,8 +356,6 @@ export const TrendsScreen = () => {
 
     return (
         <View style={styles.container}>
-
-
             <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={[styles.content]}

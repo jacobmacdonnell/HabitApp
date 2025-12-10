@@ -1,10 +1,8 @@
+import { LiquidGlassView } from '@callstack/liquid-glass';
+import { useRouter } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
-import { LiquidGlassView } from '@callstack/liquid-glass';
-import { SymbolView } from 'expo-symbols';
-import { useRouter } from 'expo-router';
-
-
 
 export const LiquidFab = () => {
     const router = useRouter();
@@ -14,7 +12,7 @@ export const LiquidFab = () => {
             <Pressable onPress={() => router.push('/habit-form')}>
                 <LiquidGlassView
                     style={[styles.fabMain, { backgroundColor: 'rgba(28,28,30,0.5)' }]} // Manual dark tint
-                    interactive={true}
+                    interactive
                 >
                     <SymbolView name="plus" tintColor="#fff" size={28} />
                 </LiquidGlassView>
@@ -55,5 +53,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-    }
+    },
 });

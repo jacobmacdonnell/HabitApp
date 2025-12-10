@@ -1,12 +1,11 @@
+import { useHabit } from '@habitapp/shared';
+import { Egg } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
-import { useHabit } from '@habitapp/shared';
-import { Pet } from '../components/Pet';
-
-import { Egg } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LiquidGlass } from '../theme/theme';
 
+import { Pet } from '../components/Pet';
+import { LiquidGlass } from '../theme/theme';
 import { validatePetName } from '../utils/validation';
 
 export const PetScreen = () => {
@@ -16,12 +15,14 @@ export const PetScreen = () => {
     const insets = useSafeAreaInsets();
 
     const handleHatch = () => {
-
         const validation = validatePetName(name);
         if (!validation.isValid) {
             Alert.alert(
-                validation.error?.includes('under 12') ? 'Too Long' :
-                    validation.error?.includes('friendly') ? 'Whoops!' : 'Name Required',
+                validation.error?.includes('under 12')
+                    ? 'Too Long'
+                    : validation.error?.includes('friendly')
+                      ? 'Whoops!'
+                      : 'Name Required',
                 validation.error
             );
             return;
@@ -51,7 +52,11 @@ export const PetScreen = () => {
                             {['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5', '#FF99CC'].map((c) => (
                                 <TouchableOpacity
                                     key={c}
-                                    style={[styles.colorDot, { backgroundColor: c }, color === c && styles.colorSelected]}
+                                    style={[
+                                        styles.colorDot,
+                                        { backgroundColor: c },
+                                        color === c && styles.colorSelected,
+                                    ]}
                                     onPress={() => setColor(c)}
                                 />
                             ))}
@@ -68,8 +73,6 @@ export const PetScreen = () => {
 
     return (
         <View style={styles.wrapper}>
-
-
             <ScrollView
                 style={styles.container}
                 contentContainerStyle={[styles.content]}
@@ -78,7 +81,7 @@ export const PetScreen = () => {
                 <View style={[styles.headerRow, { marginTop: 20 }]}>
                     <Text style={styles.headerTitle}>{pet.name || 'My Companion'}</Text>
                 </View>
-                <Pet pet={pet} isFullView={true} onUpdate={updatePet} />
+                <Pet pet={pet} isFullView onUpdate={updatePet} />
             </ScrollView>
         </View>
     );

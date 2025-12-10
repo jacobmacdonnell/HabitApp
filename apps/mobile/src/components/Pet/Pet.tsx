@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Animated, Easing, Platform } from 'react-native';
-import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Text as SvgText, Rect } from 'react-native-svg';
 import { Pet as PetType } from '@habitapp/shared';
-
-import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { ZParticle } from './ZParticle';
+import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Animated, Easing, Platform } from 'react-native';
+import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Text as SvgText, Rect } from 'react-native-svg';
+
 import { PetEyes } from './PetEyes';
-import { PetMouth } from './PetMouth';
 import { PetHat } from './PetHat';
+import { PetMouth } from './PetMouth';
+import { ZParticle } from './ZParticle';
 
 const { width } = Dimensions.get('window');
 
@@ -26,7 +26,15 @@ interface PetProps {
 
 // ZParticle is now imported from './PetAnimations'
 
-export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress = false, initialSpeechText, onUpdate, feedingBounce }: PetProps) => {
+export const Pet = ({
+    pet,
+    isFullView = false,
+    hideStats = false,
+    disablePress = false,
+    initialSpeechText,
+    onUpdate,
+    feedingBounce,
+}: PetProps) => {
     // State
     const navigation = useNavigation();
     const router = useRouter();
@@ -55,7 +63,7 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
         if (feedingBounce && feedingBounce > 0) {
             Animated.sequence([
                 Animated.timing(interactionScale, { toValue: 1.15, duration: 100, useNativeDriver: true }),
-                Animated.spring(interactionScale, { toValue: 1, friction: 3, tension: 300, useNativeDriver: true })
+                Animated.spring(interactionScale, { toValue: 1, friction: 3, tension: 300, useNativeDriver: true }),
             ]).start();
         }
     }, [feedingBounce]);
@@ -68,7 +76,6 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
     // Blinking state for awake animations
     const [isBlinking, setIsBlinking] = useState(false);
-
 
     // Peeking state - one eye open when doing habits while sleeping
     const [isPeeking, setIsPeeking] = useState(false);
@@ -89,19 +96,19 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                 toValue: 1,
                 duration: 400,
                 easing: Easing.inOut(Easing.ease),
-                useNativeDriver: false // Can't use native for interpolated values we read
-            })
+                useNativeDriver: false, // Can't use native for interpolated values we read
+            }),
         ]).start();
 
         // Show a funny late-night message
         const lateNightPhrases = [
-            "Up late, huh? 👀",
-            "*one eye opens* ...nice.",
+            'Up late, huh? 👀',
+            '*one eye opens* ...nice.',
             "Couldn't sleep either?",
-            "Midnight grinder! 🌙",
+            'Midnight grinder! 🌙',
             "Shh... I won't tell.",
-            "*peeks* ...productive!",
-            "Night owl energy! 🦉",
+            '*peeks* ...productive!',
+            'Night owl energy! 🦉',
         ];
         const randomPhrase = lateNightPhrases[Math.floor(Math.random() * lateNightPhrases.length)];
         setSpeechBubbleText(randomPhrase);
@@ -167,7 +174,7 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
         // Bounce animation
         Animated.sequence([
             Animated.timing(interactionScale, { toValue: 0.9, duration: 100, useNativeDriver: true }),
-            Animated.spring(interactionScale, { toValue: 1, friction: 4, tension: 40, useNativeDriver: true })
+            Animated.spring(interactionScale, { toValue: 1, friction: 4, tension: 40, useNativeDriver: true }),
         ]).start();
 
         // Mood-specific phrases
@@ -175,41 +182,36 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
         if (isSleeping) {
             phrases = [
-                "*yawn* ...five more minutes...",
-                "Zzz... huh? ...zzz...",
-                "*mumbles* ...so tired...",
-                "Let me sleep... 😴",
-                "*stretches* ...not yet...",
-                "Shh... dreaming of XP...",
+                '*yawn* ...five more minutes...',
+                'Zzz... huh? ...zzz...',
+                '*mumbles* ...so tired...',
+                'Let me sleep... 😴',
+                '*stretches* ...not yet...',
+                'Shh... dreaming of XP...',
             ];
         } else if (isSad) {
             phrases = [
-                "I miss you...",
-                "Complete some habits?",
+                'I miss you...',
+                'Complete some habits?',
                 "I'm kinda lonely...",
-                "Need some attention...",
-                "*sigh*",
+                'Need some attention...',
+                '*sigh*',
             ];
         } else if (isSick) {
-            phrases = [
-                "Not feeling great...",
-                "Need some care...",
-                "*cough*",
-                "Help me feel better?",
-            ];
+            phrases = ['Not feeling great...', 'Need some care...', '*cough*', 'Help me feel better?'];
         } else {
             // Happy/Neutral - energetic phrases
             phrases = [
                 "You're doing great!",
                 "Let's get some XP!",
                 "I'm hungry for habits!",
-                "Did you drink water?",
-                "Keep it up! 💪",
-                "You got this!",
-                "Time to focus!",
-                "Shiny habits! ✨",
-                "Level up time?",
-                "I believe in you!",
+                'Did you drink water?',
+                'Keep it up! 💪',
+                'You got this!',
+                'Time to focus!',
+                'Shiny habits! ✨',
+                'Level up time?',
+                'I believe in you!',
                 "Let's crush today!",
             ];
         }
@@ -239,15 +241,35 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
         const breathing = Animated.loop(
             Animated.sequence([
-                Animated.timing(breathVal, { toValue: 1, duration: 2500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-                Animated.timing(breathVal, { toValue: 0, duration: 2500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+                Animated.timing(breathVal, {
+                    toValue: 1,
+                    duration: 2500,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(breathVal, {
+                    toValue: 0,
+                    duration: 2500,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
             ])
         );
 
         const floating = Animated.loop(
             Animated.sequence([
-                Animated.timing(floatVal, { toValue: 1, duration: 2500, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-                Animated.timing(floatVal, { toValue: 0, duration: 2500, easing: Easing.inOut(Easing.sin), useNativeDriver: true })
+                Animated.timing(floatVal, {
+                    toValue: 1,
+                    duration: 2500,
+                    easing: Easing.inOut(Easing.sin),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(floatVal, {
+                    toValue: 0,
+                    duration: 2500,
+                    easing: Easing.inOut(Easing.sin),
+                    useNativeDriver: true,
+                }),
             ])
         );
 
@@ -283,12 +305,17 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
             xpFadeAnim.setValue(0);
 
             Animated.parallel([
-                Animated.timing(xpFloatAnim, { toValue: -50, duration: 1500, easing: Easing.out(Easing.ease), useNativeDriver: true }),
+                Animated.timing(xpFloatAnim, {
+                    toValue: -50,
+                    duration: 1500,
+                    easing: Easing.out(Easing.ease),
+                    useNativeDriver: true,
+                }),
                 Animated.sequence([
                     Animated.timing(xpFadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
                     Animated.delay(800),
                     Animated.timing(xpFadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
-                ])
+                ]),
             ]).start();
         }
 
@@ -301,16 +328,15 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                 Animated.delay(300), // Wait slightly
                 Animated.parallel([
                     Animated.spring(levelScaleAnim, { toValue: 1, friction: 5, useNativeDriver: true }),
-                    Animated.timing(levelFadeAnim, { toValue: 1, duration: 300, useNativeDriver: true })
+                    Animated.timing(levelFadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
                 ]),
                 Animated.delay(2000),
-                Animated.timing(levelFadeAnim, { toValue: 0, duration: 500, useNativeDriver: true })
+                Animated.timing(levelFadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
             ]).start();
         }
 
         prevXpRef.current = pet.xp || 0;
         prevLevelRef.current = pet.level || 1;
-
     }, [pet?.xp, pet?.level]);
 
     if (!pet) return null;
@@ -335,10 +361,26 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                                 <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
                             </RadialGradient>
                         </Defs>
-                        <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGrad)" stroke={pet.color} strokeWidth="2" />
-                        <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
+                        <Path
+                            d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z"
+                            fill="url(#bodyGrad)"
+                            stroke={pet.color}
+                            strokeWidth="2"
+                        />
+                        <Path
+                            d="M90,50 Q100,10 115,45 Q125,15 135,50"
+                            fill="none"
+                            stroke={pet.color}
+                            strokeWidth="8"
+                            strokeLinecap="round"
+                        />
                         <G transform="translate(0, 10)">
-                            <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} eyeLookAnim={eyeLookAnim} />
+                            <PetEyes
+                                isSleeping={isSleeping}
+                                isPeeking={isPeeking}
+                                isBlinking={isBlinking}
+                                eyeLookAnim={eyeLookAnim}
+                            />
                             <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
                             <PetHat hat={pet.hat} />
                         </G>
@@ -369,11 +411,11 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
     return (
         <View style={styles.fullContainer}>
-
-
             <View style={styles.petDisplay}>
                 {/* Glow Effect using RadialGradient for softness */}
-                <Animated.View style={[styles.glowContainer, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}>
+                <Animated.View
+                    style={[styles.glowContainer, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}
+                >
                     <Svg height="500" width="500" viewBox="0 0 500 500">
                         <Defs>
                             <RadialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
@@ -387,13 +429,18 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
                 <View style={styles.petAnchor}>
                     <TouchableOpacity activeOpacity={1} onPress={handlePetPress}>
-                        <Animated.View style={[styles.petSvgContainer, {
-                            transform: [
-                                { translateY: petFloatY },
-                                { scale: petScale },
-                                { scale: interactionScale }
-                            ]
-                        }]}>
+                        <Animated.View
+                            style={[
+                                styles.petSvgContainer,
+                                {
+                                    transform: [
+                                        { translateY: petFloatY },
+                                        { scale: petScale },
+                                        { scale: interactionScale },
+                                    ],
+                                },
+                            ]}
+                        >
                             <Svg viewBox="0 0 200 200" style={styles.svg}>
                                 <Defs>
                                     <RadialGradient id="bodyGradFull" cx="30%" cy="30%" r="80%">
@@ -401,10 +448,26 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                                         <Stop offset="100%" stopColor={pet.color} stopOpacity="0.8" />
                                     </RadialGradient>
                                 </Defs>
-                                <Path d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z" fill="url(#bodyGradFull)" stroke={pet.color} strokeWidth="2" />
-                                <Path d="M90,50 Q100,10 115,45 Q125,15 135,50" fill="none" stroke={pet.color} strokeWidth="8" strokeLinecap="round" />
+                                <Path
+                                    d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z"
+                                    fill="url(#bodyGradFull)"
+                                    stroke={pet.color}
+                                    strokeWidth="2"
+                                />
+                                <Path
+                                    d="M90,50 Q100,10 115,45 Q125,15 135,50"
+                                    fill="none"
+                                    stroke={pet.color}
+                                    strokeWidth="8"
+                                    strokeLinecap="round"
+                                />
                                 <G transform="translate(0, 10)">
-                                    <PetEyes isSleeping={isSleeping} isPeeking={isPeeking} isBlinking={isBlinking} eyeLookAnim={eyeLookAnim} />
+                                    <PetEyes
+                                        isSleeping={isSleeping}
+                                        isPeeking={isPeeking}
+                                        isBlinking={isBlinking}
+                                        eyeLookAnim={eyeLookAnim}
+                                    />
                                     <PetMouth isHappy={isHappy} isSad={isSad} isSick={isSick} />
                                     {!isSick && (
                                         <G>
@@ -420,11 +483,13 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
 
                     {/* Speech Bubble anchored to pet frame */}
                     {speechBubbleText && (
-                        <Animated.View style={[
-                            styles.speechBubble,
-                            { opacity: speechFadeAnim },
-                            hideStats && { top: -60 } // Override for hatching screen
-                        ]}>
+                        <Animated.View
+                            style={[
+                                styles.speechBubble,
+                                { opacity: speechFadeAnim },
+                                hideStats && { top: -60 }, // Override for hatching screen
+                            ]}
+                        >
                             <Text style={styles.speechText}>{speechBubbleText}</Text>
                             <View style={styles.speechArrow} />
                         </Animated.View>
@@ -442,18 +507,28 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                 )}
 
                 {/* +XP Popup */}
-                <Animated.View style={[styles.xpPopup, {
-                    opacity: xpFadeAnim,
-                    transform: [{ translateY: xpFloatAnim }]
-                }]}>
+                <Animated.View
+                    style={[
+                        styles.xpPopup,
+                        {
+                            opacity: xpFadeAnim,
+                            transform: [{ translateY: xpFloatAnim }],
+                        },
+                    ]}
+                >
                     <Text style={styles.xpText}>+{xpDiff} XP</Text>
                 </Animated.View>
 
                 {/* Level Up Popup */}
-                <Animated.View style={[styles.levelPopup, {
-                    opacity: levelFadeAnim,
-                    transform: [{ scale: levelScaleAnim }]
-                }]}>
+                <Animated.View
+                    style={[
+                        styles.levelPopup,
+                        {
+                            opacity: levelFadeAnim,
+                            transform: [{ scale: levelScaleAnim }],
+                        },
+                    ]}
+                >
                     <Text style={styles.levelText}>LEVEL UP!</Text>
                     <Text style={styles.levelSubText}>Lvl {pet.level}</Text>
                 </Animated.View>
@@ -469,7 +544,10 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                             <Text style={styles.levelBadgeText}>Level {currentLevel}</Text>
                         </View>
                         <View style={styles.moodPill}>
-                            <Smile size={14} color={pet.mood === 'happy' ? '#22c55e' : pet.mood === 'sad' ? '#f87171' : '#a5b4fc'} />
+                            <Smile
+                                size={14}
+                                color={pet.mood === 'happy' ? '#22c55e' : pet.mood === 'sad' ? '#f87171' : '#a5b4fc'}
+                            />
                             <Text style={styles.moodText}>{pet.mood.charAt(0).toUpperCase() + pet.mood.slice(1)}</Text>
                         </View>
                     </View>
@@ -484,7 +562,15 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                             </View>
                             <View style={styles.barWrapper}>
                                 <View style={styles.barBg}>
-                                    <View style={[styles.barFill, { width: `${pet.health}%`, backgroundColor: pet.health < 30 ? '#ef4444' : '#22c55e' }]} />
+                                    <View
+                                        style={[
+                                            styles.barFill,
+                                            {
+                                                width: `${pet.health}%`,
+                                                backgroundColor: pet.health < 30 ? '#ef4444' : '#22c55e',
+                                            },
+                                        ]}
+                                    />
                                 </View>
                                 <Text style={styles.barValue}>{Math.round(pet.health)}%</Text>
                             </View>
@@ -498,29 +584,40 @@ export const Pet = ({ pet, isFullView = false, hideStats = false, disablePress =
                             </View>
                             <View style={styles.barWrapper}>
                                 <View style={styles.barBg}>
-                                    <View style={[styles.barFill, { width: `${xpPercentage}%`, backgroundColor: '#facc15' }]} />
+                                    <View
+                                        style={[
+                                            styles.barFill,
+                                            { width: `${xpPercentage}%`, backgroundColor: '#facc15' },
+                                        ]}
+                                    />
                                 </View>
-                                <Text style={styles.barValue}>{currentXp}/{xpToNextLevel}</Text>
+                                <Text style={styles.barValue}>
+                                    {currentXp}/{xpToNextLevel}
+                                </Text>
                             </View>
                         </View>
                     </View>
 
                     {/* Action Buttons */}
                     <View style={styles.actionButtonsRow}>
-                        <TouchableOpacity style={[styles.actionButton, styles.customizeButton]} onPress={() => router.push('/pet-customize')}>
+                        <TouchableOpacity
+                            style={[styles.actionButton, styles.customizeButton]}
+                            onPress={() => router.push('/pet-customize')}
+                        >
                             <Palette size={18} color="#fff" />
                             <Text style={styles.actionButtonText}>Customize</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.actionButton, styles.shopButton]} onPress={() => router.push('/hat-shop')}>
+                        <TouchableOpacity
+                            style={[styles.actionButton, styles.shopButton]}
+                            onPress={() => router.push('/hat-shop')}
+                        >
                             <Zap size={18} color="#1a1a1a" fill="#1a1a1a" />
                             <Text style={[styles.actionButtonText, { color: '#1a1a1a' }]}>Hat Shop</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             )}
-
-
         </View>
     );
 };

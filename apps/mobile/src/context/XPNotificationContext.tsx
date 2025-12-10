@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
-import { Zap } from 'lucide-react-native';
+import { useHabit } from '@habitapp/shared';
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
-import { useHabit } from '@habitapp/shared';
+import { Zap } from 'lucide-react-native';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 
 interface XPNotification {
     id: string;
@@ -40,88 +40,89 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
         if (!settings.sound) return;
 
         try {
-            const { sound } = await Audio.Sound.createAsync(
-                require('../../assets/sounds/xp-pop.mp3'),
-                { shouldPlay: true, volume: 0.5 }
-            );
+            const { sound } = await Audio.Sound.createAsync(require('../../assets/sounds/xp-pop.mp3'), {
+                shouldPlay: true,
+                volume: 0.5,
+            });
             // Unload after playing
             sound.setOnPlaybackStatusUpdate((status) => {
                 if (status.isLoaded && status.didJustFinish) {
                     sound.unloadAsync();
                 }
             });
-        } catch (error) {
-
-        }
+        } catch (error) {}
     };
 
-    const showXP = useCallback((amount: number) => {
-        // Play sound and double haptic for extra satisfaction
-        playXPSound();
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 100);
+    const showXP = useCallback(
+        (amount: number) => {
+            // Play sound and double haptic for extra satisfaction
+            playXPSound();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 100);
 
-        const id = `xp-${idCounter.current++}`;
-        const opacity = new Animated.Value(0);
-        const translateY = new Animated.Value(30);
-        const scale = new Animated.Value(0.5); // Start smaller for bigger pop
+            const id = `xp-${idCounter.current++}`;
+            const opacity = new Animated.Value(0);
+            const translateY = new Animated.Value(30);
+            const scale = new Animated.Value(0.5); // Start smaller for bigger pop
 
-        const notification: XPNotification = { id, amount, opacity, translateY, scale };
+            const notification: XPNotification = { id, amount, opacity, translateY, scale };
 
-        setNotifications(prev => [...prev, notification]);
+            setNotifications((prev) => [...prev, notification]);
 
-        // Animate in with overshoot bounce
-        Animated.parallel([
-            Animated.timing(opacity, {
-                toValue: 1,
-                duration: 100,
-                useNativeDriver: true,
-            }),
-            Animated.spring(translateY, {
-                toValue: 0,
-                friction: 6,
-                tension: 120,
-                useNativeDriver: true,
-            }),
-            Animated.spring(scale, {
-                toValue: 1.1, // Overshoot then settle
-                friction: 4,
-                tension: 180,
-                useNativeDriver: true,
-            }),
-        ]).start(() => {
-            // Settle back to 1.0
-            Animated.spring(scale, {
-                toValue: 1,
-                friction: 6,
-                tension: 100,
-                useNativeDriver: true,
-            }).start();
-        });
-
-        // Animate out quickly
-        setTimeout(() => {
+            // Animate in with overshoot bounce
             Animated.parallel([
                 Animated.timing(opacity, {
+                    toValue: 1,
+                    duration: 100,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(translateY, {
                     toValue: 0,
-                    duration: 200,
+                    friction: 6,
+                    tension: 120,
                     useNativeDriver: true,
                 }),
-                Animated.timing(translateY, {
-                    toValue: -20,
-                    duration: 200,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(scale, {
-                    toValue: 0.8,
-                    duration: 200,
+                Animated.spring(scale, {
+                    toValue: 1.1, // Overshoot then settle
+                    friction: 4,
+                    tension: 180,
                     useNativeDriver: true,
                 }),
             ]).start(() => {
-                setNotifications(prev => prev.filter(n => n.id !== id));
+                // Settle back to 1.0
+                Animated.spring(scale, {
+                    toValue: 1,
+                    friction: 6,
+                    tension: 100,
+                    useNativeDriver: true,
+                }).start();
             });
-        }, 700);
-    }, [settings.sound]);
+
+            // Animate out quickly
+            setTimeout(() => {
+                Animated.parallel([
+                    Animated.timing(opacity, {
+                        toValue: 0,
+                        duration: 200,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(translateY, {
+                        toValue: -20,
+                        duration: 200,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(scale, {
+                        toValue: 0.8,
+                        duration: 200,
+                        useNativeDriver: true,
+                    }),
+                ]).start(() => {
+                    setNotifications((prev) => prev.filter((n) => n.id !== id));
+                });
+            }, 700);
+        },
+        [settings.sound]
+    );
 
     return (
         <XPNotificationContext.Provider value={{ showXP }}>
@@ -136,10 +137,7 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
                             styles.notification,
                             {
                                 opacity: notification.opacity,
-                                transform: [
-                                    { translateY: notification.translateY },
-                                    { scale: notification.scale },
-                                ],
+                                transform: [{ translateY: notification.translateY }, { scale: notification.scale }],
                             },
                         ]}
                     >

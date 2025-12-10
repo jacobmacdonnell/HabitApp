@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, ViewStyle, StyleProp, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { LiquidGlass } from '../theme/theme';
 
 interface ScreenWrapperProps {
@@ -20,15 +21,11 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
     contentContainerStyle,
     footer,
     keyboardAvoiding = false,
-    isModal = false
+    isModal = false,
 }) => {
     const insets = useSafeAreaInsets();
 
-    const containerStyles = [
-        styles.container,
-        { paddingTop: isModal ? 0 : insets.top },
-        style
-    ];
+    const containerStyles = [styles.container, { paddingTop: isModal ? 0 : insets.top }, style];
 
     const bottomPadding = isModal ? insets.bottom + 32 : 100;
 
@@ -41,7 +38,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
                         styles.scrollContent,
                         isModal && { paddingTop: 32 }, // Visual top padding for modals
                         { paddingBottom: isModal ? insets.bottom + 32 : 100 },
-                        contentContainerStyle
+                        contentContainerStyle,
                     ]}
                     showsVerticalScrollIndicator={false}
                     contentInsetAdjustmentBehavior={isModal ? 'never' : 'automatic'}
@@ -49,9 +46,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
                     {children}
                 </ScrollView>
             ) : (
-                <View style={containerStyles}>
-                    {children}
-                </View>
+                <View style={containerStyles}>{children}</View>
             )}
             {footer}
         </>
@@ -59,13 +54,8 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 
     return (
         <View style={styles.wrapper}>
-
-
             {keyboardAvoiding ? (
-                <KeyboardAvoidingView
-                    style={{ flex: 1 }}
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                >
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                     {Content}
                 </KeyboardAvoidingView>
             ) : (
@@ -86,5 +76,5 @@ const styles = StyleSheet.create({
     scrollContent: {
         padding: LiquidGlass.dock.horizontalPadding,
         paddingBottom: 100, // Space for dock
-    }
+    },
 });

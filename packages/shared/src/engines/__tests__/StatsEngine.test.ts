@@ -1,5 +1,5 @@
-import { StatsEngine } from '../StatsEngine';
 import { DailyProgress } from '../../types';
+import { StatsEngine } from '../StatsEngine';
 
 describe('StatsEngine', () => {
     describe('calculateStreak', () => {
@@ -31,23 +31,33 @@ describe('StatsEngine', () => {
         });
 
         it('should return 0 if streak is broken (last completion 2 days ago)', () => {
-            const history: DailyProgress[] = [{
-                habitId, date: twoDaysAgo, currentCount: 1, completed: true
-            }];
+            const history: DailyProgress[] = [
+                {
+                    habitId,
+                    date: twoDaysAgo,
+                    currentCount: 1,
+                    completed: true,
+                },
+            ];
             expect(StatsEngine.calculateStreak(history, habitId)).toBe(0);
         });
 
         it('should return 1 if completed today only', () => {
-            const history: DailyProgress[] = [{
-                habitId, date: today, currentCount: 1, completed: true
-            }];
+            const history: DailyProgress[] = [
+                {
+                    habitId,
+                    date: today,
+                    currentCount: 1,
+                    completed: true,
+                },
+            ];
             expect(StatsEngine.calculateStreak(history, habitId)).toBe(1);
         });
 
         it('should return 2 if completed today and yesterday', () => {
             const history: DailyProgress[] = [
                 { habitId, date: today, currentCount: 1, completed: true },
-                { habitId, date: yesterday, currentCount: 1, completed: true }
+                { habitId, date: yesterday, currentCount: 1, completed: true },
             ];
             expect(StatsEngine.calculateStreak(history, habitId)).toBe(2);
         });
@@ -56,7 +66,7 @@ describe('StatsEngine', () => {
             const history: DailyProgress[] = [
                 { habitId, date: today, currentCount: 1, completed: true },
                 { habitId, date: today, currentCount: 1, completed: true }, // Duplicate
-                { habitId, date: yesterday, currentCount: 1, completed: true }
+                { habitId, date: yesterday, currentCount: 1, completed: true },
             ];
             expect(StatsEngine.calculateStreak(history, habitId)).toBe(2);
         });

@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  quality:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Lint Shared
+        run: npm run lint --workspace=packages/shared
+
+      - name: Test Shared
+        run: npm run test --workspace=packages/shared
+
+      - name: Lint Mobile
+        run: npm run lint --workspace=apps/mobile

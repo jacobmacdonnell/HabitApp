@@ -1,5 +1,5 @@
-import { Redirect } from 'expo-router';
 import { useHabit } from '@habitapp/shared';
+import { Redirect } from 'expo-router';
 
 export default function Index() {
     const { isOnboarding } = useHabit();

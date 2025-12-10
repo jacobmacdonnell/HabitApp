@@ -31,19 +31,19 @@ export const LiquidGlass = {
             shadowOpacity: 0.3,
             shadowRadius: 20,
             elevation: 10,
-        }
+        },
     },
 
     // Border Radius Scale - iOS 26 Standard
     radius: {
-        xs: 4,      // Progress bars, tiny elements
-        sm: 8,      // Small chips
-        md: 12,     // Buttons
-        lg: 16,     // Inputs, small cards
-        xl: 20,     // Pills, badges
-        xxl: 24,    // Cards, sheets
-        pill: 28,   // FAB (half of 56pt)
-        dock: 34,   // Navbar (half of 68pt)
+        xs: 4, // Progress bars, tiny elements
+        sm: 8, // Small chips
+        md: 12, // Buttons
+        lg: 16, // Inputs, small cards
+        xl: 20, // Pills, badges
+        xxl: 24, // Cards, sheets
+        pill: 28, // FAB (half of 56pt)
+        dock: 34, // Navbar (half of 68pt)
         full: 9999, // Circular
     },
 
@@ -60,7 +60,7 @@ export const LiquidGlass = {
             shadowOpacity: 0.2,
             shadowRadius: 8,
             elevation: 5,
-        }
+        },
     },
 
     // Typography Scale - iOS SF Pro aligned
@@ -87,7 +87,7 @@ export const LiquidGlass = {
             semibold: '600' as const,
             medium: '500' as const,
             regular: '400' as const,
-        }
+        },
     },
 
     // Spacing Scale
@@ -106,12 +106,12 @@ export const LiquidGlass = {
 
     // Header constants (unified across all screens)
     header: {
-        marginBottom: 24,        // Space below header title
-        titleSize: 34,           // Header title font size
+        marginBottom: 24, // Space below header title
+        titleSize: 34, // Header title font size
         titleWeight: '800' as const,
         titleColor: '#fff',
         titleLetterSpacing: -0.5,
-        contentTopPadding: 24,   // Extra padding above content after safe area (increased for more breathability)
+        contentTopPadding: 24, // Extra padding above content after safe area (increased for more breathability)
     },
 
     // Text Colors
@@ -125,15 +125,15 @@ export const LiquidGlass = {
     // Colors
     colors: {
         // Semantic Palette - Playful Theme
-        primary: '#34C759',      // Verified Green (Navbar, Complete)
-        secondary: '#AF52DE',    // Playful Purple (Accents, Toggles)
-        tertiary: '#FF9500',     // Playful Orange (Highlights)
+        primary: '#34C759', // Verified Green (Navbar, Complete)
+        secondary: '#AF52DE', // Playful Purple (Accents, Toggles)
+        tertiary: '#FF9500', // Playful Orange (Highlights)
 
         // System Colors
         white: '#ffffff',
         black: '#000000',
         danger: '#ef4444',
-        success: '#34C759',      // Match primary green
+        success: '#34C759', // Match primary green
         warning: '#f59e0b',
         info: '#3b82f6',
 
@@ -142,10 +142,10 @@ export const LiquidGlass = {
         glassBackground: 'rgba(255,255,255,0.1)',
 
         // Domain Specific
-        xp: '#facc15',           // XP/gold
-        levelUp: '#a855f7',      // Purple for level up
-        sleep: '#c084fc',        // Light purple for sleep
-        health: '#f87171',       // Health red
+        xp: '#facc15', // XP/gold
+        levelUp: '#a855f7', // Purple for level up
+        sleep: '#c084fc', // Light purple for sleep
+        health: '#f87171', // Health red
 
         // Components
         card: 'rgba(255,255,255,0.08)',
@@ -167,8 +167,8 @@ export const LiquidGlass = {
             color: '#fff',
             fontWeight: '700' as const,
             fontSize: 15,
-        }
-    }
+        },
+    },
 } as const;
 
 // iOS 26 Specific - Glass Effect Styles

@@ -1,6 +1,7 @@
+import { LiquidGlassView } from '@callstack/liquid-glass';
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps, StyleProp, ViewStyle, TextStyle } from 'react-native';
-import { LiquidGlassView } from '@callstack/liquid-glass';
+
 import { LiquidGlass } from '../theme/theme';
 
 interface GlassInputProps extends TextInputProps {
@@ -22,7 +23,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         <View style={[styles.container, containerStyle]}>
             {label && <Text style={styles.label}>{label}</Text>}
             <View style={[styles.inputContainer, style]}>
-                <LiquidGlassView style={StyleSheet.absoluteFill} interactive={true} />
+                <LiquidGlassView style={StyleSheet.absoluteFill} interactive />
                 <TextInput
                     style={[styles.input, error ? styles.inputError : null]}
                     placeholderTextColor={LiquidGlass.text.tertiary}
@@ -71,5 +72,5 @@ const styles = StyleSheet.create({
         fontSize: LiquidGlass.typography.size.caption1,
         marginTop: LiquidGlass.spacing.xs,
         marginLeft: LiquidGlass.spacing.xs,
-    }
+    },
 });

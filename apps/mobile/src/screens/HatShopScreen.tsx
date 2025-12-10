@@ -1,12 +1,13 @@
+import { useHabit, HAT_ITEMS } from '@habitapp/shared';
+import { useNavigation } from '@react-navigation/native';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import { Zap, ArrowLeft, Check } from 'lucide-react-native';
 import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, FlatList } from 'react-native';
-import { useHabit, HAT_ITEMS } from '@habitapp/shared';
+
 import { LiquidGlass } from '../theme/theme';
-import { useNavigation } from '@react-navigation/native';
-import { Zap, ArrowLeft, Check } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
-import { BlurView } from 'expo-blur';
 
 export const HatShopScreen = () => {
     const { pet, buyItem, equipHat } = useHabit();
@@ -23,7 +24,7 @@ export const HatShopScreen = () => {
         router.back();
     };
 
-    const handleBuy = async (item: typeof HAT_ITEMS[0]) => {
+    const handleBuy = async (item: (typeof HAT_ITEMS)[0]) => {
         if (!pet) return;
 
         if (pet.xp < item.price) {
@@ -32,23 +33,19 @@ export const HatShopScreen = () => {
             return;
         }
 
-        Alert.alert(
-            'Purchase Hat',
-            `Buy ${item.name} for ${item.price} XP?`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Buy',
-                    onPress: async () => {
-                        const success = await buyItem(item.id, item.price);
-                        if (success) {
-                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                            // Auto equip? Maybe just unlock.
-                        }
+        Alert.alert('Purchase Hat', `Buy ${item.name} for ${item.price} XP?`, [
+            { text: 'Cancel', style: 'cancel' },
+            {
+                text: 'Buy',
+                onPress: async () => {
+                    const success = await buyItem(item.id, item.price);
+                    if (success) {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                        // Auto equip? Maybe just unlock.
                     }
-                }
-            ]
-        );
+                },
+            },
+        ]);
     };
 
     const handleEquip = (itemId: string) => {
@@ -56,7 +53,7 @@ export const HatShopScreen = () => {
         equipHat(itemId);
     };
 
-    const renderItem = ({ item }: { item: typeof HAT_ITEMS[0] }) => {
+    const renderItem = ({ item }: { item: (typeof HAT_ITEMS)[0] }) => {
         const isOwned = pet?.inventory?.includes(item.id) || item.id === 'none';
         const isEquipped = pet?.hat === item.id || (item.id === 'none' && !pet?.hat);
         const canAfford = (pet?.xp || 0) >= item.price;
@@ -71,10 +68,7 @@ export const HatShopScreen = () => {
 
                     {isOwned ? (
                         <TouchableOpacity
-                            style={[
-                                styles.button,
-                                isEquipped ? styles.equippedButton : styles.equipButton
-                            ]}
+                            style={[styles.button, isEquipped ? styles.equippedButton : styles.equipButton]}
                             onPress={() => !isEquipped && handleEquip(item.id)}
                             activeOpacity={isEquipped ? 1 : 0.7}
                         >
@@ -89,18 +83,13 @@ export const HatShopScreen = () => {
                         </TouchableOpacity>
                     ) : (
                         <TouchableOpacity
-                            style={[
-                                styles.button,
-                                canAfford ? styles.buyButton : styles.lockedButton
-                            ]}
+                            style={[styles.button, canAfford ? styles.buyButton : styles.lockedButton]}
                             onPress={() => handleBuy(item)}
                             activeOpacity={canAfford ? 0.7 : 1}
                         >
                             <View style={styles.buttonContent}>
                                 <Zap size={12} color="#1a1a1a" fill="#1a1a1a" />
-                                <Text style={[styles.buttonText, { color: '#1a1a1a' }]}>
-                                    {item.price}
-                                </Text>
+                                <Text style={[styles.buttonText, { color: '#1a1a1a' }]}>{item.price}</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -128,7 +117,7 @@ export const HatShopScreen = () => {
             <FlatList
                 data={HAT_ITEMS}
                 renderItem={renderItem}
-                keyExtractor={item => item.id}
+                keyExtractor={(item) => item.id}
                 numColumns={2}
                 contentContainerStyle={styles.gridContent}
                 columnWrapperStyle={styles.columnWrapper}

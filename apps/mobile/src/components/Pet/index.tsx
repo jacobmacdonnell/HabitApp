@@ -1,6 +1,6 @@
 /**
  * Pet Component - Main export
- * 
+ *
  * This folder contains the Pet character and all its sub-components:
  * - Pet.tsx: Main pet component with animations and state
  * - PetEyes.tsx: Eye rendering (sleeping, peeking, blinking, open)

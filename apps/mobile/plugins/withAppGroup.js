@@ -7,9 +7,7 @@ const withAppGroup = (config, { groupIdentifier }) => {
 
     // 1. Add Entitlement
     config = withEntitlementsPlist(config, (config) => {
-        config.modResults['com.apple.security.application-groups'] = [
-            groupIdentifier,
-        ];
+        config.modResults['com.apple.security.application-groups'] = [groupIdentifier];
         return config;
     });
 

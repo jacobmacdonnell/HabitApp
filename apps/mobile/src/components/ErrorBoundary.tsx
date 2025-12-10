@@ -1,7 +1,8 @@
+import { AlertTriangle, RefreshCw } from 'lucide-react-native';
 import React, { Component, ReactNode } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
 import { LiquidGlass } from '../theme/theme';
-import { AlertTriangle, RefreshCw } from 'lucide-react-native';
 
 interface Props {
     children: ReactNode;
@@ -56,17 +57,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
                         {__DEV__ && this.state.error && (
                             <View style={styles.errorDetails}>
-                                <Text style={styles.errorText}>
-                                    {this.state.error.message}
-                                </Text>
+                                <Text style={styles.errorText}>{this.state.error.message}</Text>
                             </View>
                         )}
 
-                        <TouchableOpacity
-                            style={styles.retryButton}
-                            onPress={this.handleRetry}
-                            activeOpacity={0.8}
-                        >
+                        <TouchableOpacity style={styles.retryButton} onPress={this.handleRetry} activeOpacity={0.8}>
                             <RefreshCw size={20} color={LiquidGlass.colors.black} />
                             <Text style={styles.retryText}>Try Again</Text>
                         </TouchableOpacity>

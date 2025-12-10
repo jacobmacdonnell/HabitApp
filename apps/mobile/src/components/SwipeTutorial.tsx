@@ -55,18 +55,16 @@ export const SwipeTutorial = ({ onDismiss, cardTop }: SwipeTutorialProps) => {
     };
 
     return (
-        <TouchableOpacity
-            style={[styles.container, { top: cardTop }]}
-            activeOpacity={1}
-            onPress={fadeOut}
-        >
-            <Animated.View style={[
-                styles.tooltip,
-                {
-                    opacity,
-                    transform: [{ translateY }],
-                }
-            ]}>
+        <TouchableOpacity style={[styles.container, { top: cardTop }]} activeOpacity={1} onPress={fadeOut}>
+            <Animated.View
+                style={[
+                    styles.tooltip,
+                    {
+                        opacity,
+                        transform: [{ translateY }],
+                    },
+                ]}
+            >
                 <Text style={styles.arrow}>←</Text>
                 <Text style={styles.tooltipText}>Swipe for options</Text>
             </Animated.View>

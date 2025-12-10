@@ -10,7 +10,9 @@ export const PetHat = ({ hat }: PetHatProps) => {
 
     return (
         <G transform="translate(60, 10) scale(0.8)">
-            {hat === 'party' && <Path d="M50 10 L80 70 L20 70 Z" fill="#facc15" stroke="white" strokeWidth="2" strokeLinejoin="round" />}
+            {hat === 'party' && (
+                <Path d="M50 10 L80 70 L20 70 Z" fill="#facc15" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+            )}
             {hat === 'cowboy' && (
                 <G transform="translate(-10, -10)">
                     <Path d="M10 60 Q50 30 90 60" fill="#78350f" stroke="white" strokeWidth="2" />
@@ -26,7 +28,13 @@ export const PetHat = ({ hat }: PetHatProps) => {
             )}
             {hat === 'crown' && (
                 <G transform="translate(0, -10)">
-                    <Path d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z" fill="#fbbf24" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+                    <Path
+                        d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z"
+                        fill="#fbbf24"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                    />
                 </G>
             )}
         </G>

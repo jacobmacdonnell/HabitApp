@@ -1,7 +1,17 @@
-import React from 'react';
-import { TouchableOpacity, Text, View, StyleSheet, ActivityIndicator, StyleProp, ViewStyle, TextStyle } from 'react-native';
-import * as Haptics from 'expo-haptics';
 import { LiquidGlassView } from '@callstack/liquid-glass';
+import * as Haptics from 'expo-haptics';
+import React from 'react';
+import {
+    TouchableOpacity,
+    Text,
+    View,
+    StyleSheet,
+    ActivityIndicator,
+    StyleProp,
+    ViewStyle,
+    TextStyle,
+} from 'react-native';
+
 import { LiquidGlass } from '../theme/theme';
 
 interface GlassButtonProps {
@@ -23,15 +33,13 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
     disabled = false,
     icon,
     style,
-    textStyle
+    textStyle,
 }) => {
     const handlePress = () => {
         if (disabled || loading) return;
         Haptics.selectionAsync();
         onPress();
     };
-
-
 
     const getTextStyle = () => {
         switch (variant) {
@@ -53,7 +61,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
                 variant === 'danger' && styles.danger,
                 variant === 'secondary' && styles.secondaryBorder,
                 disabled && styles.disabled,
-                style
+                style,
             ]}
             onPress={handlePress}
             activeOpacity={0.8}
@@ -64,13 +72,15 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
         >
             {variant === 'secondary' && (
                 <View style={[StyleSheet.absoluteFill, { borderRadius: LiquidGlass.radius.xxl, overflow: 'hidden' }]}>
-                    <LiquidGlassView style={StyleSheet.absoluteFill} interactive={true} />
+                    <LiquidGlassView style={StyleSheet.absoluteFill} interactive />
                 </View>
             )}
 
             <View style={styles.contentContainer}>
                 {loading ? (
-                    <ActivityIndicator color={variant === 'primary' ? LiquidGlass.colors.black : LiquidGlass.colors.white} />
+                    <ActivityIndicator
+                        color={variant === 'primary' ? LiquidGlass.colors.black : LiquidGlass.colors.white}
+                    />
                 ) : (
                     <>
                         {icon}
@@ -136,5 +146,5 @@ const styles = StyleSheet.create({
     },
     dangerText: {
         color: LiquidGlass.colors.danger,
-    }
+    },
 });

@@ -40,5 +40,25 @@ export const PetGameEngine = {
 
     recoverHealth: (currentHealth: number, maxHealth: number = 100) => {
         return Math.min(currentHealth + 2, maxHealth);
+    },
+
+    purchaseItem: (pet: Pet, itemId: string, price: number): { success: boolean, pet?: Pet, error?: string } => {
+        if ((pet.xp || 0) < price) {
+            return { success: false, error: 'Not enough XP' };
+        }
+
+        const currentInventory = pet.inventory || [];
+        if (currentInventory.includes(itemId)) {
+            return { success: false, error: 'Item already owned' };
+        }
+
+        return {
+            success: true,
+            pet: {
+                ...pet,
+                xp: (pet.xp || 0) - price,
+                inventory: [...currentInventory, itemId]
+            }
+        };
     }
 };

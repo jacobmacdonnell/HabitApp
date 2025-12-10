@@ -1,8 +1,7 @@
-import { PetGameEngine } from '../PetGameEngine';
 import { Pet } from '../../types';
+import { PetGameEngine } from '../PetGameEngine';
 
 describe('PetGameEngine', () => {
-
     // XP Logic
     describe('calculateXPGain', () => {
         it('should add 20 XP and not level up if below threshold', () => {
@@ -16,7 +15,7 @@ describe('PetGameEngine', () => {
                 inventory: [],
                 history: [],
                 color: '#fff',
-                lastInteraction: ''
+                lastInteraction: '',
             };
 
             const result = PetGameEngine.calculateXPGain(pet);
@@ -36,13 +35,10 @@ describe('PetGameEngine', () => {
                 inventory: [],
                 history: [],
                 color: '#fff',
-                lastInteraction: ''
+                lastInteraction: '',
             };
 
             const result = PetGameEngine.calculateXPGain(pet);
-            // 90 + 20 = 110. Threshold 100.
-            // New Level = 2.
-            // New XP = 110 - 100 = 10.
             expect(result.level).toBe(2);
             expect(result.xp).toBe(10);
             expect(result.health).toBe(100); // Full heal
@@ -62,7 +58,6 @@ describe('PetGameEngine', () => {
             twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
             const result = PetGameEngine.calculateDecay(twoDaysAgo.toISOString(), 100);
-            // Diff days = 2. Missed = 1. Decay = 10.
             expect(result).toBe(90);
         });
 
@@ -70,6 +65,42 @@ describe('PetGameEngine', () => {
             const longAgo = new Date('2020-01-01').toISOString();
             const result = PetGameEngine.calculateDecay(longAgo, 50);
             expect(result).toBe(0);
+        });
+    });
+
+    // Economy Logic
+    describe('purchaseItem', () => {
+        const basePet: Pet = {
+            name: 'Test',
+            xp: 100,
+            level: 1,
+            health: 100,
+            maxHealth: 100,
+            mood: 'happy',
+            inventory: ['hat-1'],
+            history: [],
+            color: '#fff',
+            lastInteraction: ''
+        };
+
+        it('should purchase item successfully if XP sufficient', () => {
+            const result = PetGameEngine.purchaseItem(basePet, 'hat-2', 50);
+            expect(result.success).toBe(true);
+            expect(result.pet?.xp).toBe(50);
+            expect(result.pet?.inventory).toContain('hat-2');
+            expect(result.pet?.inventory).toHaveLength(2);
+        });
+
+        it('should fail if XP is insufficient', () => {
+            const result = PetGameEngine.purchaseItem(basePet, 'hat-2', 150);
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('Not enough XP');
+        });
+
+        it('should fail if item already owned', () => {
+            const result = PetGameEngine.purchaseItem(basePet, 'hat-1', 10);
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('Item already owned');
         });
     });
 });

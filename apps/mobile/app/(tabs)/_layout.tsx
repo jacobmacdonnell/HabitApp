@@ -1,6 +1,7 @@
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { useTheme } from '../../src/context/ThemeContext';
 import { useHabit } from '@habitapp/shared';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
+
+import { useTheme } from '../../src/context/ThemeContext';
 
 export default function TabLayout() {
     const { colors: themeColors } = useTheme();

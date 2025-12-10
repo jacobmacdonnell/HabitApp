@@ -1,14 +1,15 @@
+import { LiquidGlassView } from '@callstack/liquid-glass';
+import { useHabit } from '@habitapp/shared';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
+import { ArrowRight } from 'lucide-react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
-import { LiquidGlassView } from '@callstack/liquid-glass';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useHabit } from '@habitapp/shared';
-import { router } from 'expo-router';
+
 import { GlassButton } from '../components/GlassButton';
 import { Pet } from '../components/Pet';
-import * as Haptics from 'expo-haptics';
-import { ArrowRight } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -167,26 +168,26 @@ export const HatchingScreen = () => {
             <View style={[styles.blob, { backgroundColor: pet?.color || '#FF6B6B', top: -100, left: -100 }]} />
             <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
 
-
             <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 32 }]}>
                 {/* Title */}
                 <Text style={styles.title}>
-                    {phase === 'egg' || phase === 'cracking' ? 'Something is happening...' : `${pet?.name || 'Your Pet'} has hatched!`}
+                    {phase === 'egg' || phase === 'cracking'
+                        ? 'Something is happening...'
+                        : `${pet?.name || 'Your Pet'} has hatched!`}
                 </Text>
 
                 {/* Egg / Pet Container */}
                 <View style={styles.petContainer}>
                     {/* Egg (visible during egg and cracking phases) */}
                     {(phase === 'egg' || phase === 'cracking') && (
-                        <Animated.View style={[
-                            styles.eggWrapper,
-                            {
-                                transform: [
-                                    { translateX: eggShake },
-                                    { scale: eggScale },
-                                ],
-                            }
-                        ]}>
+                        <Animated.View
+                            style={[
+                                styles.eggWrapper,
+                                {
+                                    transform: [{ translateX: eggShake }, { scale: eggScale }],
+                                },
+                            ]}
+                        >
                             <View style={[styles.eggGlow, { backgroundColor: `${pet?.color || '#FF6B6B'}30` }]}>
                                 <Text style={styles.eggEmoji}>🥚</Text>
                             </View>
@@ -197,19 +198,25 @@ export const HatchingScreen = () => {
 
                     {/* Pet (visible after hatching) - uses Pet's native speech bubble */}
                     {(phase === 'hatched' || phase === 'speaking') && (
-                        <Animated.View style={[
-                            styles.petWrapper,
-                            {
-                                opacity: petOpacity,
-                                transform: [{ scale: petScale }],
-                            }
-                        ]}>
+                        <Animated.View
+                            style={[
+                                styles.petWrapper,
+                                {
+                                    opacity: petOpacity,
+                                    transform: [{ scale: petScale }],
+                                },
+                            ]}
+                        >
                             <Pet
                                 pet={pet}
-                                isFullView={true}
-                                hideStats={true}
-                                disablePress={true}
-                                initialSpeechText={phase === 'speaking' ? `Hi! I'm ${pet?.name || 'your new friend'}! Let's build great habits together! 🎉` : undefined}
+                                isFullView
+                                hideStats
+                                disablePress
+                                initialSpeechText={
+                                    phase === 'speaking'
+                                        ? `Hi! I'm ${pet?.name || 'your new friend'}! Let's build great habits together! 🎉`
+                                        : undefined
+                                }
                                 feedingBounce={0}
                             />
                         </Animated.View>

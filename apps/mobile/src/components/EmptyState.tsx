@@ -1,6 +1,7 @@
+import { Coffee, Trophy, Sparkles } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Coffee, Trophy, Sparkles } from 'lucide-react-native';
+
 import { LiquidGlass } from '../theme/theme';
 
 interface EmptyStateProps {
@@ -18,13 +19,12 @@ export const EmptyState = ({ type, message }: EmptyStateProps) => {
                     <Coffee size={32} color={LiquidGlass.colors.secondary} />
                 )}
             </View>
-            <Text style={styles.title}>
-                {type === 'all-done' ? "All Wrapped Up!" : "Nothing Here"}
-            </Text>
+            <Text style={styles.title}>{type === 'all-done' ? 'All Wrapped Up!' : 'Nothing Here'}</Text>
             <Text style={styles.subtitle}>
-                {message || (type === 'all-done'
-                    ? "You've crushed all your habits for now. Time to relax!"
-                    : "No habits scheduled for this time. Enjoy the quiet.")}
+                {message ||
+                    (type === 'all-done'
+                        ? "You've crushed all your habits for now. Time to relax!"
+                        : 'No habits scheduled for this time. Enjoy the quiet.')}
             </Text>
         </View>
     );

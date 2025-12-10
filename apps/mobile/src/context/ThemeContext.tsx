@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useMemo } from 'react';
 import { useHabit } from '@habitapp/shared';
+import React, { createContext, useContext, useMemo } from 'react';
+
 import { LiquidGlass } from '../theme/theme';
 
 /**
@@ -36,11 +37,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         };
     }, [pet?.color]);
 
-    return (
-        <ThemeContext.Provider value={{ colors }}>
-            {children}
-        </ThemeContext.Provider>
-    );
+    return <ThemeContext.Provider value={{ colors }}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = () => {

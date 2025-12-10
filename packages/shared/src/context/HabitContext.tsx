@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Habit, Pet, DailyProgress, Settings, StorageServiceType, HabitContextType } from '../types';
-import { getLocalDateString } from '../utils/dateUtils';
+
 import { PetGameEngine } from '../engines/PetGameEngine';
 import { StatsEngine } from '../engines/StatsEngine';
+import { Habit, Pet, DailyProgress, Settings, StorageServiceType, HabitContextType } from '../types';
+import { getLocalDateString } from '../utils/dateUtils';
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined);
 
-export const HabitProvider = ({ children, storage }: { children: React.ReactNode, storage: StorageServiceType }) => {
+export const HabitProvider = ({ children, storage }: { children: React.ReactNode; storage: StorageServiceType }) => {
     const [habits, setHabits] = useState<Habit[]>([]);
     const [pet, setPet] = useState<Pet | null>(null);
     const [progress, setProgress] = useState<DailyProgress[]>([]);
@@ -16,7 +17,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         sleepEnd: '06:00',
         notifications: true,
         sound: true,
-        theme: 'auto'
+        theme: 'auto',
     });
 
     const [stats, setStats] = useState<Record<string, { currentStreak: number; totalCompletions: number }>>({});
@@ -30,10 +31,12 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
                 // Load Stats for Scalability
                 const statsMap: Record<string, { currentStreak: number; totalCompletions: number }> = {};
                 if (storage.getHabitStats) {
-                    await Promise.all(loadedHabits.map(async (h) => {
-                        const s = await storage.getHabitStats!(h.id);
-                        statsMap[h.id] = s;
-                    }));
+                    await Promise.all(
+                        loadedHabits.map(async (h) => {
+                            const s = await storage.getHabitStats!(h.id);
+                            statsMap[h.id] = s;
+                        })
+                    );
                 }
                 setStats(statsMap);
 
@@ -67,9 +70,8 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
                     ? await storage.getProgressForRange(ninetyDaysAgo, today)
                     : await storage.getProgress();
                 setProgress(loadedProgress || []);
-
             } catch (error) {
-                console.error("Failed to load data from storage:", error);
+                console.error('Failed to load data from storage:', error);
                 setHabits([]);
                 setPet(null);
                 setProgress([]);
@@ -119,8 +121,6 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         }
     };
 
-
-
     const generateId = () => {
         return Math.random().toString(36).substring(2) + Date.now().toString(36);
     };
@@ -138,11 +138,11 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         }
 
         // Init stats
-        setStats(prev => ({ ...prev, [newHabit.id]: { currentStreak: 0, totalCompletions: 0 } }));
+        setStats((prev) => ({ ...prev, [newHabit.id]: { currentStreak: 0, totalCompletions: 0 } }));
     };
 
     const updateHabit = async (id: string, updates: Partial<Habit>) => {
-        const updatedHabits = habits.map(h => h.id === id ? { ...h, ...updates } : h);
+        const updatedHabits = habits.map((h) => (h.id === id ? { ...h, ...updates } : h));
         setHabits(updatedHabits);
 
         // Use atomic operation when available, fallback to full save
@@ -154,7 +154,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
     };
 
     const deleteHabit = async (id: string) => {
-        const updatedHabits = habits.filter(h => h.id !== id);
+        const updatedHabits = habits.filter((h) => h.id !== id);
         setHabits(updatedHabits);
 
         // Use atomic operation when available (cascade delete handles progress)
@@ -163,16 +163,16 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         } else {
             await storage.saveHabits(updatedHabits);
             // Clean up progress for deleted habit (only needed for legacy storage)
-            const updatedProgress = progress.filter(p => p.habitId !== id);
+            const updatedProgress = progress.filter((p) => p.habitId !== id);
             setProgress(updatedProgress);
             await storage.saveProgress(updatedProgress);
         }
 
         // Cleanup local progress state (even with cascade, local state needs update)
-        setProgress(prev => prev.filter(p => p.habitId !== id));
+        setProgress((prev) => prev.filter((p) => p.habitId !== id));
 
         // Cleanup stats
-        setStats(prev => {
+        setStats((prev) => {
             const newStats = { ...prev };
             delete newStats[id];
             return newStats;
@@ -180,8 +180,8 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
     };
 
     const logProgress = async (habitId: string, date: string) => {
-        const currentProgress = progress.find(p => p.habitId === habitId && p.date === date);
-        const habit = habits.find(h => h.id === habitId);
+        const currentProgress = progress.find((p) => p.habitId === habitId && p.date === date);
+        const habit = habits.find((h) => h.id === habitId);
 
         if (!habit) return;
 
@@ -189,7 +189,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         let gainedXp = false;
 
         if (currentProgress) {
-            newProgress = progress.map(p => {
+            newProgress = progress.map((p) => {
                 if (p.habitId === habitId && p.date === date) {
                     const newCount = Math.min(p.currentCount + 1, habit.targetCount);
                     if (newCount === habit.targetCount && !p.completed) {
@@ -201,7 +201,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
                 return p;
             });
         } else {
-            const isCompleted = 1 >= habit.targetCount;
+            const isCompleted = habit.targetCount <= 1;
             if (isCompleted) gainedXp = true;
             newProgress = [...progress, { habitId, date, currentCount: 1, completed: isCompleted }];
         }
@@ -209,7 +209,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         setProgress(newProgress);
 
         // Optimistic update for SQLite (Single Item)
-        const changedItem = newProgress.find(p => p.habitId === habitId && p.date === date);
+        const changedItem = newProgress.find((p) => p.habitId === habitId && p.date === date);
         if (storage.logSingleProgress && changedItem) {
             await storage.logSingleProgress(changedItem);
         } else {
@@ -219,7 +219,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         // Refresh Stats
         if (storage.getHabitStats) {
             const newStats = await storage.getHabitStats(habitId);
-            setStats(prev => ({ ...prev, [habitId]: newStats }));
+            setStats((prev) => ({ ...prev, [habitId]: newStats }));
         }
 
         // Update Pet Health & XP Logic
@@ -239,7 +239,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
                 // Small increment for progress
                 updates = {
                     ...updates,
-                    health: PetGameEngine.recoverHealth(pet.health || 0, pet.maxHealth)
+                    health: PetGameEngine.recoverHealth(pet.health || 0, pet.maxHealth),
                 };
             }
             updatePet(updates);
@@ -247,14 +247,14 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
     };
 
     const undoProgress = async (habitId: string, date: string) => {
-        const currentProgress = progress.find(p => p.habitId === habitId && p.date === date);
+        const currentProgress = progress.find((p) => p.habitId === habitId && p.date === date);
         if (!currentProgress || currentProgress.currentCount <= 0) return;
 
         const wasCompleted = currentProgress.completed;
         // If uncompleting, ensure we don't go below 0
         const newCount = Math.max(0, currentProgress.currentCount - 1);
 
-        const newProgress = progress.map(p => {
+        const newProgress = progress.map((p) => {
             if (p.habitId === habitId && p.date === date) {
                 // Always mark as not completed if we decrement
                 return { ...p, currentCount: newCount, completed: false };
@@ -264,7 +264,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
 
         setProgress(newProgress);
         // Optimistic update for SQLite (Single Item)
-        const changedItem = newProgress.find(p => p.habitId === habitId && p.date === date);
+        const changedItem = newProgress.find((p) => p.habitId === habitId && p.date === date);
         if (storage.logSingleProgress && changedItem) {
             await storage.logSingleProgress(changedItem);
         } else {
@@ -274,7 +274,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         // Refresh Stats
         if (storage.getHabitStats) {
             const newStats = await storage.getHabitStats(habitId);
-            setStats(prev => ({ ...prev, [habitId]: newStats }));
+            setStats((prev) => ({ ...prev, [habitId]: newStats }));
         }
 
         if (pet && wasCompleted) {
@@ -285,7 +285,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             // Handle Level Down
             if (newXp < 0 && newLevel > 1) {
                 newLevel -= 1;
-                newXp += (newLevel * 100);
+                newXp += newLevel * 100;
             }
             // Clamp XP at 0 if Level 1
             if (newLevel === 1 && newXp < 0) newXp = 0;
@@ -305,7 +305,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             mood: 'happy',
             history: [],
             inventory: [], // Init empty inventory
-            lastInteraction: new Date().toISOString()
+            lastInteraction: new Date().toISOString(),
         };
         setPet(newPet);
         storage.savePet(newPet);
@@ -355,26 +355,21 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         }
         // Fallback for storage that doesn't support range
         const all = await storage.getProgress();
-        return all.filter(p => p.date >= start && p.date <= end);
+        return all.filter((p) => p.date >= start && p.date <= end);
     };
 
     const buyItem = async (itemId: string, price: number): Promise<boolean> => {
         if (!pet) return false;
 
-        // check balance
-        if ((pet.xp || 0) < price) return false;
+        const result = PetGameEngine.purchaseItem(pet, itemId, price);
 
-        // check inventory
-        const currentInventory = pet.inventory || [];
-        if (currentInventory.includes(itemId)) return true; // Already owned
+        if (result.success && result.pet) {
+            setPet(result.pet);
+            await storage.savePet(result.pet);
+            return true;
+        }
 
-        const newXp = (pet.xp || 0) - price;
-        const newInventory = [...currentInventory, itemId];
-
-        const updatedPet = { ...pet, xp: newXp, inventory: newInventory };
-        setPet(updatedPet);
-        await storage.savePet(updatedPet);
-        return true;
+        return false;
     };
 
     const equipHat = async (hatId: string) => {
@@ -385,27 +380,29 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
     };
 
     return (
-        <HabitContext.Provider value={{
-            habits,
-            pet,
-            progress,
-            isOnboarding,
-            setIsOnboarding,
-            addHabit,
-            updateHabit,
-            deleteHabit,
-            logProgress,
-            undoProgress,
-            resetPet,
-            updatePet,
-            getStreak,
-            resetData,
-            settings,
-            updateSettings,
-            getHistoricalProgress,
-            buyItem,
-            equipHat
-        }}>
+        <HabitContext.Provider
+            value={{
+                habits,
+                pet,
+                progress,
+                isOnboarding,
+                setIsOnboarding,
+                addHabit,
+                updateHabit,
+                deleteHabit,
+                logProgress,
+                undoProgress,
+                resetPet,
+                updatePet,
+                getStreak,
+                resetData,
+                settings,
+                updateSettings,
+                getHistoricalProgress,
+                buyItem,
+                equipHat,
+            }}
+        >
             {children}
         </HabitContext.Provider>
     );

@@ -4,7 +4,7 @@ export const StatsEngine = {
     calculateStreak: (history: DailyProgress[], habitId: string): number => {
         // Filter and Sort Descending
         const habitProgress = history
-            .filter(p => p.habitId === habitId && p.completed)
+            .filter((p) => p.habitId === habitId && p.completed)
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
         if (habitProgress.length === 0) return 0;
@@ -22,7 +22,7 @@ export const StatsEngine = {
         const yesterday = getLocalDateString(new Date(now.getTime() - 86400000));
 
         // Get unique dates only
-        const uniqueDates = Array.from(new Set(habitProgress.map(p => p.date)));
+        const uniqueDates = Array.from(new Set(habitProgress.map((p) => p.date)));
 
         // 1. Check if streak is even active (Last completion must be Today or Yesterday)
         const lastCompletedDate = uniqueDates[0];
@@ -50,5 +50,5 @@ export const StatsEngine = {
         }
 
         return streak;
-    }
+    },
 };

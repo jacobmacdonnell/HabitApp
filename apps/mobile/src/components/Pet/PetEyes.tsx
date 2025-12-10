@@ -16,39 +16,60 @@ export const PetEyes = ({ isSleeping, isPeeking, isBlinking, eyeLookAnim }: PetE
     // 0 = center (85), 1 = looking down (92)
     const pupilY = eyeLookAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [85, 92]
+        outputRange: [85, 92],
     });
 
     const glintY = eyeLookAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [81, 88] // 85-4=81, 92-4=88
+        outputRange: [81, 88], // 85-4=81, 92-4=88
     });
 
     // Peeking - one eye open while sleeping (late night habit)
-    if (isSleeping && isPeeking) return (
-        <G>
-            <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <Circle cx="130" cy="85" r="16" fill="white" />
-            <AnimatedCircle cx="130" cy={pupilY} r="6" fill="black" />
-            <AnimatedCircle cx="133" cy={glintY} r="2" fill="white" fillOpacity="0.8" />
-        </G>
-    );
+    if (isSleeping && isPeeking)
+        return (
+            <G>
+                <Path
+                    d="M 60 85 Q 70 95 80 85"
+                    stroke="rgba(0,0,0,0.8)"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeLinecap="round"
+                />
+                <Circle cx="130" cy="85" r="16" fill="white" />
+                <AnimatedCircle cx="130" cy={pupilY} r="6" fill="black" />
+                <AnimatedCircle cx="133" cy={glintY} r="2" fill="white" fillOpacity="0.8" />
+            </G>
+        );
 
     // Sleeping eyes
-    if (isSleeping) return (
-        <G>
-            <Path d="M 60 85 Q 70 95 80 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <Path d="M 120 85 Q 130 95 140 85" stroke="rgba(0,0,0,0.8)" strokeWidth="4" fill="none" strokeLinecap="round" />
-        </G>
-    );
+    if (isSleeping)
+        return (
+            <G>
+                <Path
+                    d="M 60 85 Q 70 95 80 85"
+                    stroke="rgba(0,0,0,0.8)"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeLinecap="round"
+                />
+                <Path
+                    d="M 120 85 Q 130 95 140 85"
+                    stroke="rgba(0,0,0,0.8)"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeLinecap="round"
+                />
+            </G>
+        );
 
     // Blinking
-    if (isBlinking) return (
-        <G>
-            <Path d="M 54 85 L 86 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
-            <Path d="M 114 85 L 146 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
-        </G>
-    );
+    if (isBlinking)
+        return (
+            <G>
+                <Path d="M 54 85 L 86 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
+                <Path d="M 114 85 L 146 85" stroke="rgba(0,0,0,0.8)" strokeWidth="3" strokeLinecap="round" />
+            </G>
+        );
 
     // Normal open eyes
     return (

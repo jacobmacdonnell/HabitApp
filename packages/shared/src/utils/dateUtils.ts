@@ -5,7 +5,7 @@
 /**
  * Returns a local date string in YYYY-MM-DD format.
  * Unlike toISOString(), this respects the user's timezone.
- * 
+ *
  * @param date - The date to format (defaults to now)
  * @returns Date string in YYYY-MM-DD format
  */
