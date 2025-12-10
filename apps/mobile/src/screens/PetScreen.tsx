@@ -1,10 +1,11 @@
 import { useHabit } from '@habitapp/shared';
-import { Egg } from 'lucide-react-native';
+import { Egg, Zap } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Pet } from '../components/Pet';
+import { CurrencyBadge } from '../components/badges/CurrencyBadge';
 import { LiquidGlass } from '../theme/theme';
 import { validatePetName } from '../utils/validation';
 
@@ -21,8 +22,8 @@ export const PetScreen = () => {
                 validation.error?.includes('under 12')
                     ? 'Too Long'
                     : validation.error?.includes('friendly')
-                      ? 'Whoops!'
-                      : 'Name Required',
+                        ? 'Whoops!'
+                        : 'Name Required',
                 validation.error
             );
             return;
@@ -80,6 +81,9 @@ export const PetScreen = () => {
             >
                 <View style={[styles.headerRow, { marginTop: 20 }]}>
                     <Text style={styles.headerTitle}>{pet.name || 'My Companion'}</Text>
+
+                    {/* XP Badge (Sparks) */}
+                    <CurrencyBadge amount={pet.xp || 0} size="lg" />
                 </View>
                 <Pet pet={pet} isFullView onUpdate={updatePet} />
             </ScrollView>
@@ -101,6 +105,9 @@ const styles = StyleSheet.create({
     },
     headerRow: {
         marginBottom: LiquidGlass.header.marginBottom,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     headerTitle: {
         fontSize: LiquidGlass.header.titleSize,

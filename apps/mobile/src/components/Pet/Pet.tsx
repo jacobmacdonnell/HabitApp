@@ -2,7 +2,7 @@ import { Pet as PetType } from '@habitapp/shared';
 import { useNavigation } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { Heart, Zap, Smile, Palette } from 'lucide-react-native';
+import { Heart, Zap, Palette, Star } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Animated, Easing, Platform } from 'react-native';
 import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Text as SvgText, Rect } from 'react-native-svg';
@@ -13,6 +13,7 @@ import { PetMouth } from './PetMouth';
 import { ZParticle } from './ZParticle';
 import { SafeLiquidGlassView } from '../SafeLiquidGlassView';
 import { GlassButton } from '../GlassButton';
+import { LevelBadge } from '../badges/LevelBadge';
 
 const { width } = Dimensions.get('window');
 
@@ -539,29 +540,18 @@ export const Pet = ({
             {/* Stats Card - hidden during onboarding hatching */}
             {!hideStats && (
                 <SafeLiquidGlassView style={styles.statsCard} intensity={25}>
-                    {/* Level & Mood Header */}
-                    <View style={styles.headerRow}>
-                        <View style={styles.levelBadge}>
-                            <Zap size={14} color="#facc15" />
-                            <Text style={styles.levelBadgeText}>Level {currentLevel}</Text>
-                        </View>
-                        <View style={styles.moodPill}>
-                            <Smile
-                                size={14}
-                                color={pet.mood === 'happy' ? '#22c55e' : pet.mood === 'sad' ? '#f87171' : '#a5b4fc'}
-                            />
-                            <Text style={styles.moodText}>{pet.mood.charAt(0).toUpperCase() + pet.mood.slice(1)}</Text>
-                        </View>
+
+
+                    {/* Level Badge - Centered */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 20 }}>
+                        <LevelBadge level={currentLevel} variant="filled" size="sm" />
                     </View>
 
-                    {/* Stats Bars */}
+                    {/* Stats Bars - Icon + Bar + Value (No Labels) */}
                     <View style={styles.barsContainer}>
                         {/* Health Bar */}
                         <View style={styles.statRow}>
-                            <View style={styles.statInfo}>
-                                <Heart size={14} color="#f87171" />
-                                <Text style={styles.statLabel}>Health</Text>
-                            </View>
+                            <Heart size={20} color="#f87171" fill="#f87171" />
                             <View style={styles.barWrapper}>
                                 <View style={styles.barBg}>
                                     <View
@@ -578,23 +568,20 @@ export const Pet = ({
                             </View>
                         </View>
 
-                        {/* XP Bar */}
+                        {/* Level Bar (Progress) - Purple Star */}
                         <View style={styles.statRow}>
-                            <View style={styles.statInfo}>
-                                <Zap size={14} color="#facc15" />
-                                <Text style={styles.statLabel}>XP</Text>
-                            </View>
+                            <Star size={20} color="#d8b4fe" fill="#d8b4fe" />
                             <View style={styles.barWrapper}>
                                 <View style={styles.barBg}>
                                     <View
                                         style={[
                                             styles.barFill,
-                                            { width: `${xpPercentage}%`, backgroundColor: '#facc15' },
+                                            { width: `${xpPercentage}%`, backgroundColor: '#d8b4fe' },
                                         ]}
                                     />
                                 </View>
                                 <Text style={styles.barValue}>
-                                    {currentXp}/{xpToNextLevel}
+                                    {Math.floor(xpPercentage)}%
                                 </Text>
                             </View>
                         </View>
@@ -607,13 +594,13 @@ export const Pet = ({
                             onPress={() => router.push('/pet-customize')}
                             icon={<Palette size={18} color="#fff" />}
                             title="Customize"
-                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.15)' }} // Made lighter
+                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.15)' }}
                         />
 
                         <GlassButton
                             variant="primary"
                             // @ts-ignore
-                            style={{ flex: 1, backgroundColor: '#facc15' }} // Override to keep gold
+                            style={{ flex: 1, backgroundColor: '#facc15' }}
                             textStyle={{ color: '#1a1a1a' }}
                             onPress={() => router.push('/shop')}
                             icon={<Zap size={18} color="#1a1a1a" fill="#1a1a1a" />}
@@ -799,7 +786,7 @@ const styles = StyleSheet.create({
     levelBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(250, 204, 21, 0.15)',
+        backgroundColor: 'rgba(168, 85, 247, 0.15)',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 20,
@@ -808,21 +795,7 @@ const styles = StyleSheet.create({
     levelBadgeText: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#facc15',
-    },
-    moodPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 20,
-        gap: 6,
-    },
-    moodText: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.8)',
+        color: '#a855f7',
     },
     barsContainer: {
         gap: 12,
@@ -831,17 +804,7 @@ const styles = StyleSheet.create({
     statRow: {
         flexDirection: 'row',
         alignItems: 'center',
-    },
-    statInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-        width: 70,
-    },
-    statLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.6)',
+        gap: 12,
     },
     barWrapper: {
         flex: 1,
@@ -851,20 +814,20 @@ const styles = StyleSheet.create({
     },
     barBg: {
         flex: 1,
-        height: 8,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: 4,
+        height: 12,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 6,
         overflow: 'hidden',
     },
     barFill: {
         height: '100%',
-        borderRadius: 4,
+        borderRadius: 6,
     },
     barValue: {
-        fontSize: 11,
-        fontWeight: '600',
-        color: 'rgba(255,255,255,0.7)',
-        width: 55,
+        fontSize: 12,
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.8)',
+        width: 45,
         textAlign: 'right',
     },
     actionButtonsRow: {

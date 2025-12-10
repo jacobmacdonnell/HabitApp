@@ -11,6 +11,7 @@ import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { PetPreview, HatIcon } from '../components/PetPreview';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { RootStackParamList } from '../navigation/types';
+import { CurrencyBadge } from '../components/badges/CurrencyBadge';
 
 const { width } = Dimensions.get('window');
 
@@ -26,9 +27,8 @@ export const ShopScreen = () => {
         navigation.setOptions({
             title: 'Shop',
             headerLeft: () => (
-                <View style={{ paddingHorizontal: 16, justifyContent: 'center', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Zap size={16} color="#facc15" fill="#facc15" />
-                    <Text style={{ color: '#facc15', fontSize: 16, fontWeight: '700' }}>{pet?.xp || 0}</Text>
+                <View style={{ paddingHorizontal: 16, justifyContent: 'center' }}>
+                    <CurrencyBadge amount={pet?.xp || 0} size="md" />
                 </View>
             ),
             headerRight: () => (
