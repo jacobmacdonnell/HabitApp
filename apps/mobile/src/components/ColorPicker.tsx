@@ -1,8 +1,9 @@
 import { Check } from 'lucide-react-native';
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, ScrollView, ViewStyle } from 'react-native';
+import { View, StyleSheet, ScrollView, ViewStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
+import { ScalePressable } from './ScalePressable';
 import { LiquidGlass } from '../theme/theme';
 
 interface ColorPickerProps {
@@ -26,6 +27,7 @@ interface ColorPickerProps {
  * - Optional glow effect for special contexts (onboarding)
  * - Two variants: scroll (horizontal) or wrap (grid layout)
  * - Haptic feedback on selection
+ * - Scale animation on press
  */
 export const ColorPicker = ({
     colors,
@@ -42,7 +44,7 @@ export const ColorPicker = ({
     const renderColorDots = () => (
         <>
             {colors.map((color) => (
-                <TouchableOpacity
+                <ScalePressable
                     key={color}
                     style={[
                         styles.colorDot,
@@ -53,10 +55,10 @@ export const ColorPicker = ({
                     onPress={() => handleSelect(color)}
                     accessibilityLabel={`Select color ${color}`}
                     accessibilityRole="radio"
-                    accessibilityState={{ selected: selectedColor === color }}
+                    scaleOnPress={0.9}
                 >
                     {selectedColor === color && <Check size={18} color="#fff" strokeWidth={3} />}
-                </TouchableOpacity>
+                </ScalePressable>
             ))}
         </>
     );

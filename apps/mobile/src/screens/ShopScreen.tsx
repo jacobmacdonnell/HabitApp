@@ -208,14 +208,14 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     previewSection: {
-        marginBottom: 20,
+        marginBottom: LiquidGlass.spacing.xl,
         height: 180,
         justifyContent: 'center',
         alignItems: 'center',
     },
     tabContainer: {
         paddingHorizontal: 20,
-        marginBottom: 24,
+        marginBottom: LiquidGlass.spacing.xxl,
     },
     grid: {
         flexDirection: 'row',
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 204, 0, 0.1)',
         borderRadius: 16,
         padding: LiquidGlass.spacing.lg,
-        marginBottom: 16,
+        marginBottom: LiquidGlass.spacing.lg,
         borderWidth: 1,
         borderColor: 'rgba(255, 204, 0, 0.2)',
         gap: 12,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
         fontSize: LiquidGlass.typography.size.caption2,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.9)',
-        marginTop: 8,
+        marginTop: LiquidGlass.spacing.sm,
         textAlign: 'center',
     },
     actionContainer: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
-        marginBottom: 8,
+        marginBottom: LiquidGlass.spacing.sm,
     },
     emptySubtext: {
         color: 'rgba(255,255,255,0.5)',

@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GlassButton } from '../components/GlassButton';
 import { Pet } from '../components/Pet';
+import { LiquidGlass } from '../theme/theme';
 
 const { width, height } = Dimensions.get('window');
 
@@ -291,6 +292,6 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         width: '100%',
-        marginBottom: 20,
+        marginBottom: LiquidGlass.spacing.xl,
     },
 });

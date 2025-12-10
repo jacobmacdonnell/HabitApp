@@ -461,10 +461,10 @@ const styles = StyleSheet.create({
         fontSize: LiquidGlass.typography.size.footnote,
         fontWeight: '600',
         textTransform: 'uppercase',
-        marginTop: 4,
+        marginTop: LiquidGlass.spacing.xs,
     },
     petHeaderContainer: {
-        marginBottom: 4,
+        marginBottom: LiquidGlass.spacing.xs,
     },
     petGlass: {
         width: 130,
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     filterContainer: {
-        marginBottom: 16,
+        marginBottom: LiquidGlass.spacing.lg,
     },
     filterRow: {
         flexDirection: 'row',

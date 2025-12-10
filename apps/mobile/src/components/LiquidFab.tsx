@@ -1,27 +1,26 @@
 import { SafeLiquidGlassView as LiquidGlassView } from './SafeLiquidGlassView';
+import { ScalePressable } from './ScalePressable';
 import { useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 export const LiquidFab = () => {
     const router = useRouter();
 
     return (
         <View style={styles.container}>
-            <Pressable
+            <ScalePressable
                 onPress={() => router.push('/habit-form')}
                 accessibilityLabel="Add new habit"
                 accessibilityRole="button"
                 accessibilityHint="Opens the habit creation form"
+                scaleOnPress={0.9}
             >
-                <LiquidGlassView
-                    style={[styles.fabMain, { backgroundColor: 'rgba(28,28,30,0.5)' }]} // Manual dark tint
-                    interactive
-                >
+                <LiquidGlassView style={[styles.fabMain, { backgroundColor: 'rgba(28,28,30,0.5)' }]} interactive>
                     <SymbolView name="plus" tintColor="#fff" size={28} />
                 </LiquidGlassView>
-            </Pressable>
+            </ScalePressable>
         </View>
     );
 };

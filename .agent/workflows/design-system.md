@@ -48,6 +48,8 @@ LiquidGlass.colors.surface     - Surface backgrounds
 LiquidGlass.colors.border      - Border color
 ```
 
+> **Full color list:** see [`theme.ts`](file:///apps/mobile/src/theme/theme.ts)
+
 ## Touch Targets
 
 - Minimum: 44pt × 44pt

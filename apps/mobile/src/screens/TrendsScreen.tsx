@@ -406,8 +406,8 @@ const styles = StyleSheet.create({
 
     // Toggle
     toggleContainer: {
-        marginBottom: 24,
-        marginHorizontal: 16, // Use standard margin
+        marginBottom: LiquidGlass.spacing.xxl,
+        marginHorizontal: LiquidGlass.spacing.lg,
     },
     // Weekly
     listContainer: {
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     weekHeaderRow: {
         flexDirection: 'row',
         paddingRight: 16,
-        marginBottom: 4,
+        marginBottom: LiquidGlass.spacing.xs,
     },
     daysRow: {
         flexDirection: 'row',
@@ -445,13 +445,13 @@ const styles = StyleSheet.create({
     },
     habitInfo: {
         flex: 1,
-        marginRight: 12,
+        marginRight: LiquidGlass.spacing.md,
     },
     habitTitle: {
         fontSize: LiquidGlass.typography.size.body,
         fontWeight: '700',
         color: '#fff',
-        marginBottom: 4,
+        marginBottom: LiquidGlass.spacing.xs,
     },
     streakLabel: {
         fontSize: LiquidGlass.typography.size.caption1,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         paddingVertical: 20,
         paddingHorizontal: 12,
-        marginBottom: 24,
+        marginBottom: LiquidGlass.spacing.xxl,
     },
     compactStat: {
         alignItems: 'center',
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: LiquidGlass.spacing.lg,
         paddingHorizontal: 8,
     },
     navButton: {
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     },
     weekDaysGrid: {
         flexDirection: 'row',
-        marginBottom: 8,
+        marginBottom: LiquidGlass.spacing.sm,
     },
     calendarDayHeader: {
         flex: 1,
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 20,
+        marginTop: LiquidGlass.spacing.xl,
         gap: 12,
         opacity: 0.6,
     },

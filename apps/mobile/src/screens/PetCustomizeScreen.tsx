@@ -172,24 +172,24 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     previewSection: {
-        marginBottom: 20,
+        marginBottom: LiquidGlass.spacing.xl,
         height: 180,
         justifyContent: 'center',
         alignItems: 'center',
     },
     tabContainer: {
         paddingHorizontal: 20,
-        marginBottom: 24,
+        marginBottom: LiquidGlass.spacing.xxl,
     },
     section: {
-        marginBottom: 24,
+        marginBottom: LiquidGlass.spacing.xxl,
     },
     label: {
         fontSize: 12,
         fontWeight: '700',
         color: 'rgba(255,255,255,0.5)',
-        marginBottom: 12,
-        marginLeft: 4,
+        marginBottom: LiquidGlass.spacing.md,
+        marginLeft: LiquidGlass.spacing.xs,
     },
     inputRow: {
         backgroundColor: 'rgba(255,255,255,0.1)',
@@ -230,9 +230,9 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.9)',
-        marginTop: 8,
+        marginTop: LiquidGlass.spacing.sm,
         textAlign: 'center',
-        marginBottom: 4,
+        marginBottom: LiquidGlass.spacing.xs,
     },
     badgeEquipped: {
         position: 'absolute',

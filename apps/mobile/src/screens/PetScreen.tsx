@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
         fontSize: LiquidGlass.typography.size.title1,
         fontWeight: '800',
         color: '#fff',
-        marginTop: 24,
-        marginBottom: 8,
+        marginTop: LiquidGlass.spacing.xxl,
+        marginBottom: LiquidGlass.spacing.sm,
     },
     eggSubtitle: {
         fontSize: LiquidGlass.typography.size.body,

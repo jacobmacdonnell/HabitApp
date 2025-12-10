@@ -245,14 +245,14 @@ export const HabitFormScreen = () => {
 
 const styles = StyleSheet.create({
     section: {
-        marginBottom: 24,
+        marginBottom: LiquidGlass.spacing.xxl,
     },
     label: {
         fontSize: 12,
         fontWeight: '700',
         color: 'rgba(255,255,255,0.5)',
-        marginBottom: 12,
-        marginLeft: 4,
+        marginBottom: LiquidGlass.spacing.md,
+        marginLeft: LiquidGlass.spacing.xs,
     },
     presetRow: {
         gap: 10,
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
         padding: LiquidGlass.spacing.md,
     },
     footer: {
-        marginTop: 20,
+        marginTop: LiquidGlass.spacing.xl,
         marginBottom: 40,
     },
 });

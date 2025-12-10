@@ -251,20 +251,20 @@ const styles = StyleSheet.create({
         letterSpacing: LiquidGlass.header.titleLetterSpacing,
     },
     section: {
-        marginBottom: 24,
+        marginBottom: LiquidGlass.spacing.xxl,
     },
     sectionHeader: {
         fontSize: LiquidGlass.typography.size.caption1,
         fontWeight: '700',
         color: 'rgba(255,255,255,0.5)',
-        marginBottom: 8,
-        marginLeft: 12,
+        marginBottom: LiquidGlass.spacing.sm,
+        marginLeft: LiquidGlass.spacing.md,
     },
     helperText: {
         fontSize: LiquidGlass.typography.size.caption1,
         color: 'rgba(255,255,255,0.4)',
-        marginTop: 8,
-        marginLeft: 12,
+        marginTop: LiquidGlass.spacing.sm,
+        marginLeft: LiquidGlass.spacing.md,
         fontStyle: 'italic',
     },
     card: {
@@ -311,6 +311,6 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.2)',
         fontSize: LiquidGlass.typography.size.footnote,
         fontWeight: '500',
-        marginTop: 20,
+        marginTop: LiquidGlass.spacing.xl,
     },
 });

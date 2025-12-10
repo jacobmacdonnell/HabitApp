@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(99, 102, 241, 0.8)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 32,
+        marginBottom: LiquidGlass.spacing.xxxl,
         shadowColor: LiquidGlass.colors.secondary,
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.5,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         color: '#fff',
         textAlign: 'center',
-        marginBottom: 16,
+        marginBottom: LiquidGlass.spacing.lg,
     },
     heroSubtitle: {
         fontSize: 17,
@@ -496,14 +496,14 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     stepHeader: {
-        marginBottom: 8,
+        marginBottom: LiquidGlass.spacing.sm,
     },
     title: {
         fontSize: 28,
         fontWeight: '700',
         color: '#fff',
         textAlign: 'center',
-        marginBottom: 8,
+        marginBottom: LiquidGlass.spacing.sm,
     },
     subtitle: {
         fontSize: 15,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
     buttonRow: {
         flexDirection: 'row',
         gap: 12,
-        marginTop: 8,
+        marginTop: LiquidGlass.spacing.sm,
     },
     card: {
         backgroundColor: LiquidGlass.colors.card,
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
-        marginVertical: 4,
+        marginVertical: LiquidGlass.spacing.xs,
     },
     dividerLine: {
         flex: 1,
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '700',
         color: 'rgba(255,255,255,0.5)',
-        marginBottom: 8,
+        marginBottom: LiquidGlass.spacing.sm,
     },
     counterRow: {
         flexDirection: 'row',
