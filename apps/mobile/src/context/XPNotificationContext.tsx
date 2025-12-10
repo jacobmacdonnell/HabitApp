@@ -2,6 +2,7 @@ import { useHabit } from '@habitapp/shared';
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import { Zap } from 'lucide-react-native';
+import { LiquidGlass } from '../theme/theme';
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 
@@ -50,7 +51,7 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
                     sound.unloadAsync();
                 }
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const showXP = useCallback(
@@ -161,10 +162,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 9999,
     },
+
+
     notification: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#facc15',
+        backgroundColor: LiquidGlass.colors.currency,
         paddingHorizontal: 24,
         paddingVertical: 14,
         borderRadius: 28,

@@ -601,7 +601,7 @@ export const Pet = ({
                         <GlassButton
                             variant="primary"
                             // @ts-ignore
-                            style={{ flex: 1, backgroundColor: '#facc15' }}
+                            style={{ flex: 1, backgroundColor: LiquidGlass.colors.currency }}
                             textStyle={{ color: '#1a1a1a' }}
                             onPress={() => router.push('/shop')}
                             icon={<Zap size={18} color="#1a1a1a" fill="#1a1a1a" />}
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     xpText: {
         fontSize: 24,
         fontWeight: '800',
-        color: '#facc15',
+        color: LiquidGlass.colors.currency,
         textShadowColor: 'rgba(0,0,0,0.5)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 16,
         alignItems: 'center',
-        shadowColor: '#a855f7',
+        shadowColor: LiquidGlass.colors.levelUp,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.5,
         shadowRadius: 10,
@@ -849,7 +849,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.1)',
     },
     shopButton: {
-        backgroundColor: '#facc15',
+        backgroundColor: LiquidGlass.colors.currency,
     },
     actionButtonText: {
         fontSize: 15,

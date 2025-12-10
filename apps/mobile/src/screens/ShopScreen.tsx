@@ -108,7 +108,7 @@ export const ShopScreen = () => {
                                         </View>
                                     ) : (
                                         <View style={styles.priceContainer}>
-                                            <Zap size={10} color={canAfford ? "#facc15" : "rgba(255,255,255,0.4)"} fill={canAfford ? "#facc15" : "none"} />
+                                            <Zap size={10} color={canAfford ? LiquidGlass.colors.currency : "rgba(255,255,255,0.4)"} fill={canAfford ? LiquidGlass.colors.currency : "none"} />
                                             <Text style={[styles.priceText, !canAfford && { color: 'rgba(255,255,255,0.4)' }]}>{item.price}</Text>
                                         </View>
                                     )}
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     priceText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#facc15',
+        color: LiquidGlass.colors.currency,
     },
     badgeEquipped: {
         flexDirection: 'row',

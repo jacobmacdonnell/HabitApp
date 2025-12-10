@@ -211,7 +211,7 @@ export const HabitCard = React.memo(
                                         {/* XP Badge - only show when not completed */}
                                         {!isCompleted && (
                                             <View style={styles.xpBadge}>
-                                                <Zap size={10} color="#facc15" fill="#facc15" />
+                                                <Zap size={10} color={LiquidGlass.colors.currency} fill={LiquidGlass.colors.currency} />
                                                 <Text style={styles.xpText}>+20 XP</Text>
                                             </View>
                                         )}
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     xpBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(250, 204, 21, 0.15)',
+        backgroundColor: 'rgba(250, 204, 21, 0.15)', // TODO: Add to theme or calc opacity
         paddingHorizontal: 6,
         paddingVertical: 3,
         borderRadius: 6,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     },
     xpText: {
         fontSize: 10,
-        color: '#facc15',
+        color: LiquidGlass.colors.currency,
         fontWeight: '700',
     },
     rightSection: {
