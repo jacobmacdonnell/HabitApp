@@ -14,6 +14,7 @@ import { ZParticle } from './ZParticle';
 import { SafeLiquidGlassView } from '../SafeLiquidGlassView';
 import { GlassButton } from '../GlassButton';
 import { LevelBadge } from '../badges/LevelBadge';
+import { LiquidGlass } from '../../theme/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -551,7 +552,7 @@ export const Pet = ({
                     <View style={styles.barsContainer}>
                         {/* Health Bar */}
                         <View style={styles.statRow}>
-                            <Heart size={20} color="#f87171" fill="#f87171" />
+                            <Heart size={20} color={LiquidGlass.colors.health} fill={LiquidGlass.colors.health} />
                             <View style={styles.barWrapper}>
                                 <View style={styles.barBg}>
                                     <View
@@ -559,7 +560,7 @@ export const Pet = ({
                                             styles.barFill,
                                             {
                                                 width: `${pet.health}%`,
-                                                backgroundColor: pet.health < 30 ? '#ef4444' : '#22c55e',
+                                                backgroundColor: pet.health < 30 ? LiquidGlass.colors.danger : LiquidGlass.colors.success,
                                             },
                                         ]}
                                     />
@@ -570,13 +571,13 @@ export const Pet = ({
 
                         {/* Level Bar (Progress) - Purple Star */}
                         <View style={styles.statRow}>
-                            <Star size={20} color="#d8b4fe" fill="#d8b4fe" />
+                            <Star size={20} color={LiquidGlass.colors.growth} fill={LiquidGlass.colors.growth} />
                             <View style={styles.barWrapper}>
                                 <View style={styles.barBg}>
                                     <View
                                         style={[
                                             styles.barFill,
-                                            { width: `${xpPercentage}%`, backgroundColor: '#d8b4fe' },
+                                            { width: `${xpPercentage}%`, backgroundColor: LiquidGlass.colors.growth },
                                         ]}
                                     />
                                 </View>

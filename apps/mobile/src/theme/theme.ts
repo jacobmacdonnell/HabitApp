@@ -142,8 +142,10 @@ export const LiquidGlass = {
         glassBackground: 'rgba(255,255,255,0.1)',
 
         // Domain Specific
-        xp: '#facc15', // XP/gold
-        levelUp: '#a855f7', // Purple for level up
+        xp: '#facc15', // Deprecated: Use currency
+        levelUp: '#a855f7', // Purple for level up animations
+        currency: '#facc15', // Sparks (Gold)
+        growth: '#d8b4fe', // Level/XP (Lavender)
         sleep: '#c084fc', // Light purple for sleep
         health: '#f87171', // Health red
 

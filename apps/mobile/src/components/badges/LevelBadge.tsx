@@ -1,6 +1,7 @@
 import { Star } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { LiquidGlass } from '../../theme/theme';
 
 interface LevelBadgeProps {
     level: number;
@@ -17,6 +18,7 @@ export const LevelBadge: React.FC<LevelBadgeProps> = ({
 }) => {
     const iconSize = size === 'sm' ? 14 : size === 'md' ? 16 : 20;
     const fontSize = size === 'sm' ? 14 : size === 'md' ? 16 : 20;
+    const color = LiquidGlass.colors.growth;
 
     return (
         <View style={[
@@ -24,8 +26,8 @@ export const LevelBadge: React.FC<LevelBadgeProps> = ({
             variant === 'filled' && styles.filledContainer,
             style
         ]}>
-            <Star size={iconSize} color="#d8b4fe" fill="#d8b4fe" />
-            <Text style={[styles.text, { fontSize }]}>
+            <Star size={iconSize} color={color} fill={color} />
+            <Text style={[styles.text, { fontSize, color }]}>
                 {variant === 'filled' ? `LEVEL ${level}` : `Lvl ${level}`}
             </Text>
         </View>
@@ -39,13 +41,12 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     filledContainer: {
-        backgroundColor: 'rgba(216, 180, 254, 0.15)', // Lighter purple tint
+        backgroundColor: 'rgba(216, 180, 254, 0.15)', // Match growth color with opacity
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 20,
     },
     text: {
         fontWeight: '700',
-        color: '#d8b4fe', // Lighter purple text
     },
 });
