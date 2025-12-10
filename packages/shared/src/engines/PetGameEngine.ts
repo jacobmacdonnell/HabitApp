@@ -36,5 +36,9 @@ export const PetGameEngine = {
         if (health < 30) return 'sick';
         if (health < 60) return 'sad';
         return 'happy';
+    },
+
+    recoverHealth: (currentHealth: number, maxHealth: number = 100) => {
+        return Math.min(currentHealth + 2, maxHealth);
     }
 };

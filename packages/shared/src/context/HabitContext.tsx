@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Habit, Pet, DailyProgress, Settings, StorageServiceType, HabitContextType } from '../types';
 import { getLocalDateString } from '../utils/dateUtils';
+import { PetGameEngine } from '../engines/PetGameEngine';
+import { StatsEngine } from '../engines/StatsEngine';
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined);
 
@@ -48,9 +50,8 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
 
                     if (diffDays > 1) {
                         // Decay health for missed days
-                        const healthLoss = (diffDays - 1) * 10;
-                        loadedPet.health = Math.max(0, loadedPet.health - healthLoss);
-                        loadedPet.mood = loadedPet.health < 30 ? 'sick' : (loadedPet.health < 60 ? 'sad' : 'neutral');
+                        loadedPet.health = PetGameEngine.calculateDecay(loadedPet.lastInteraction, loadedPet.health);
+                        loadedPet.mood = PetGameEngine.determineMood(loadedPet.health, false);
                         await storage.savePet(loadedPet);
                     }
                 }
@@ -118,11 +119,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         }
     };
 
-    const getMood = (health: number) => {
-        if (health < 30) return 'sick';
-        if (health < 60) return 'sad';
-        return 'happy';
-    };
+
 
     const generateId = () => {
         return Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -231,31 +228,18 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
 
             if (gainedXp) {
                 // XP Gain
-                const xpGain = 20;
-                let newXp = (pet.xp || 0) + xpGain;
-                let newLevel = pet.level || 1;
-                let newHealth = Math.min((pet.health || 0) + 10, pet.maxHealth || 100);
-
-                // Level Up Logic (Threshold: Level * 100)
-                const xpThreshold = newLevel * 100;
-                if (newXp >= xpThreshold) {
-                    newLevel += 1;
-                    newXp -= xpThreshold;
-                    newHealth = pet.maxHealth || 100; // Full heal on level up!
-                }
-
+                const { xp, level, health } = PetGameEngine.calculateXPGain(pet);
                 updates = {
                     ...updates,
-                    health: newHealth,
-                    xp: newXp,
-                    level: newLevel,
-                    // Don't force mood - let updatePet determine based on health/sleep
+                    xp,
+                    level,
+                    health,
                 };
             } else {
                 // Small increment for progress
                 updates = {
                     ...updates,
-                    health: Math.min((pet.health || 0) + 2, pet.maxHealth || 100)
+                    health: PetGameEngine.recoverHealth(pet.health || 0, pet.maxHealth)
                 };
             }
             updatePet(updates);
@@ -333,40 +317,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         }
 
         // Fallback to legacy calc if stat not ready
-        const habitProgress = progress
-            .filter(p => p.habitId === habitId && p.completed)
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-        if (habitProgress.length === 0) return 0;
-
-        let streak = 0;
-        const today = getLocalDateString();
-        const yesterday = getLocalDateString(new Date(Date.now() - 86400000));
-
-        // Check if the streak is active (completed today or yesterday)
-        const lastCompleted = habitProgress[0].date;
-        if (lastCompleted !== today && lastCompleted !== yesterday) {
-            return 0;
-        }
-
-        // Count consecutive days
-        let currentDate = new Date(lastCompleted);
-        const seenDates = new Set();
-
-        for (const p of habitProgress) {
-            if (seenDates.has(p.date)) continue;
-            seenDates.add(p.date);
-
-            const pDate = new Date(p.date);
-            // Relaxed check for same day
-            if (Math.abs(pDate.getTime() - currentDate.getTime()) < 1000 * 60 * 60 * 24 * 1.5) { // within ~1 day
-                // Correct logic requires strictly prev day
-            }
-            // Let's rely on the DB stat mostly. This is just fallback.
-            // Simplified fallback:
-            return habitProgress.length; // Just return count if algo fails
-        }
-        return streak;
+        return StatsEngine.calculateStreak(progress, habitId);
     };
 
     const resetData = () => {
@@ -389,7 +340,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             if (isSleepingTime()) {
                 newMood = 'sleeping';
             } else {
-                newMood = getMood(newHealth);
+                newMood = PetGameEngine.determineMood(newHealth, false);
             }
         }
 

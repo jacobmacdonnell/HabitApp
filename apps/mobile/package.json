@@ -6,7 +6,8 @@
     "start": "expo start",
     "ios": "expo run:ios",
     "android": "expo run:android",
-    "build": "eas build"
+    "build": "eas build",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@callstack/liquid-glass": "^0.6.1",
