@@ -11,6 +11,8 @@ import { PetEyes } from './PetEyes';
 import { PetHat } from './PetHat';
 import { PetMouth } from './PetMouth';
 import { ZParticle } from './ZParticle';
+import { SafeLiquidGlassView } from '../SafeLiquidGlassView';
+import { GlassButton } from '../GlassButton';
 
 const { width } = Dimensions.get('window');
 
@@ -536,7 +538,7 @@ export const Pet = ({
 
             {/* Stats Card - hidden during onboarding hatching */}
             {!hideStats && (
-                <View style={styles.statsCard}>
+                <SafeLiquidGlassView style={styles.statsCard} intensity={25}>
                     {/* Level & Mood Header */}
                     <View style={styles.headerRow}>
                         <View style={styles.levelBadge}>
@@ -600,23 +602,25 @@ export const Pet = ({
 
                     {/* Action Buttons */}
                     <View style={styles.actionButtonsRow}>
-                        <TouchableOpacity
-                            style={[styles.actionButton, styles.customizeButton]}
+                        <GlassButton
+                            variant="secondary"
                             onPress={() => router.push('/pet-customize')}
-                        >
-                            <Palette size={18} color="#fff" />
-                            <Text style={styles.actionButtonText}>Customize</Text>
-                        </TouchableOpacity>
+                            icon={<Palette size={18} color="#fff" />}
+                            title="Customize"
+                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.15)' }} // Made lighter
+                        />
 
-                        <TouchableOpacity
-                            style={[styles.actionButton, styles.shopButton]}
-                            onPress={() => router.push('/hat-shop')}
-                        >
-                            <Zap size={18} color="#1a1a1a" fill="#1a1a1a" />
-                            <Text style={[styles.actionButtonText, { color: '#1a1a1a' }]}>Hat Shop</Text>
-                        </TouchableOpacity>
+                        <GlassButton
+                            variant="primary"
+                            // @ts-ignore
+                            style={{ flex: 1, backgroundColor: '#facc15' }} // Override to keep gold
+                            textStyle={{ color: '#1a1a1a' }}
+                            onPress={() => router.push('/shop')}
+                            icon={<Zap size={18} color="#1a1a1a" fill="#1a1a1a" />}
+                            title="Shop"
+                        />
                     </View>
-                </View>
+                </SafeLiquidGlassView>
             )}
         </View>
     );
@@ -780,7 +784,9 @@ const styles = StyleSheet.create({
         width: width - 40,
         borderRadius: 24,
         padding: 24,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'rgba(30, 30, 35, 0.6)', // Darker, more visible glass tint
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
         overflow: 'hidden',
         marginTop: 20,
     },

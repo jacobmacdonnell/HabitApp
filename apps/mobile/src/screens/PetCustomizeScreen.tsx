@@ -1,271 +1,66 @@
-import { useHabit } from '@habitapp/shared';
+import { useHabit, HAT_ITEMS } from '@habitapp/shared';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { Check, Lock } from 'lucide-react-native';
+import { Check } from 'lucide-react-native';
 import React, { useState, useLayoutEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, TextInput, Alert } from 'react-native';
-import Svg, { Path, Defs, RadialGradient, Stop, Circle, G, Rect } from 'react-native-svg';
 
+import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
+import { PetPreview, HatIcon } from '../components/PetPreview';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { RootStackParamList } from '../navigation/types';
 import { validatePetName } from '../utils/validation';
 
 const { width } = Dimensions.get('window');
 
-// Pet colors - excludes app semantic colors (green, gold) to avoid confusion
+// Pet colors
 const COLORS = [
     '#f97316',
     '#f59e0b',
-    '#eab308', // Warm oranges/yellows
+    '#eab308',
     '#84cc16',
     '#10b981',
-    '#06b6d4', // Teals/greens (not the primary green)
+    '#06b6d4',
     '#0ea5e9',
     '#3b82f6',
     '#6366f1',
-    '#8b5cf6', // Blues/indigos
+    '#8b5cf6',
     '#a855f7',
     '#d946ef',
-    '#ec4899',
-    '#f43f5e', // Purples/pinks
-    '#ef4444', // Red (kept for variety)
+    '#f43f5e',
+    '#ef4444',
 ];
-
-const HATS = [
-    { id: 'none', name: 'None', requiredLevel: 1 },
-    { id: 'party', name: 'Party', requiredLevel: 2 },
-    { id: 'cowboy', name: 'Cowboy', requiredLevel: 5 },
-    { id: 'tophat', name: 'Gentleman', requiredLevel: 10 },
-    { id: 'crown', name: 'Crown', requiredLevel: 20 },
-];
-
-// Live Pet Preview Component
-const PetPreview = ({ color, hat, mood }: { color: string; hat: string; mood: string }) => {
-    const isSleeping = mood === 'sleeping';
-    const isHappy = mood === 'happy';
-    const isSad = mood === 'sad';
-    const isSick = mood === 'sick';
-
-    const renderEyes = () => {
-        if (isSleeping)
-            return (
-                <G>
-                    <Path
-                        d="M 60 85 Q 70 95 80 85"
-                        stroke="rgba(0,0,0,0.8)"
-                        strokeWidth="4"
-                        fill="none"
-                        strokeLinecap="round"
-                    />
-                    <Path
-                        d="M 120 85 Q 130 95 140 85"
-                        stroke="rgba(0,0,0,0.8)"
-                        strokeWidth="4"
-                        fill="none"
-                        strokeLinecap="round"
-                    />
-                </G>
-            );
-        return (
-            <G>
-                <Circle cx="70" cy="85" r="16" fill="white" />
-                <Circle cx="70" cy="85" r="6" fill="black" />
-                <Circle cx="130" cy="85" r="16" fill="white" />
-                <Circle cx="130" cy="85" r="6" fill="black" />
-                <Circle cx="76" cy="78" r="4" fill="white" fillOpacity="0.8" />
-                <Circle cx="136" cy="78" r="4" fill="white" fillOpacity="0.8" />
-            </G>
-        );
-    };
-
-    const renderMouth = () => {
-        if (isHappy)
-            return (
-                <Path
-                    d="M 70 120 Q 100 150 130 120"
-                    stroke="rgba(0,0,0,0.8)"
-                    strokeWidth="6"
-                    fill="none"
-                    strokeLinecap="round"
-                />
-            );
-        if (isSad || isSick)
-            return (
-                <Path
-                    d="M 70 140 Q 100 110 130 140"
-                    stroke="rgba(0,0,0,0.8)"
-                    strokeWidth="6"
-                    fill="none"
-                    strokeLinecap="round"
-                />
-            );
-        return (
-            <Path d="M 70 130 L 130 130" stroke="rgba(0,0,0,0.8)" strokeWidth="6" fill="none" strokeLinecap="round" />
-        );
-    };
-
-    const renderHat = () => {
-        if (!hat || hat === 'none') return null;
-        return (
-            <G transform="translate(60, 10) scale(0.8)">
-                {hat === 'party' && (
-                    <Path
-                        d="M50 10 L80 70 L20 70 Z"
-                        fill="#facc15"
-                        stroke="white"
-                        strokeWidth="2"
-                        strokeLinejoin="round"
-                    />
-                )}
-                {hat === 'cowboy' && (
-                    <G transform="translate(-10, -10)">
-                        <Path d="M10 60 Q50 30 90 60" fill="#78350f" stroke="white" strokeWidth="2" />
-                        <Path d="M30 60 L30 40 Q50 20 70 40 L70 60" fill="#78350f" stroke="white" strokeWidth="2" />
-                    </G>
-                )}
-                {hat === 'tophat' && (
-                    <G transform="translate(-10, -20)">
-                        <Rect x="20" y="60" width="60" height="10" fill="#1f2937" stroke="white" strokeWidth="2" />
-                        <Rect x="30" y="20" width="40" height="40" fill="#1f2937" stroke="white" strokeWidth="2" />
-                        <Rect x="30" y="50" width="40" height="5" fill="#ef4444" />
-                    </G>
-                )}
-                {hat === 'crown' && (
-                    <G transform="translate(0, -10)">
-                        <Path
-                            d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z"
-                            fill="#fbbf24"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinejoin="round"
-                        />
-                    </G>
-                )}
-            </G>
-        );
-    };
-
-    return (
-        <View style={styles.previewContainer}>
-            {/* Glow behind pet */}
-            <View style={styles.glowWrapper}>
-                <Svg height="180" width="180" viewBox="0 0 180 180">
-                    <Defs>
-                        <RadialGradient id="previewGlow" cx="50%" cy="50%" r="50%">
-                            <Stop offset="0%" stopColor={color} stopOpacity="0.4" />
-                            <Stop offset="100%" stopColor={color} stopOpacity="0" />
-                        </RadialGradient>
-                    </Defs>
-                    <Circle cx="90" cy="90" r="90" fill="url(#previewGlow)" />
-                </Svg>
-            </View>
-
-            {/* Pet */}
-            <Svg viewBox="0 0 200 200" style={styles.petSvg}>
-                <Defs>
-                    <RadialGradient id="previewBodyGrad" cx="30%" cy="30%" r="80%">
-                        <Stop offset="0%" stopColor={color} stopOpacity="1" />
-                        <Stop offset="100%" stopColor={color} stopOpacity="0.8" />
-                    </RadialGradient>
-                </Defs>
-                <Path
-                    d="M100,180 C60,180 30,150 30,110 C30,80 50,55 75,50 C80,30 100,20 120,30 C140,20 160,35 165,60 C185,70 190,100 180,125 C190,150 170,180 130,180 Z"
-                    fill="url(#previewBodyGrad)"
-                    stroke={color}
-                    strokeWidth="2"
-                />
-                <Path
-                    d="M90,50 Q100,10 115,45 Q125,15 135,50"
-                    fill="none"
-                    stroke={color}
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                />
-                <G transform="translate(0, 10)">
-                    {renderEyes()}
-                    {renderMouth()}
-                    {!isSick && (
-                        <G>
-                            <Circle cx="60" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
-                            <Circle cx="140" cy="125" r="14" fill="#ff99cc" opacity="0.5" />
-                        </G>
-                    )}
-                    {renderHat()}
-                </G>
-            </Svg>
-        </View>
-    );
-};
-
-// Hat preview icon for grid
-const HatIcon = ({ type }: { type: string }) => {
-    if (type === 'none') return <View style={styles.noneIcon} />;
-
-    return (
-        <Svg viewBox="0 0 100 100" style={{ width: 36, height: 36 }}>
-            {type === 'party' && (
-                <Path d="M50 10 L80 70 L20 70 Z" fill="#facc15" stroke="white" strokeWidth="2" strokeLinejoin="round" />
-            )}
-            {type === 'cowboy' && (
-                <G>
-                    <Path d="M10 60 Q50 30 90 60" fill="#78350f" stroke="white" strokeWidth="2" />
-                    <Path d="M30 60 L30 40 Q50 20 70 40 L70 60" fill="#78350f" stroke="white" strokeWidth="2" />
-                </G>
-            )}
-            {type === 'tophat' && (
-                <G>
-                    <Rect x="20" y="60" width="60" height="10" fill="#1f2937" stroke="white" strokeWidth="2" />
-                    <Rect x="30" y="20" width="40" height="40" fill="#1f2937" stroke="white" strokeWidth="2" />
-                    <Rect x="30" y="50" width="40" height="5" fill="#ef4444" />
-                </G>
-            )}
-            {type === 'crown' && (
-                <Path
-                    d="M20 60 L20 30 L35 50 L50 20 L65 50 L80 30 L80 60 Z"
-                    fill="#fbbf24"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                />
-            )}
-        </Svg>
-    );
-};
 
 export const PetCustomizeScreen = () => {
-    const { pet, updatePet } = useHabit();
+    const { pet, updatePet, equipHat } = useHabit();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const router = useRouter();
 
+    const [activeTab, setActiveTab] = useState<'identity' | 'wardrobe'>('identity');
     const [name, setName] = useState(pet?.name || '');
     const [selectedColor, setSelectedColor] = useState(pet?.color || COLORS[0]);
-    const [selectedHat, setSelectedHat] = useState(pet?.hat || 'none');
 
     const handleSave = useCallback(() => {
         const validation = validatePetName(name);
 
         if (!validation.isValid) {
             Alert.alert(
-                validation.error?.includes('under 12')
-                    ? 'Too Long'
-                    : validation.error?.includes('friendly')
-                      ? 'Whoops!'
-                      : 'Required',
+                validation.error?.includes('under 12') ? 'Too Long' : 'Whoops!',
                 validation.error
             );
             return;
         }
 
-        updatePet({ name: name.trim(), color: selectedColor, hat: selectedHat });
+        updatePet({ name: name.trim(), color: selectedColor });
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         router.back();
-    }, [name, selectedColor, selectedHat, updatePet, router]);
+    }, [name, selectedColor, updatePet, router]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: 'Customize Pet',
+            title: activeTab === 'identity' ? 'Identity' : 'Wardrobe',
             headerLeft: () => (
                 <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 16 }}>
                     <Text style={{ color: '#fff', fontSize: 17, textAlign: 'center' }}>Cancel</Text>
@@ -277,122 +72,142 @@ export const PetCustomizeScreen = () => {
                 </TouchableOpacity>
             ),
         });
-    }, [navigation, router, handleSave]);
+    }, [navigation, router, handleSave, activeTab]);
 
     if (!pet) return null;
 
-    const handleColorSelect = (color: string) => {
-        setSelectedColor(color);
+    const handleEquip = (itemId: string) => {
         Haptics.selectionAsync();
+        equipHat(itemId);
     };
 
-    const handleHatSelect = (hatId: string, isLocked: boolean) => {
-        if (isLocked) {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            return;
-        }
-        setSelectedHat(hatId);
-        Haptics.selectionAsync();
-    };
+    // Filter only owned items for Wardrobe
+    const ownedHats = HAT_ITEMS.filter(item =>
+        item.id === 'none' || pet.inventory?.includes(item.id)
+    );
 
     return (
         <ScreenWrapper keyboardAvoiding isModal contentContainerStyle={styles.content}>
             {/* Live Pet Preview */}
-            <PetPreview color={selectedColor} hat={selectedHat} mood={pet.mood} />
-
-            {/* Name Input */}
-            <View style={styles.section}>
-                <Text style={styles.label}>NAME</Text>
-                <View style={styles.inputRow}>
-                    <TextInput
-                        style={styles.input}
-                        value={name}
-                        onChangeText={setName}
-                        placeholder="Pet Name"
-                        placeholderTextColor="rgba(255,255,255,0.3)"
-                        maxLength={20}
-                    />
-                </View>
+            <View style={styles.previewSection}>
+                <PetPreview
+                    color={activeTab === 'identity' ? selectedColor : pet.color}
+                    hat={pet.hat || 'none'}
+                    mood={pet.mood}
+                />
             </View>
 
-            {/* Color Picker */}
-            <View style={styles.section}>
-                <Text style={styles.label}>COLOR</Text>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.colorRow}
-                    style={{ marginHorizontal: -12 }}
-                >
-                    {COLORS.map((color) => (
-                        <TouchableOpacity
-                            key={color}
-                            style={[
-                                styles.colorDot,
-                                { backgroundColor: color },
-                                selectedColor === color && styles.colorSelected,
-                            ]}
-                            onPress={() => handleColorSelect(color)}
-                        >
-                            {selectedColor === color && <Check size={16} color="#fff" strokeWidth={3} />}
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
+            {/* Tab Switcher */}
+            <View style={styles.tabContainer}>
+                <GlassSegmentedControl
+                    values={['Identity', 'Wardrobe']}
+                    selectedIndex={activeTab === 'identity' ? 0 : 1}
+                    onChange={(event) => {
+                        setActiveTab(event.nativeEvent.selectedSegmentIndex === 0 ? 'identity' : 'wardrobe');
+                        Haptics.selectionAsync();
+                    }}
+                />
             </View>
 
-            {/* Hat/Wardrobe Picker */}
-            <View style={styles.section}>
-                <Text style={styles.label}>ACCESSORIES</Text>
-                <View style={styles.hatGrid}>
-                    {HATS.map((hat) => {
-                        const isLocked = (pet.level || 1) < hat.requiredLevel;
-                        const isSelected = selectedHat === hat.id;
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {activeTab === 'identity' ? (
+                    <>
+                        {/* Name Input */}
+                        <View style={styles.section}>
+                            <Text style={styles.label}>NAME</Text>
+                            <View style={styles.inputRow}>
+                                <TextInput
+                                    style={styles.input}
+                                    value={name}
+                                    onChangeText={setName}
+                                    placeholder="Pet Name"
+                                    placeholderTextColor="rgba(255,255,255,0.3)"
+                                    maxLength={20}
+                                />
+                            </View>
+                        </View>
 
-                        return (
-                            <TouchableOpacity
-                                key={hat.id}
-                                style={[styles.hatCard, isSelected && styles.hatSelected, isLocked && styles.hatLocked]}
-                                onPress={() => handleHatSelect(hat.id, isLocked)}
-                                activeOpacity={0.8}
+                        {/* Color Picker */}
+                        <View style={styles.section}>
+                            <Text style={styles.label}>COLOR</Text>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={styles.colorRow}
+                                style={{ marginHorizontal: -12 }}
                             >
-                                <HatIcon type={hat.id} />
-                                <Text style={styles.hatName}>{hat.name}</Text>
-                                {isLocked && (
-                                    <View style={styles.lockBadge}>
-                                        <Lock size={8} color="#fff" />
-                                        <Text style={styles.lockText}>Lvl {hat.requiredLevel}</Text>
-                                    </View>
-                                )}
-                                {isSelected && !isLocked && (
-                                    <View style={styles.checkBadge}>
-                                        <Check size={10} color="#000" strokeWidth={3} />
-                                    </View>
-                                )}
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
-            </View>
+                                {COLORS.map((color) => (
+                                    <TouchableOpacity
+                                        key={color}
+                                        style={[
+                                            styles.colorDot,
+                                            { backgroundColor: color },
+                                            selectedColor === color && styles.colorSelected,
+                                        ]}
+                                        onPress={() => {
+                                            setSelectedColor(color);
+                                            Haptics.selectionAsync();
+                                        }}
+                                    >
+                                        {selectedColor === color && <Check size={16} color="#fff" strokeWidth={3} />}
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    </>
+                ) : (
+                    /* Wardrobe (Owned Items) */
+                    <View style={styles.section}>
+                        <View style={styles.grid}>
+                            {ownedHats.map((item) => {
+                                const isEquipped = pet.hat === item.id || (item.id === 'none' && !pet.hat);
+
+                                return (
+                                    <TouchableOpacity
+                                        key={item.id}
+                                        style={[
+                                            styles.card,
+                                            isEquipped && styles.cardEquipped
+                                        ]}
+                                        onPress={() => handleEquip(item.id)}
+                                        activeOpacity={0.8}
+                                    >
+                                        <HatIcon type={item.id} />
+                                        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+
+                                        {isEquipped && (
+                                            <View style={styles.badgeEquipped}>
+                                                <Check size={10} color="#000" strokeWidth={3} />
+                                                <Text style={styles.badgeText}>On</Text>
+                                            </View>
+                                        )}
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+                    </View>
+                )}
+            </ScrollView>
         </ScreenWrapper>
     );
 };
 
 const styles = StyleSheet.create({
     content: {
-        // Padding handled by ScreenWrapper
+        flex: 1,
     },
-    previewContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
+    scrollContent: {
+        paddingBottom: 40,
+    },
+    previewSection: {
+        marginBottom: 20,
         height: 180,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    tabContainer: {
+        paddingHorizontal: 20,
         marginBottom: 24,
-    },
-    glowWrapper: {
-        position: 'absolute',
-    },
-    petSvg: {
-        width: 140,
-        height: 140,
     },
     section: {
         marginBottom: 24,
@@ -409,8 +224,6 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 4,
         minHeight: 52,
-        // @ts-ignore
-        cornerCurve: 'continuous',
     },
     input: {
         flex: 1,
@@ -438,64 +251,47 @@ const styles = StyleSheet.create({
         borderColor: '#fff',
         transform: [{ scale: 1.1 }],
     },
-    hatGrid: {
+    // Wardrobe Grid
+    grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 10,
+        gap: 12,
     },
-    hatCard: {
-        width: (width - 60) / 3, // Roughly 3 columns
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 12,
+    card: {
+        width: Math.floor((width - 40 - 24) / 3),
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        borderRadius: 16,
         padding: 12,
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: 'transparent',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        aspectRatio: 0.9,
+        justifyContent: 'space-between',
     },
-    hatSelected: {
-        borderColor: '#fff',
+    cardEquipped: {
+        borderColor: '#4ade80',
+        backgroundColor: 'rgba(74, 222, 128, 0.1)',
     },
-    hatLocked: {
-        opacity: 0.5,
-    },
-    hatName: {
-        color: '#fff',
-        fontSize: 12,
+    itemName: {
+        fontSize: 11,
         fontWeight: '600',
-        marginTop: 6,
+        color: 'rgba(255,255,255,0.9)',
+        marginTop: 8,
+        textAlign: 'center',
+        marginBottom: 4,
     },
-    noneIcon: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.2)',
-        borderStyle: 'dashed',
-    },
-    lockBadge: {
+    badgeEquipped: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#ef4444',
-        paddingHorizontal: 5,
-        paddingVertical: 2,
-        borderRadius: 4,
-        gap: 3,
-        marginTop: 4,
-    },
-    lockText: {
-        color: '#fff',
-        fontSize: 9,
-        fontWeight: '700',
-    },
-    checkBadge: {
-        position: 'absolute',
-        top: 6,
-        right: 6,
-        backgroundColor: '#fff',
-        width: 16,
-        height: 16,
+        backgroundColor: '#4ade80',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
         borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
+        gap: 4,
+    },
+    badgeText: {
+        fontSize: 10,
+        fontWeight: '700',
+        color: '#000',
     },
 });

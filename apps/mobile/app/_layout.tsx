@@ -74,6 +74,16 @@ const ThemedRoot = () => {
                         headerShadowVisible: false,
                     }}
                 />
+                <Stack.Screen
+                    name="shop"
+                    options={{
+                        presentation: 'modal',
+                        headerShown: true,
+                        headerStyle: { backgroundColor: LiquidGlass.backgroundColor },
+                        headerTintColor: '#fff',
+                        headerShadowVisible: false,
+                    }}
+                />
                 <Stack.Screen name="onboarding" options={{ headerShown: false }} />
                 <Stack.Screen name="index" options={{ headerShown: false }} />
             </Stack>
