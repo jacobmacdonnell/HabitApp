@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
+import { ColorPicker } from '../components/ColorPicker';
 import { GlassButton } from '../components/GlassButton';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { validatePetName } from '../utils/validation';
@@ -94,8 +95,8 @@ export const OnboardingScreen = () => {
                     validation.error?.includes('under 12')
                         ? 'Too Long'
                         : validation.error?.includes('friendly')
-                            ? 'Whoops!'
-                            : 'Name Required',
+                          ? 'Whoops!'
+                          : 'Name Required',
                     validation.error
                 );
                 return;
@@ -173,7 +174,6 @@ export const OnboardingScreen = () => {
 
     return (
         <View style={styles.container}>
-
             {/* Progress Dots - at top with safe area */}
             <View style={[styles.progressContainer, { paddingTop: insets.top + 20 }]}>
                 {[0, 1, 2, 3].map((i) => (
@@ -247,19 +247,13 @@ export const OnboardingScreen = () => {
                             </View>
 
                             <Text style={styles.colorLabel}>Choose a color</Text>
-                            <View style={styles.colorRow}>
-                                {HABIT_COLORS.slice(0, 6).map((c) => (
-                                    <TouchableOpacity
-                                        key={c}
-                                        style={[
-                                            styles.colorDot,
-                                            { backgroundColor: c },
-                                            petColor === c && styles.colorSelected,
-                                        ]}
-                                        onPress={() => handleColorSelect(c)}
-                                    />
-                                ))}
-                            </View>
+                            <ColorPicker
+                                colors={HABIT_COLORS.slice(0, 6)}
+                                selectedColor={petColor}
+                                onColorSelect={(color) => handleColorSelect(color)}
+                                variant="wrap"
+                                showGlow
+                            />
                         </View>
 
                         <View style={styles.buttonRow}>
@@ -282,17 +276,23 @@ export const OnboardingScreen = () => {
                         showsVerticalScrollIndicator={false}
                     >
                         <View style={styles.stepHeader}>
-                            <Text style={styles.title}>Pick Your First Habit</Text>
-                            <Text style={styles.subtitle}>Start small. You can add more later.</Text>
+                            <Text style={styles.title}>Start with one habit</Text>
+                            <Text style={styles.subtitle}>
+                                Research shows focusing on one habit leads to 3x better results. You can add more
+                                anytime!
+                            </Text>
                         </View>
 
                         <View style={styles.grid}>
-                            {HABIT_PRESETS.map((preset, index) => (
+                            {HABIT_PRESETS.slice(0, 6).map((preset, index) => (
                                 <TouchableOpacity
                                     key={preset.id}
                                     activeOpacity={0.8}
                                     onPress={() => handlePresetSelect(preset.id, index)}
                                     style={{ width: '48%' }}
+                                    accessibilityLabel={`${preset.title} habit`}
+                                    accessibilityRole="radio"
+                                    accessibilityState={{ selected: selectedPreset === preset.id }}
                                 >
                                     <Animated.View
                                         style={[
@@ -369,14 +369,24 @@ export const OnboardingScreen = () => {
                         <View style={styles.card}>
                             <Text style={styles.label}>DAILY TARGET</Text>
                             <View style={styles.counterRow}>
-                                <TouchableOpacity style={styles.counterButton} onPress={() => handleCounterChange(-1)}>
+                                <TouchableOpacity
+                                    style={styles.counterButton}
+                                    onPress={() => handleCounterChange(-1)}
+                                    accessibilityLabel="Decrease target"
+                                    accessibilityRole="button"
+                                >
                                     <Minus size={20} color="#fff" />
                                 </TouchableOpacity>
                                 <View style={styles.counterCenter}>
                                     <Text style={styles.counterValue}>{targetCount}</Text>
                                     <Text style={styles.counterUnit}>times per day</Text>
                                 </View>
-                                <TouchableOpacity style={styles.counterButton} onPress={() => handleCounterChange(1)}>
+                                <TouchableOpacity
+                                    style={styles.counterButton}
+                                    onPress={() => handleCounterChange(1)}
+                                    accessibilityLabel="Increase target"
+                                    accessibilityRole="button"
+                                >
                                     <Plus size={20} color="#fff" />
                                 </TouchableOpacity>
                             </View>
@@ -509,7 +519,7 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: LiquidGlass.colors.card,
         borderRadius: 24,
-        padding: 24,
+        padding: LiquidGlass.spacing.xxl,
         gap: 16,
         borderWidth: 1,
         borderColor: LiquidGlass.colors.border,
@@ -528,23 +538,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: 'rgba(255,255,255,0.4)',
         textAlign: 'center',
-        marginBottom: -8,
-    },
-    colorRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 16,
-    },
-    colorDot: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        borderWidth: 3,
-        borderColor: 'transparent',
-    },
-    colorSelected: {
-        borderColor: '#fff',
-        transform: [{ scale: 1.15 }],
+        marginBottom: LiquidGlass.spacing.sm,
     },
     grid: {
         flexDirection: 'row',
@@ -596,7 +590,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: 'rgba(0,0,0,0.2)',
-        padding: 12,
+        padding: LiquidGlass.spacing.md,
         borderRadius: 20,
     },
     counterButton: {
@@ -633,7 +627,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: '600',
         color: '#fff',
-        padding: 12,
+        padding: LiquidGlass.spacing.md,
         textAlign: 'center',
     },
 });

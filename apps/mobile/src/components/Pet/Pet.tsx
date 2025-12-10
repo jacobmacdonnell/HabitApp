@@ -541,8 +541,6 @@ export const Pet = ({
             {/* Stats Card - hidden during onboarding hatching */}
             {!hideStats && (
                 <SafeLiquidGlassView style={styles.statsCard} intensity={25}>
-
-
                     {/* Level Badge - Centered */}
                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 20 }}>
                         <LevelBadge level={currentLevel} variant="filled" size="sm" />
@@ -560,7 +558,10 @@ export const Pet = ({
                                             styles.barFill,
                                             {
                                                 width: `${pet.health}%`,
-                                                backgroundColor: pet.health < 30 ? LiquidGlass.colors.danger : LiquidGlass.colors.success,
+                                                backgroundColor:
+                                                    pet.health < 30
+                                                        ? LiquidGlass.colors.danger
+                                                        : LiquidGlass.colors.success,
                                             },
                                         ]}
                                     />
@@ -581,9 +582,7 @@ export const Pet = ({
                                         ]}
                                     />
                                 </View>
-                                <Text style={styles.barValue}>
-                                    {Math.floor(xpPercentage)}%
-                                </Text>
+                                <Text style={styles.barValue}>{Math.floor(xpPercentage)}%</Text>
                             </View>
                         </View>
                     </View>
@@ -770,7 +769,7 @@ const styles = StyleSheet.create({
     statsCard: {
         width: width - 40,
         borderRadius: 24,
-        padding: 24,
+        padding: LiquidGlass.spacing.xxl,
         backgroundColor: 'rgba(30, 30, 35, 0.6)', // Darker, more visible glass tint
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',

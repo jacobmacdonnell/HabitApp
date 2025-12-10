@@ -127,6 +127,8 @@ export const SettingsScreen = () => {
                                     onValueChange={handleSoundChange}
                                     trackColor={{ false: '#3e3e3e', true: themeColors.accent }}
                                     ios_backgroundColor="#3e3e3e"
+                                    accessibilityLabel="Sound effects toggle"
+                                    accessibilityRole="switch"
                                 />
                             </View>
 
@@ -145,6 +147,8 @@ export const SettingsScreen = () => {
                                     onValueChange={handleNotificationChange}
                                     trackColor={{ false: '#3e3e3e', true: themeColors.accent }}
                                     ios_backgroundColor="#3e3e3e"
+                                    accessibilityLabel="Notifications toggle"
+                                    accessibilityRole="switch"
                                 />
                             </View>
                         </View>
@@ -182,7 +186,11 @@ export const SettingsScreen = () => {
                     <Text style={styles.sectionHeader}>DATA & PRIVACY</Text>
                     <View style={[styles.card, { overflow: 'hidden' }]}>
                         <View style={{ position: 'relative', zIndex: 1 }}>
-                            <TouchableOpacity style={styles.row}>
+                            <TouchableOpacity
+                                style={styles.row}
+                                accessibilityLabel="View privacy policy"
+                                accessibilityRole="link"
+                            >
                                 <View style={styles.iconLabel}>
                                     <View
                                         style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}
@@ -196,7 +204,13 @@ export const SettingsScreen = () => {
 
                             <View style={styles.separator} />
 
-                            <TouchableOpacity style={styles.row} onPress={handleReset}>
+                            <TouchableOpacity
+                                style={styles.row}
+                                onPress={handleReset}
+                                accessibilityLabel="Reset all data"
+                                accessibilityRole="button"
+                                accessibilityHint="Deletes all habits and pet progress"
+                            >
                                 <View style={styles.iconLabel}>
                                     <View style={[styles.iconContainer, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
                                         <Trash2 size={20} color="#ef4444" />
@@ -254,13 +268,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16,
+        padding: LiquidGlass.spacing.lg,
     },
     timeRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16,
+        padding: LiquidGlass.spacing.lg,
     },
     iconLabel: {
         flexDirection: 'row',

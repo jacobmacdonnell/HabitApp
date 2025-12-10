@@ -5,6 +5,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { EmptyState } from '../components/EmptyState';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { LiquidGlass } from '../theme/theme';
 
@@ -199,11 +200,7 @@ export const TrendsScreen = () => {
     const renderWeeklyView = () => (
         <View style={styles.listContainer}>
             {habits.length === 0 ? (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyIcon}>📊</Text>
-                    <Text style={styles.emptyTitle}>No habits yet</Text>
-                    <Text style={styles.emptyText}>Create your first habit to start tracking</Text>
-                </View>
+                <EmptyState type="empty" message="Create your first habit to start tracking" />
             ) : (
                 <>
                     <View style={styles.weekHeaderRow}>
@@ -290,6 +287,8 @@ export const TrendsScreen = () => {
                         onPress={() => changeMonth(-1)}
                         style={styles.navButton}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        accessibilityLabel="Previous month"
+                        accessibilityRole="button"
                     >
                         <ChevronLeft size={24} color={LiquidGlass.text.secondary} />
                     </TouchableOpacity>
@@ -300,6 +299,8 @@ export const TrendsScreen = () => {
                         onPress={() => changeMonth(1)}
                         style={styles.navButton}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        accessibilityLabel="Next month"
+                        accessibilityRole="button"
                     >
                         <ChevronRight size={24} color={LiquidGlass.text.secondary} />
                     </TouchableOpacity>
@@ -437,7 +438,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 16,
+        padding: LiquidGlass.spacing.lg,
         borderRadius: 24,
         backgroundColor: LiquidGlass.colors.surface,
         overflow: 'hidden',
@@ -514,7 +515,7 @@ const styles = StyleSheet.create({
     calendarContainer: {
         borderRadius: 24,
         overflow: 'hidden',
-        padding: 16,
+        padding: LiquidGlass.spacing.lg,
         backgroundColor: LiquidGlass.colors.card,
     },
     monthNavRow: {
@@ -597,29 +598,7 @@ const styles = StyleSheet.create({
         height: 8,
         borderRadius: 4,
     },
-
     scrollView: {
         flex: 1,
-    },
-    // Empty State
-    emptyState: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 60,
-    },
-    emptyIcon: {
-        fontSize: 48,
-        marginBottom: 16,
-    },
-    emptyTitle: {
-        fontSize: LiquidGlass.typography.size.title3,
-        fontWeight: '700',
-        color: '#fff',
-        marginBottom: 8,
-    },
-    emptyText: {
-        fontSize: LiquidGlass.typography.size.subheadline,
-        color: 'rgba(255,255,255,0.5)',
-        textAlign: 'center',
     },
 });

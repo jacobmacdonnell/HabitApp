@@ -9,7 +9,12 @@ export const LiquidFab = () => {
 
     return (
         <View style={styles.container}>
-            <Pressable onPress={() => router.push('/habit-form')}>
+            <Pressable
+                onPress={() => router.push('/habit-form')}
+                accessibilityLabel="Add new habit"
+                accessibilityRole="button"
+                accessibilityHint="Opens the habit creation form"
+            >
                 <LiquidGlassView
                     style={[styles.fabMain, { backgroundColor: 'rgba(28,28,30,0.5)' }]} // Manual dark tint
                     interactive

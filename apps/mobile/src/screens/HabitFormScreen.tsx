@@ -1,10 +1,10 @@
 import { useHabit, Habit } from '@habitapp/shared';
-import { HABIT_COLORS, HABIT_ICONS } from '@habitapp/shared/src/constants';
+import { HABIT_COLORS, HABIT_ICONS, HABIT_PRESETS } from '@habitapp/shared/src/constants';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { Trash2, Minus, Plus, Check } from 'lucide-react-native';
+import { Trash2, Minus, Plus } from 'lucide-react-native';
 import React, { useState, useLayoutEffect } from 'react';
 import {
     View,
@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 
 import { GlassButton } from '../components/GlassButton';
+import { ColorPicker } from '../components/ColorPicker';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { RootStackParamList } from '../navigation/types';
@@ -98,8 +99,47 @@ export const HabitFormScreen = () => {
         ]);
     };
 
+    const applyPreset = (preset: (typeof HABIT_PRESETS)[0]) => {
+        Haptics.selectionAsync();
+        setTitle(preset.title);
+        setIcon(preset.icon);
+        setColor(preset.color);
+        setTimeOfDay(preset.defaultTime as Habit['timeOfDay']);
+        setTargetCount(preset.defaultTarget);
+    };
+
     return (
         <ScreenWrapper keyboardAvoiding isModal>
+            {/* Preset Picker - Only show when creating new habit */}
+            {!editingHabit && (
+                <View style={styles.section}>
+                    <Text style={styles.label}>QUICK START</Text>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.presetRow}
+                        style={{ marginHorizontal: -12 }}
+                    >
+                        {HABIT_PRESETS.map((preset) => (
+                            <TouchableOpacity
+                                key={preset.id}
+                                style={[
+                                    styles.presetChip,
+                                    { backgroundColor: preset.color + '20', borderColor: preset.color },
+                                ]}
+                                onPress={() => applyPreset(preset)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.presetIcon}>{preset.icon}</Text>
+                                <Text style={[styles.presetTitle, { color: preset.color }]} numberOfLines={1}>
+                                    {preset.title}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
+            )}
+
             {/* Title Input */}
             <View style={styles.section}>
                 <Text style={styles.label}>HABIT TITLE</Text>
@@ -124,6 +164,8 @@ export const HabitFormScreen = () => {
                             setTargetCount(Math.max(1, targetCount - 1));
                             Haptics.selectionAsync();
                         }}
+                        accessibilityLabel="Decrease daily target"
+                        accessibilityRole="button"
                     >
                         <Minus size={20} color="#fff" />
                     </TouchableOpacity>
@@ -137,6 +179,8 @@ export const HabitFormScreen = () => {
                             setTargetCount(targetCount + 1);
                             Haptics.selectionAsync();
                         }}
+                        accessibilityLabel="Increase daily target"
+                        accessibilityRole="button"
                     >
                         <Plus size={20} color="#fff" />
                     </TouchableOpacity>
@@ -189,25 +233,7 @@ export const HabitFormScreen = () => {
             {/* Color Picker */}
             <View style={styles.section}>
                 <Text style={styles.label}>COLOR</Text>
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.colorRow}
-                    style={{ marginHorizontal: -12 }}
-                >
-                    {HABIT_COLORS.map((c) => (
-                        <TouchableOpacity
-                            key={c}
-                            style={[styles.colorDot, { backgroundColor: c }, color === c && styles.colorSelected]}
-                            onPress={() => {
-                                setColor(c);
-                                Haptics.selectionAsync();
-                            }}
-                        >
-                            {color === c && <Check size={16} color="#fff" strokeWidth={3} />}
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
+                <ColorPicker colors={HABIT_COLORS} selectedColor={color} onColorSelect={setColor} variant="scroll" />
             </View>
 
             {editingHabit && (
@@ -235,23 +261,26 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         marginLeft: 4,
     },
-    colorRow: {
-        gap: 12,
+    presetRow: {
+        gap: 10,
         paddingHorizontal: 12,
-        paddingVertical: 10,
+        paddingVertical: 4,
     },
-    colorDot: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        justifyContent: 'center',
+    presetChip: {
+        flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 3,
-        borderColor: 'transparent',
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        borderRadius: 20,
+        borderWidth: 1.5,
+        gap: 6,
     },
-    colorSelected: {
-        borderColor: '#fff',
-        transform: [{ scale: 1.1 }],
+    presetIcon: {
+        fontSize: 16,
+    },
+    presetTitle: {
+        fontSize: 14,
+        fontWeight: '600',
     },
     iconRow: {
         gap: 12,
@@ -288,7 +317,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: 'rgba(0,0,0,0.2)',
-        padding: 12,
+        padding: LiquidGlass.spacing.md,
         borderRadius: 20,
     },
     counterButton: {
@@ -317,7 +346,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: '600',
         color: '#fff',
-        padding: 12,
+        padding: LiquidGlass.spacing.md,
     },
     footer: {
         marginTop: 20,

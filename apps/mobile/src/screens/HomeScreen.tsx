@@ -202,7 +202,6 @@ export const HomeScreen = () => {
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
                 logProgress(habit.id, today);
-
             }
         },
         [progress, today, logProgress, undoProgress, habits]
@@ -302,6 +301,9 @@ export const HomeScreen = () => {
                         activeOpacity={0.8}
                         onPress={() => router.push('/(tabs)/pet')}
                         style={styles.petHeaderContainer}
+                        accessibilityLabel={`View ${pet?.name || 'your pet'}`}
+                        accessibilityRole="button"
+                        accessibilityHint="Opens pet details screen"
                     >
                         <View style={styles.petGlass}>
                             <Pet pet={pet} isFullView={false} feedingBounce={petBounce} />
@@ -341,6 +343,8 @@ export const HomeScreen = () => {
                                 style={styles.completedToggle}
                                 activeOpacity={0.7}
                                 disabled={!hasCompletedHabits}
+                                accessibilityLabel={showCompleted ? 'Hide completed habits' : 'Show completed habits'}
+                                accessibilityRole="button"
                             >
                                 {showCompleted ? (
                                     <Eye size={18} color="#34C759" />

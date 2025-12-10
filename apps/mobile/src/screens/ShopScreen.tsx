@@ -7,7 +7,6 @@ import { Check, Lock, Zap } from 'lucide-react-native';
 import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 
-
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { PetPreview, HatIcon } from '../components/PetPreview';
 import { ScreenWrapper } from '../components/ScreenWrapper';
@@ -37,8 +36,12 @@ export const ShopScreen = () => {
                 <TouchableOpacity
                     onPress={() => router.back()}
                     style={{ paddingHorizontal: 16, justifyContent: 'center', alignItems: 'flex-end', minWidth: 60 }}
+                    accessibilityLabel="Close shop"
+                    accessibilityRole="button"
                 >
-                    <Text style={{ color: '#fff', fontSize: LiquidGlass.typography.size.headline, fontWeight: '600' }}>Done</Text>
+                    <Text style={{ color: '#fff', fontSize: LiquidGlass.typography.size.headline, fontWeight: '600' }}>
+                        Done
+                    </Text>
                 </TouchableOpacity>
             ),
         });
@@ -86,16 +89,20 @@ export const ShopScreen = () => {
                                 style={[
                                     styles.card,
                                     isEquipped && styles.cardEquipped,
-                                    !isOwned && !canAfford && styles.cardLocked
+                                    !isOwned && !canAfford && styles.cardLocked,
                                 ]}
                                 onPress={() => {
                                     if (isOwned && !isEquipped) handleEquip(item.id);
                                     else if (!isOwned) handleBuy(item);
                                 }}
                                 activeOpacity={0.8}
+                                accessibilityLabel={`${item.name}, ${isEquipped ? 'equipped' : isOwned ? 'owned, tap to equip' : `${item.price} XP to buy`}`}
+                                accessibilityRole="button"
                             >
                                 <HatIcon type={item.id} />
-                                <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                                <Text style={styles.itemName} numberOfLines={1}>
+                                    {item.name}
+                                </Text>
 
                                 {/* Action / Price */}
                                 <View style={styles.actionContainer}>
@@ -110,8 +117,21 @@ export const ShopScreen = () => {
                                         </View>
                                     ) : (
                                         <View style={styles.priceContainer}>
-                                            <Zap size={10} color={canAfford ? LiquidGlass.colors.currency : "rgba(255,255,255,0.4)"} fill={canAfford ? LiquidGlass.colors.currency : "none"} />
-                                            <Text style={[styles.priceText, !canAfford && { color: 'rgba(255,255,255,0.4)' }]}>{item.price}</Text>
+                                            <Zap
+                                                size={10}
+                                                color={
+                                                    canAfford ? LiquidGlass.colors.currency : 'rgba(255,255,255,0.4)'
+                                                }
+                                                fill={canAfford ? LiquidGlass.colors.currency : 'none'}
+                                            />
+                                            <Text
+                                                style={[
+                                                    styles.priceText,
+                                                    !canAfford && { color: 'rgba(255,255,255,0.4)' },
+                                                ]}
+                                            >
+                                                {item.price}
+                                            </Text>
                                         </View>
                                     )}
                                 </View>
@@ -184,7 +204,7 @@ const styles = StyleSheet.create({
         width: Math.floor((width - 40 - 24) / 3),
         backgroundColor: LiquidGlass.colors.card,
         borderRadius: 16,
-        padding: 12,
+        padding: LiquidGlass.spacing.md,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: LiquidGlass.colors.border,
@@ -254,5 +274,5 @@ const styles = StyleSheet.create({
     emptySubtext: {
         color: 'rgba(255,255,255,0.5)',
         fontSize: LiquidGlass.typography.size.subheadline,
-    }
+    },
 });

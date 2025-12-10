@@ -8,6 +8,7 @@ import React, { useState, useLayoutEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, TextInput, Alert } from 'react-native';
 
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
+import { ColorPicker } from '../components/ColorPicker';
 import { PetPreview, HatIcon } from '../components/PetPreview';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { RootStackParamList } from '../navigation/types';
@@ -47,10 +48,7 @@ export const PetCustomizeScreen = () => {
         const validation = validatePetName(name);
 
         if (!validation.isValid) {
-            Alert.alert(
-                validation.error?.includes('under 12') ? 'Too Long' : 'Whoops!',
-                validation.error
-            );
+            Alert.alert(validation.error?.includes('under 12') ? 'Too Long' : 'Whoops!', validation.error);
             return;
         }
 
@@ -83,9 +81,7 @@ export const PetCustomizeScreen = () => {
     };
 
     // Filter only owned items for Wardrobe
-    const ownedHats = HAT_ITEMS.filter(item =>
-        item.id === 'none' || pet.inventory?.includes(item.id)
-    );
+    const ownedHats = HAT_ITEMS.filter((item) => item.id === 'none' || pet.inventory?.includes(item.id));
 
     return (
         <ScreenWrapper keyboardAvoiding isModal contentContainerStyle={styles.content}>
@@ -131,29 +127,12 @@ export const PetCustomizeScreen = () => {
                         {/* Color Picker */}
                         <View style={styles.section}>
                             <Text style={styles.label}>COLOR</Text>
-                            <ScrollView
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={styles.colorRow}
-                                style={{ marginHorizontal: -12 }}
-                            >
-                                {COLORS.map((color) => (
-                                    <TouchableOpacity
-                                        key={color}
-                                        style={[
-                                            styles.colorDot,
-                                            { backgroundColor: color },
-                                            selectedColor === color && styles.colorSelected,
-                                        ]}
-                                        onPress={() => {
-                                            setSelectedColor(color);
-                                            Haptics.selectionAsync();
-                                        }}
-                                    >
-                                        {selectedColor === color && <Check size={16} color="#fff" strokeWidth={3} />}
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
+                            <ColorPicker
+                                colors={COLORS}
+                                selectedColor={selectedColor}
+                                onColorSelect={setSelectedColor}
+                                variant="scroll"
+                            />
                         </View>
                     </>
                 ) : (
@@ -166,15 +145,14 @@ export const PetCustomizeScreen = () => {
                                 return (
                                     <TouchableOpacity
                                         key={item.id}
-                                        style={[
-                                            styles.card,
-                                            isEquipped && styles.cardEquipped
-                                        ]}
+                                        style={[styles.card, isEquipped && styles.cardEquipped]}
                                         onPress={() => handleEquip(item.id)}
                                         activeOpacity={0.8}
                                     >
                                         <HatIcon type={item.id} />
-                                        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                                        <Text style={styles.itemName} numberOfLines={1}>
+                                            {item.name}
+                                        </Text>
 
                                         {isEquipped && (
                                             <View style={styles.badgeEquipped}>
@@ -231,30 +209,8 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: '600',
         color: '#fff',
-        padding: 12,
+        padding: LiquidGlass.spacing.md,
         textAlign: 'center',
-    },
-    colorRow: {
-        gap: 12,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-    },
-    colorDot: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 3,
-        borderColor: 'transparent',
-    },
-    itemSelected: {
-        borderColor: LiquidGlass.colors.success,
-        borderWidth: 2,
-    },
-    colorSelected: {
-        borderColor: '#fff',
-        transform: [{ scale: 1.1 }],
     },
     // Wardrobe Grid
     grid: {
@@ -266,7 +222,7 @@ const styles = StyleSheet.create({
         width: Math.floor((width - 40 - 24) / 3),
         backgroundColor: 'rgba(255,255,255,0.08)',
         borderRadius: 16,
-        padding: 12,
+        padding: LiquidGlass.spacing.md,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',

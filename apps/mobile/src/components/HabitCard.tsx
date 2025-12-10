@@ -139,7 +139,13 @@ export const HabitCard = React.memo(
                 <Animated.View style={[styles.actionsContainer, { opacity }]}>
                     {/* Undo - only show if there's progress to undo */}
                     {currentCount > 0 && (
-                        <TouchableOpacity onPress={handleUndo} style={styles.actionButton} activeOpacity={0.7}>
+                        <TouchableOpacity
+                            onPress={handleUndo}
+                            style={styles.actionButton}
+                            activeOpacity={0.7}
+                            accessibilityLabel="Undo last progress"
+                            accessibilityRole="button"
+                        >
                             <View style={[styles.actionIconCircle, styles.undoCircle]}>
                                 <Undo2 size={18} color="#fff" />
                             </View>
@@ -152,6 +158,8 @@ export const HabitCard = React.memo(
                         }}
                         style={styles.actionButton}
                         activeOpacity={0.7}
+                        accessibilityLabel={`Edit ${habit.title}`}
+                        accessibilityRole="button"
                     >
                         <View style={styles.actionIconCircle}>
                             <Edit2 size={18} color="#fff" />
@@ -164,6 +172,8 @@ export const HabitCard = React.memo(
                         }}
                         style={styles.actionButton}
                         activeOpacity={0.7}
+                        accessibilityLabel={`Delete ${habit.title}`}
+                        accessibilityRole="button"
                     >
                         <View style={[styles.actionIconCircle, styles.deleteCircle]}>
                             <Trash2 size={18} color="#fff" />
@@ -182,7 +192,12 @@ export const HabitCard = React.memo(
                     friction={1}
                     rightThreshold={40}
                 >
-                    <TouchableOpacity activeOpacity={0.95}>
+                    <TouchableOpacity
+                        activeOpacity={0.95}
+                        accessibilityLabel={`${habit.title}, ${isCompleted ? 'completed' : `${currentCount} of ${habit.targetCount}`}${streak > 0 ? `, ${streak} day streak` : ''}`}
+                        accessibilityRole="button"
+                        accessibilityHint="Swipe left for more options"
+                    >
                         <View style={[styles.blur, isCompleted && styles.completedCard]}>
                             <View style={styles.content}>
                                 {/* Left: Icon */}
@@ -211,7 +226,11 @@ export const HabitCard = React.memo(
                                         {/* XP Badge - only show when not completed */}
                                         {!isCompleted && (
                                             <View style={styles.xpBadge}>
-                                                <Zap size={10} color={LiquidGlass.colors.currency} fill={LiquidGlass.colors.currency} />
+                                                <Zap
+                                                    size={10}
+                                                    color={LiquidGlass.colors.currency}
+                                                    fill={LiquidGlass.colors.currency}
+                                                />
                                                 <Text style={styles.xpText}>+20 XP</Text>
                                             </View>
                                         )}
@@ -232,6 +251,11 @@ export const HabitCard = React.memo(
                                         onPress={handleCheckboxTap}
                                         activeOpacity={0.7}
                                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                        accessibilityLabel={
+                                            isCompleted ? `${habit.title} completed` : `Mark ${habit.title} as done`
+                                        }
+                                        accessibilityRole="checkbox"
+                                        accessibilityState={{ checked: isCompleted }}
                                     >
                                         <Animated.View
                                             style={[styles.checkbox, { transform: [{ scale: checkboxScaleAnim }] }]}

@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Pet } from '../components/Pet';
 import { CurrencyBadge } from '../components/badges/CurrencyBadge';
+import { ColorPicker } from '../components/ColorPicker';
 import { LiquidGlass } from '../theme/theme';
 import { validatePetName } from '../utils/validation';
 
@@ -22,8 +23,8 @@ export const PetScreen = () => {
                 validation.error?.includes('under 12')
                     ? 'Too Long'
                     : validation.error?.includes('friendly')
-                        ? 'Whoops!'
-                        : 'Name Required',
+                      ? 'Whoops!'
+                      : 'Name Required',
                 validation.error
             );
             return;
@@ -49,21 +50,20 @@ export const PetScreen = () => {
                             onChangeText={setName}
                         />
 
-                        <View style={styles.colorRow}>
-                            {['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5', '#FF99CC'].map((c) => (
-                                <TouchableOpacity
-                                    key={c}
-                                    style={[
-                                        styles.colorDot,
-                                        { backgroundColor: c },
-                                        color === c && styles.colorSelected,
-                                    ]}
-                                    onPress={() => setColor(c)}
-                                />
-                            ))}
-                        </View>
+                        <ColorPicker
+                            colors={['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8C42', '#A06CD5', '#FF99CC']}
+                            selectedColor={color}
+                            onColorSelect={setColor}
+                            variant="wrap"
+                        />
 
-                        <TouchableOpacity style={styles.hatchButton} onPress={handleHatch}>
+                        <TouchableOpacity
+                            style={styles.hatchButton}
+                            onPress={handleHatch}
+                            accessibilityLabel="Hatch egg"
+                            accessibilityRole="button"
+                            accessibilityHint="Creates your new pet companion"
+                        >
                             <Text style={styles.hatchText}>Hatch Egg</Text>
                         </TouchableOpacity>
                     </View>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     },
     formCard: {
         width: '100%',
-        padding: 24,
+        padding: LiquidGlass.spacing.xxl,
         borderRadius: 24,
         backgroundColor: 'rgba(255,255,255,0.05)',
         overflow: 'hidden',
@@ -145,31 +145,15 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'rgba(0,0,0,0.3)',
         borderRadius: 16,
-        padding: 16,
+        padding: LiquidGlass.spacing.lg,
         color: '#fff',
         fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
         textAlign: 'center',
     },
-    colorRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 10,
-    },
-    colorDot: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        borderWidth: 2,
-        borderColor: 'transparent',
-    },
-    colorSelected: {
-        borderColor: '#fff',
-        transform: [{ scale: 1.1 }],
-    },
     hatchButton: {
         backgroundColor: '#fff',
-        padding: 16,
+        padding: LiquidGlass.spacing.lg,
         borderRadius: 16,
         alignItems: 'center',
     },
@@ -177,14 +161,5 @@ const styles = StyleSheet.create({
         color: '#000',
         fontSize: LiquidGlass.typography.size.body,
         fontWeight: '700',
-    },
-    blob: {
-        position: 'absolute',
-        width: 600,
-        height: 600,
-        borderRadius: 300,
-        opacity: 0.25,
-        top: '15%',
-        alignSelf: 'center',
     },
 });
