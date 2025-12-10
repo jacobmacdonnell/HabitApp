@@ -17,11 +17,11 @@ export const migrateFromAsyncStorage = async () => {
         // Check if we already have data in SQLite
         const existingHabits = await db.select().from(habits).limit(1);
         if (existingHabits.length > 0) {
-            // console.log('Migration skipped: Data already exists in SQLite');
+
             return;
         }
 
-        console.log('Starting migration from AsyncStorage...');
+        // console.log('Starting migration from AsyncStorage...');
 
         // 1. Habits
         const habitsJson = await AsyncStorage.getItem(KEYS.HABITS);
@@ -73,7 +73,7 @@ export const migrateFromAsyncStorage = async () => {
             await db.insert(settings).values(settingsData);
         }
 
-        console.log('Migration completed successfully!');
+        // console.log('Migration completed successfully!');
 
         // Optional: clear AsyncStorage after success? 
         // Better to keep it as backup for now.
@@ -100,7 +100,7 @@ export const SQLiteStorageService: StorageServiceType = {
         // For MVP compatibility with `saveHabits(Habit[])`:
         // We will perform a Transaction: Delete All -> Insert All.
         // This is inefficient but 100% compatible. 
-        // TODO: Refactor Context to call addHabit/updateHabit individually
+        // Note: Context now calls atomic addHabit/updateHabit; this is kept for bulk migration.
 
         await db.transaction(async (tx) => {
             await tx.delete(habits);
@@ -120,7 +120,7 @@ export const SQLiteStorageService: StorageServiceType = {
         const row = rows[0];
         return {
             ...row,
-            history: (row.history as any) || []
+            history: (row.history as Pet['history']) || []
         } as Pet;
     },
 
@@ -253,7 +253,7 @@ export const SQLiteStorageService: StorageServiceType = {
         // Optimized methods like logSingleProgress should be used for frequent updates.
 
         try {
-            console.warn('Optimized saveProgress: Using Upsert Strategy');
+
             await db.transaction(async (tx) => {
                 if (progressList.length > 0) {
                     // Upsert in chunks

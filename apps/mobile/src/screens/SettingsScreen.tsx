@@ -26,7 +26,7 @@ export const SettingsScreen = () => {
         );
     };
 
-    const onTimeChange = (type: 'bedtime' | 'wakeup', event: { type: string; nativeEvent: any }, date?: Date) => {
+    const onTimeChange = (type: 'bedtime' | 'wakeup', event: { type: string; nativeEvent: unknown }, date?: Date) => {
         if (date) {
             const timeString = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
             if (type === 'bedtime') {

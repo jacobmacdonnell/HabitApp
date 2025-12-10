@@ -43,7 +43,7 @@ export const HabitFormScreen = () => {
             title,
             color,
             icon,
-            timeOfDay: timeOfDay as any,
+            timeOfDay: timeOfDay as Habit['timeOfDay'],
             frequency: { type: (frequencyIndex === 0 ? 'daily' : 'weekly') as 'daily' | 'weekly', days: [] },
             targetCount,
         };

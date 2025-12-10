@@ -27,7 +27,7 @@ export const NotificationService = {
             }
             return true;
         } else {
-            console.log('Must use physical device for Push Notifications');
+
             return false;
         }
     },

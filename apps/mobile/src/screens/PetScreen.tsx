@@ -16,7 +16,7 @@ export const PetScreen = () => {
     const insets = useSafeAreaInsets();
 
     const handleHatch = () => {
-        console.log('Validating hatch name:', name);
+
         const validation = validatePetName(name);
         if (!validation.isValid) {
             Alert.alert(

@@ -51,7 +51,7 @@ export const XPNotificationProvider = ({ children }: { children: React.ReactNode
                 }
             });
         } catch (error) {
-            console.log('Sound playback error:', error);
+
         }
     };
 
