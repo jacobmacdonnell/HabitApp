@@ -11,7 +11,9 @@ import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { XPNotificationProvider } from '../src/context/XPNotificationContext';
 import { useMigrationHelper } from '../src/db/migrate';
+import { WidgetService } from '../src/services/WidgetService';
 import { MobileStorageService, migrateFromAsyncStorage } from '../src/services/storage';
+
 import { LiquidGlass } from '../src/theme/theme';
 
 // Initialize notification handler
@@ -95,7 +97,7 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
                 <ErrorBoundary>
-                    <HabitProvider storage={MobileStorageService}>
+                    <HabitProvider storage={MobileStorageService} widgetService={WidgetService}>
                         <ThemeProvider>
                             <XPNotificationProvider>
                                 <ThemedRoot />
