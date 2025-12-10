@@ -88,11 +88,18 @@ export const migrateFromAsyncStorage = async () => {
 
 export const SQLiteStorageService: StorageServiceType = {
     getHabits: async (): Promise<Habit[]> => {
-        const rows = await db.select().from(habits);
-        return rows.map((row) => ({
-            ...row,
-            frequency: row.frequency as HabitFrequency,
-        })) as Habit[];
+        try {
+            const rows = await db.select().from(habits);
+            return rows.map((row) => ({
+                ...row,
+                frequency: row.frequency as HabitFrequency,
+            })) as Habit[];
+        } catch (error) {
+            console.error('DatabaseService: Failed to load habits. Data might be corrupted.', error);
+            // Fallback: Return empty array to prevent crash
+            // In a real pro app, we might trigger a "Safe Mode" UI or attempt repair
+            return [];
+        }
     },
 
     saveHabits: async (newHabits: Habit[]) => {
@@ -105,45 +112,59 @@ export const SQLiteStorageService: StorageServiceType = {
         // This is inefficient but 100% compatible.
         // Note: Context now calls atomic addHabit/updateHabit; this is kept for bulk migration.
 
-        await db.transaction(async (tx) => {
-            await tx.delete(habits);
-            if (newHabits.length > 0) {
-                await tx.insert(habits).values(
-                    newHabits.map((h) => ({
-                        ...h,
-                        frequency: h.frequency,
-                        createdAt: Date.now(),
-                    }))
-                );
-            }
-        });
+        try {
+            await db.transaction(async (tx) => {
+                await tx.delete(habits);
+                if (newHabits.length > 0) {
+                    await tx.insert(habits).values(
+                        newHabits.map((h) => ({
+                            ...h,
+                            frequency: h.frequency,
+                            createdAt: Date.now(),
+                        }))
+                    );
+                }
+            });
+        } catch (error) {
+            console.error('DatabaseService: Failed to save habits.', error);
+        }
     },
 
     getPet: async (): Promise<Pet | null> => {
-        const rows = await db.select().from(pet).limit(1);
-        if (rows.length === 0) return null;
-        const row = rows[0];
-        return {
-            ...row,
-            history: (row.history as Pet['history']) || [],
-        } as Pet;
+        try {
+            const rows = await db.select().from(pet).limit(1);
+            if (rows.length === 0) return null;
+            const row = rows[0];
+            return {
+                ...row,
+                history: (row.history as Pet['history']) || [],
+            } as Pet;
+        } catch (error) {
+            console.error('DatabaseService: Failed to load pet. Data might be corrupted.', error);
+            // Fallback: Return null (will trigger onboarding/reset safely)
+            return null;
+        }
     },
 
     savePet: async (newPet: Pet) => {
-        const existing = await db.select().from(pet).limit(1);
-        if (existing.length > 0) {
-            await db
-                .update(pet)
-                .set({
+        try {
+            const existing = await db.select().from(pet).limit(1);
+            if (existing.length > 0) {
+                await db
+                    .update(pet)
+                    .set({
+                        ...newPet,
+                        history: newPet.history || [],
+                    })
+                    .where(eq(pet.id, existing[0].id));
+            } else {
+                await db.insert(pet).values({
                     ...newPet,
-                    history: newPet.history || [],
-                })
-                .where(eq(pet.id, existing[0].id));
-        } else {
-            await db.insert(pet).values({
-                ...newPet,
-                history: newPet.history ?? [],
-            });
+                    history: newPet.history ?? [],
+                });
+            }
+        } catch (error) {
+            console.error('DatabaseService: Failed to save pet.', error);
         }
     },
 

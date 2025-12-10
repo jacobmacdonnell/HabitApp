@@ -1,4 +1,4 @@
-import { LiquidGlassView } from '@callstack/liquid-glass';
+import { SafeLiquidGlassView as LiquidGlassView } from './SafeLiquidGlassView';
 import { useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import React from 'react';

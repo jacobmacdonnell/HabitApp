@@ -1,4 +1,4 @@
-import { LiquidGlassView } from '@callstack/liquid-glass';
+import { SafeLiquidGlassView as LiquidGlassView } from './SafeLiquidGlassView';
 import * as Haptics from 'expo-haptics';
 import React from 'react';
 import {

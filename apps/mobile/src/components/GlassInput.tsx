@@ -1,4 +1,4 @@
-import { LiquidGlassView } from '@callstack/liquid-glass';
+import { SafeLiquidGlassView as LiquidGlassView } from './SafeLiquidGlassView';
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps, StyleProp, ViewStyle, TextStyle } from 'react-native';
 

@@ -1,4 +1,3 @@
-import { LiquidGlassView } from '@callstack/liquid-glass';
 import { useHabit, TimeOfDay } from '@habitapp/shared';
 import { HABIT_COLORS } from '@habitapp/shared/src/constants';
 import * as Haptics from 'expo-haptics';
@@ -105,8 +104,8 @@ export const OnboardingScreen = () => {
                     validation.error?.includes('under 12')
                         ? 'Too Long'
                         : validation.error?.includes('friendly')
-                          ? 'Whoops!'
-                          : 'Name Required',
+                            ? 'Whoops!'
+                            : 'Name Required',
                     validation.error
                 );
                 return;

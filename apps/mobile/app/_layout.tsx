@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { SmartNotificationController } from '../src/components/SmartNotificationController';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { ThemeProvider } from '../src/context/ThemeContext';
 import { XPNotificationProvider } from '../src/context/XPNotificationContext';
@@ -94,12 +95,14 @@ export default function RootLayout() {
     if (!success && !error) return null;
 
     return (
+
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
                 <ErrorBoundary>
                     <HabitProvider storage={MobileStorageService} widgetService={WidgetService}>
                         <ThemeProvider>
                             <XPNotificationProvider>
+                                <SmartNotificationController />
                                 <ThemedRoot />
                             </XPNotificationProvider>
                         </ThemeProvider>
