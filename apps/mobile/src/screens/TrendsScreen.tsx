@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
         marginBottom: LiquidGlass.header.marginBottom,
     },
     headerTitle: {
-        fontSize: LiquidGlass.header.titleSize,
+        fontSize: LiquidGlass.typography.size.headline,
         fontWeight: LiquidGlass.header.titleWeight,
         color: LiquidGlass.header.titleColor,
         letterSpacing: LiquidGlass.header.titleLetterSpacing,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     columnLabel: {
         width: 20,
         textAlign: 'center',
-        fontSize: 10,
+        fontSize: LiquidGlass.typography.size.micro,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.3)',
     },
@@ -447,13 +447,13 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     habitTitle: {
-        fontSize: 16,
+        fontSize: LiquidGlass.typography.size.body,
         fontWeight: '700',
         color: '#fff',
         marginBottom: 4,
     },
     streakLabel: {
-        fontSize: 12,
+        fontSize: LiquidGlass.typography.size.caption1,
         color: 'rgba(255,255,255,0.6)',
         fontWeight: '500',
     },
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     compactStatLabel: {
-        fontSize: 12,
+        fontSize: LiquidGlass.typography.size.caption1,
         color: 'rgba(255,255,255,0.4)',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     compactStatValue: {
-        fontSize: 20,
+        fontSize: LiquidGlass.typography.size.title3,
         fontWeight: '700',
         color: '#fff',
         fontVariant: ['tabular-nums'],
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     monthTitle: {
-        fontSize: 17,
+        fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
         color: '#fff',
     },
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     calendarDayHeader: {
         flex: 1,
         textAlign: 'center',
-        fontSize: 11,
+        fontSize: LiquidGlass.typography.size.caption2,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.3)',
     },
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     dayNum: {
-        fontSize: 13,
+        fontSize: LiquidGlass.typography.size.footnote,
         fontWeight: '500',
         color: 'rgba(255,255,255,0.5)',
     },
@@ -612,13 +612,13 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     emptyTitle: {
-        fontSize: 20,
+        fontSize: LiquidGlass.typography.size.title3,
         fontWeight: '700',
         color: '#fff',
         marginBottom: 8,
     },
     emptyText: {
-        fontSize: 14,
+        fontSize: LiquidGlass.typography.size.subheadline,
         color: 'rgba(255,255,255,0.5)',
         textAlign: 'center',
     },

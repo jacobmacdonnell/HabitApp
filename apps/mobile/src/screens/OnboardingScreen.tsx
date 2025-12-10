@@ -17,10 +17,9 @@ import {
     Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import { LiquidGlass } from '../theme/theme';
 import { GlassButton } from '../components/GlassButton';
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
-import { LiquidGlass } from '../theme/theme';
 import { validatePetName } from '../utils/validation';
 
 const { width, height } = Dimensions.get('window');
@@ -185,7 +184,7 @@ export const OnboardingScreen = () => {
         <View style={styles.container}>
             {/* Ambient Background */}
             <View style={[styles.blob, { backgroundColor: petColor, top: -100, left: -100 }]} />
-            <View style={[styles.blob, { backgroundColor: '#6366f1', bottom: -100, right: -100 }]} />
+            <View style={[styles.blob, { backgroundColor: LiquidGlass.colors.secondary, bottom: -100, right: -100 }]} />
 
             {/* Progress Dots - at top with safe area */}
             <View style={[styles.progressContainer, { paddingTop: insets.top + 20 }]}>
@@ -478,7 +477,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 32,
-        shadowColor: '#6366f1',
+        shadowColor: LiquidGlass.colors.secondary,
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.5,
         shadowRadius: 24,

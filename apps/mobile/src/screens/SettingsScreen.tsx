@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     sectionHeader: {
-        fontSize: 12,
+        fontSize: LiquidGlass.typography.size.caption1,
         fontWeight: '700',
         color: 'rgba(255,255,255,0.5)',
         marginBottom: 8,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     label: {
-        fontSize: 16,
+        fontSize: LiquidGlass.typography.size.body,
         fontWeight: '600',
         color: '#fff',
     },
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     footer: {
         textAlign: 'center',
         color: 'rgba(255,255,255,0.2)',
-        fontSize: 13,
+        fontSize: LiquidGlass.typography.size.footnote,
         fontWeight: '500',
         marginTop: 20,
     },

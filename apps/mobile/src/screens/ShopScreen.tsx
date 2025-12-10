@@ -7,9 +7,11 @@ import { Check, Lock, Zap } from 'lucide-react-native';
 import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 
+
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { PetPreview, HatIcon } from '../components/PetPreview';
 import { ScreenWrapper } from '../components/ScreenWrapper';
+import { LiquidGlass } from '../theme/theme';
 import { RootStackParamList } from '../navigation/types';
 import { CurrencyBadge } from '../components/badges/CurrencyBadge';
 
@@ -36,7 +38,7 @@ export const ShopScreen = () => {
                     onPress={() => router.back()}
                     style={{ paddingHorizontal: 16, justifyContent: 'center', alignItems: 'flex-end', minWidth: 60 }}
                 >
-                    <Text style={{ color: '#fff', fontSize: 17, fontWeight: '600' }}>Done</Text>
+                    <Text style={{ color: '#fff', fontSize: LiquidGlass.typography.size.headline, fontWeight: '600' }}>Done</Text>
                 </TouchableOpacity>
             ),
         });
@@ -190,14 +192,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     cardEquipped: {
-        borderColor: '#4ade80',
-        backgroundColor: 'rgba(74, 222, 128, 0.1)',
+        borderColor: LiquidGlass.colors.success,
+        backgroundColor: 'rgba(52, 199, 89, 0.1)', // Match success color 0.1
     },
     cardLocked: {
         opacity: 0.6,
     },
     itemName: {
-        fontSize: 11,
+        fontSize: LiquidGlass.typography.size.caption2,
         fontWeight: '600',
         color: 'rgba(255,255,255,0.9)',
         marginTop: 8,
@@ -214,14 +216,14 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     priceText: {
-        fontSize: 12,
+        fontSize: LiquidGlass.typography.size.caption1,
         fontWeight: '700',
         color: LiquidGlass.colors.currency,
     },
     badgeEquipped: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#4ade80',
+        backgroundColor: LiquidGlass.colors.success,
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
@@ -234,7 +236,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     badgeText: {
-        fontSize: 10,
+        fontSize: LiquidGlass.typography.size.micro,
         fontWeight: '700',
         color: '#000',
     },
@@ -245,12 +247,12 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
         marginBottom: 8,
     },
     emptySubtext: {
         color: 'rgba(255,255,255,0.5)',
-        fontSize: 14,
+        fontSize: LiquidGlass.typography.size.subheadline,
     }
 });

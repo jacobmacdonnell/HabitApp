@@ -12,6 +12,7 @@ import { PetPreview, HatIcon } from '../components/PetPreview';
 import { ScreenWrapper } from '../components/ScreenWrapper';
 import { RootStackParamList } from '../navigation/types';
 import { validatePetName } from '../utils/validation';
+import { LiquidGlass } from '../theme/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -247,6 +248,10 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: 'transparent',
     },
+    itemSelected: {
+        borderColor: LiquidGlass.colors.success,
+        borderWidth: 2,
+    },
     colorSelected: {
         borderColor: '#fff',
         transform: [{ scale: 1.1 }],
@@ -281,9 +286,10 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     badgeEquipped: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#4ade80',
+        position: 'absolute',
+        top: 6,
+        right: 6,
+        backgroundColor: LiquidGlass.colors.success,
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,

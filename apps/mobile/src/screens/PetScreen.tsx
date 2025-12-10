@@ -122,14 +122,14 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     eggTitle: {
-        fontSize: 28,
+        fontSize: LiquidGlass.typography.size.title1,
         fontWeight: '800',
         color: '#fff',
         marginTop: 24,
         marginBottom: 8,
     },
     eggSubtitle: {
-        fontSize: 16,
+        fontSize: LiquidGlass.typography.size.body,
         color: 'rgba(255,255,255,0.5)',
         marginBottom: 40,
         textAlign: 'center',
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         color: '#fff',
-        fontSize: 18,
+        fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
         textAlign: 'center',
     },
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     },
     hatchText: {
         color: '#000',
-        fontSize: 16,
+        fontSize: LiquidGlass.typography.size.body,
         fontWeight: '700',
     },
     blob: {
