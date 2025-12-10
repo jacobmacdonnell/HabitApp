@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     },
     date: {
         color: 'rgba(255,255,255,0.6)',
-        fontSize: 13,
+        fontSize: LiquidGlass.typography.size.footnote,
         fontWeight: '600',
         textTransform: 'uppercase',
         marginTop: 4,

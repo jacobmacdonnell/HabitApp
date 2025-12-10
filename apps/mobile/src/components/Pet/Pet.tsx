@@ -600,7 +600,6 @@ export const Pet = ({
 
                         <GlassButton
                             variant="primary"
-                            // @ts-ignore
                             style={{ flex: 1, backgroundColor: LiquidGlass.colors.currency }}
                             textStyle={{ color: '#1a1a1a' }}
                             onPress={() => router.push('/shop')}

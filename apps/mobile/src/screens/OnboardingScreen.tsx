@@ -1,5 +1,5 @@
 import { useHabit, TimeOfDay } from '@habitapp/shared';
-import { HABIT_COLORS } from '@habitapp/shared/src/constants';
+import { HABIT_COLORS, HABIT_PRESETS } from '@habitapp/shared/src/constants';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { ArrowRight, Check, Minus, Plus, Sparkles } from 'lucide-react-native';
@@ -24,15 +24,6 @@ import { validatePetName } from '../utils/validation';
 
 const { width, height } = Dimensions.get('window');
 
-const PRESETS = [
-    { id: 'water', title: 'Drink Water', icon: '💧', color: '#4ECDC4', defaultTarget: 3, defaultTime: 'anytime' },
-    { id: 'read', title: 'Read 10 mins', icon: '📚', color: '#FFE66D', defaultTarget: 1, defaultTime: 'evening' },
-    { id: 'walk', title: 'Take a Walk', icon: '👣', color: '#FF6B6B', defaultTarget: 1, defaultTime: 'morning' },
-    { id: 'meditate', title: 'Meditate', icon: '🧘', color: '#A06CD5', defaultTarget: 1, defaultTime: 'morning' },
-    { id: 'journal', title: 'Journal', icon: '✍️', color: '#FF8C42', defaultTarget: 1, defaultTime: 'evening' },
-    { id: 'exercise', title: 'Exercise', icon: '💪', color: '#FF6B6B', defaultTarget: 1, defaultTime: 'anytime' },
-];
-
 export const OnboardingScreen = () => {
     const { resetPet, addHabit, setIsOnboarding } = useHabit();
     const insets = useSafeAreaInsets();
@@ -42,7 +33,7 @@ export const OnboardingScreen = () => {
     const fadeAnim = useRef(new Animated.Value(1)).current;
     const slideAnim = useRef(new Animated.Value(0)).current;
     const eggPulse = useRef(new Animated.Value(1)).current;
-    const cardScales = useRef(PRESETS.map(() => new Animated.Value(1))).current;
+    const cardScales = useRef(HABIT_PRESETS.map(() => new Animated.Value(1))).current;
 
     // Step 1: Pet Data
     const [petName, setPetName] = useState('');
@@ -124,7 +115,7 @@ export const OnboardingScreen = () => {
             Animated.spring(cardScales[index], { toValue: 1, friction: 3, tension: 200, useNativeDriver: true }),
         ]).start();
 
-        const preset = PRESETS.find((p) => p.id === presetId);
+        const preset = HABIT_PRESETS.find((p) => p.id === presetId);
         setSelectedPreset(presetId);
         setCustomHabit('');
         if (preset) {
@@ -153,7 +144,7 @@ export const OnboardingScreen = () => {
 
         // 2. Create First Habit
         if (selectedPreset) {
-            const preset = PRESETS.find((p) => p.id === selectedPreset);
+            const preset = HABIT_PRESETS.find((p) => p.id === selectedPreset);
             if (preset) {
                 addHabit({
                     title: preset.title,
@@ -299,7 +290,7 @@ export const OnboardingScreen = () => {
                         </View>
 
                         <View style={styles.grid}>
-                            {PRESETS.map((preset, index) => (
+                            {HABIT_PRESETS.map((preset, index) => (
                                 <TouchableOpacity
                                     key={preset.id}
                                     activeOpacity={0.8}

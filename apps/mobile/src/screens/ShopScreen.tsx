@@ -182,12 +182,12 @@ const styles = StyleSheet.create({
     },
     card: {
         width: Math.floor((width - 40 - 24) / 3),
-        backgroundColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: LiquidGlass.colors.card,
         borderRadius: 16,
         padding: 12,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: LiquidGlass.colors.border,
         aspectRatio: 0.8,
         justifyContent: 'space-between',
     },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     badgeOwned: {
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: LiquidGlass.colors.surfaceHighlight,
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,

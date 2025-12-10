@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 16,
         borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: LiquidGlass.colors.surface,
         overflow: 'hidden',
     },
     habitInfo: {
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.04)',
+        backgroundColor: LiquidGlass.colors.card,
         borderRadius: 24,
         paddingVertical: 20,
         paddingHorizontal: 12,
@@ -508,14 +508,14 @@ const styles = StyleSheet.create({
     statDivider: {
         width: 1,
         height: 24,
-        backgroundColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: LiquidGlass.colors.glassBorder,
     },
 
     calendarContainer: {
         borderRadius: 24,
         overflow: 'hidden',
         padding: 16,
-        backgroundColor: 'rgba(255,255,255,0.04)',
+        backgroundColor: LiquidGlass.colors.card,
     },
     monthNavRow: {
         flexDirection: 'row',

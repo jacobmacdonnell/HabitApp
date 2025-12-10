@@ -13,6 +13,12 @@ try {
     LiquidGlassView = (props: ViewProps) => <View {...props} />;
 }
 
-export const SafeLiquidGlassView = (props: any) => {
+interface SafeLiquidGlassViewProps extends ViewProps {
+    interactive?: boolean;
+    intensity?: number;
+    // Add other known props from native module if needed
+}
+
+export const SafeLiquidGlassView = (props: SafeLiquidGlassViewProps) => {
     return <LiquidGlassView {...props} />;
 };

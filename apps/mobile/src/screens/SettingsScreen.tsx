@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     card: {
         borderRadius: 24,
         overflow: 'hidden',
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: LiquidGlass.colors.surface,
     },
     row: {
         flexDirection: 'row',
