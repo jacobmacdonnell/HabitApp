@@ -91,3 +91,8 @@ export interface HabitContextType {
     buyItem: (itemId: string, price: number) => Promise<boolean>;
     equipHat: (hatId: string) => void;
 }
+
+export interface WidgetServiceType {
+    setSharedData: (key: string, data: any) => Promise<void>;
+    reloadAllTimelines: () => void;
+}

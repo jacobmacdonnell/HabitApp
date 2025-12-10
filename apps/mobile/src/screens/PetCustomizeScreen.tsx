@@ -251,8 +251,8 @@ export const PetCustomizeScreen = () => {
                 validation.error?.includes('under 12')
                     ? 'Too Long'
                     : validation.error?.includes('friendly')
-                        ? 'Whoops!'
-                        : 'Required',
+                      ? 'Whoops!'
+                      : 'Required',
                 validation.error
             );
             return;

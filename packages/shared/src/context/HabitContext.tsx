@@ -2,12 +2,20 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 import { PetGameEngine } from '../engines/PetGameEngine';
 import { StatsEngine } from '../engines/StatsEngine';
-import { Habit, Pet, DailyProgress, Settings, StorageServiceType, HabitContextType } from '../types';
+import { Habit, Pet, DailyProgress, Settings, StorageServiceType, HabitContextType, WidgetServiceType } from '../types';
 import { getLocalDateString } from '../utils/dateUtils';
 
 const HabitContext = createContext<HabitContextType | undefined>(undefined);
 
-export const HabitProvider = ({ children, storage }: { children: React.ReactNode; storage: StorageServiceType }) => {
+export const HabitProvider = ({
+    children,
+    storage,
+    widgetService
+}: {
+    children: React.ReactNode;
+    storage: StorageServiceType;
+    widgetService?: WidgetServiceType;
+}) => {
     const [habits, setHabits] = useState<Habit[]>([]);
     const [pet, setPet] = useState<Pet | null>(null);
     const [progress, setProgress] = useState<DailyProgress[]>([]);
@@ -21,6 +29,27 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
     });
 
     const [stats, setStats] = useState<Record<string, { currentStreak: number; totalCompletions: number }>>({});
+
+    const syncToWidget = async (updatedPet: Pet) => {
+        if (widgetService) {
+            try {
+                // We only need basic data for the widget
+                const widgetData = {
+                    name: updatedPet.name,
+                    xp: updatedPet.xp,
+                    level: updatedPet.level,
+                    mood: updatedPet.mood,
+                    hat: updatedPet.hat,
+                    color: updatedPet.color,
+                    health: updatedPet.health
+                };
+                await widgetService.setSharedData('pet_data', JSON.stringify(widgetData));
+                widgetService.reloadAllTimelines();
+            } catch (e) {
+                console.warn('Widget sync failed:', e);
+            }
+        }
+    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -48,30 +77,34 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
                 if (loadedPet) {
                     const lastLogin = new Date(loadedPet.lastInteraction || new Date().toISOString());
                     const now = new Date();
-                    const diffTime = Math.abs(now.getTime() - lastLogin.getTime());
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                    if (diffDays > 1) {
-                        // Decay health for missed days
-                        loadedPet.health = PetGameEngine.calculateDecay(loadedPet.lastInteraction, loadedPet.health);
-                        loadedPet.mood = PetGameEngine.determineMood(loadedPet.health, false);
-                        await storage.savePet(loadedPet);
+                    // Simple day check (if not same day)
+                    if (getLocalDateString(lastLogin) !== getLocalDateString(now)) {
+                        // Calculate decay
+                        const newHealth = PetGameEngine.calculateDecay(loadedPet.lastInteraction, loadedPet.health);
+
+                        // Apply decay if needed
+                        if (newHealth !== loadedPet.health) {
+                            const updatedPet = { ...loadedPet, health: newHealth };
+                            setPet(updatedPet);
+                            await storage.savePet(updatedPet);
+                            syncToWidget(updatedPet);
+                        } else {
+                            setPet(loadedPet);
+                            syncToWidget(loadedPet);
+                        }
+                    } else {
+                        setPet(loadedPet);
+                        syncToWidget(loadedPet);
                     }
+                } else {
+                    setPet(null);
                 }
 
-                setPet(loadedPet);
-                setIsOnboarding(!loadedPet);
-
-                // Load only last 90 days of progress for performance
-                // This prevents loading unbounded historical data as the app ages
-                const today = getLocalDateString();
-                const ninetyDaysAgo = getLocalDateString(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000));
-                const loadedProgress = storage.getProgressForRange
-                    ? await storage.getProgressForRange(ninetyDaysAgo, today)
-                    : await storage.getProgress();
+                const loadedProgress = await storage.getProgress();
                 setProgress(loadedProgress || []);
-            } catch (error) {
-                console.error('Failed to load data from storage:', error);
+            } catch (e) {
+                console.error('Failed to load data', e);
                 setHabits([]);
                 setPet(null);
                 setProgress([]);
@@ -294,7 +327,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         }
     };
 
-    const resetPet = (name: string, color: string) => {
+    const resetPet = async (name: string, color: string) => {
         const newPet: Pet = {
             name,
             color,
@@ -303,12 +336,15 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
             level: 1,
             xp: 0,
             mood: 'happy',
+            inventory: [],
             history: [],
-            inventory: [], // Init empty inventory
+            hat: 'none',
             lastInteraction: new Date().toISOString(),
         };
         setPet(newPet);
-        storage.savePet(newPet);
+        setIsOnboarding(false);
+        await storage.savePet(newPet);
+        syncToWidget(newPet);
     };
 
     const getStreak = (habitId: string) => {
@@ -329,7 +365,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         storage.saveProgress([]);
     };
 
-    const updatePet = (updates: Partial<Pet>) => {
+    const updatePet = async (updates: Partial<Pet>) => {
         if (!pet) return;
 
         // Auto-update mood based on health if not explicitly set
@@ -346,7 +382,8 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
 
         const updatedPet = { ...pet, ...updates, mood: newMood };
         setPet(updatedPet);
-        storage.savePet(updatedPet);
+        await storage.savePet(updatedPet);
+        syncToWidget(updatedPet);
     };
 
     const getHistoricalProgress = async (start: string, end: string) => {
@@ -366,6 +403,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         if (result.success && result.pet) {
             setPet(result.pet);
             await storage.savePet(result.pet);
+            syncToWidget(result.pet);
             return true;
         }
 
@@ -377,6 +415,7 @@ export const HabitProvider = ({ children, storage }: { children: React.ReactNode
         const updatedPet = { ...pet, hat: hatId };
         setPet(updatedPet);
         await storage.savePet(updatedPet); // Ensure equipment persists
+        syncToWidget(updatedPet);
     };
 
     return (

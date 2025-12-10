@@ -1,13 +1,12 @@
 import { useHabit, HAT_ITEMS } from '@habitapp/shared';
 import { useNavigation } from '@react-navigation/native';
-import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { Zap, ArrowLeft, Check } from 'lucide-react-native';
 import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList } from 'react-native';
 
-import { LiquidGlass } from '../theme/theme';
+import { ScreenWrapper } from '../components/ScreenWrapper';
 
 export const HatShopScreen = () => {
     const { pet, buyItem, equipHat } = useHabit();
@@ -27,9 +26,9 @@ export const HatShopScreen = () => {
     const handleBuy = async (item: (typeof HAT_ITEMS)[0]) => {
         if (!pet) return;
 
-        if (pet.xp < item.price) {
+        if ((pet.xp || 0) < item.price) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            Alert.alert('Not Enough XP', `You need ${item.price - pet.xp} more XP to buy this!`);
+            Alert.alert('Not Enough XP', `You need ${item.price - (pet.xp || 0)} more XP to buy this!`);
             return;
         }
 
@@ -41,7 +40,8 @@ export const HatShopScreen = () => {
                     const success = await buyItem(item.id, item.price);
                     if (success) {
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                        // Auto equip? Maybe just unlock.
+                    } else {
+                        Alert.alert('Error', 'Could not purchase item.');
                     }
                 },
             },
@@ -99,39 +99,40 @@ export const HatShopScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                    <ArrowLeft size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Hat Shop</Text>
+        <ScreenWrapper>
+            <View style={styles.container}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                        <ArrowLeft size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Hat Shop</Text>
 
-                {/* XP Balance Pill */}
-                <View style={styles.balancePill}>
-                    <Zap size={14} color="#facc15" fill="#facc15" />
-                    <Text style={styles.balanceText}>{pet?.xp || 0}</Text>
+                    {/* XP Balance Pill */}
+                    <View style={styles.balancePill}>
+                        <Zap size={14} color="#facc15" fill="#facc15" />
+                        <Text style={styles.balanceText}>{pet?.xp || 0}</Text>
+                    </View>
                 </View>
-            </View>
 
-            <FlatList
-                data={HAT_ITEMS}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                numColumns={2}
-                contentContainerStyle={styles.gridContent}
-                columnWrapperStyle={styles.columnWrapper}
-                showsVerticalScrollIndicator={false}
-            />
-        </View>
+                <FlatList
+                    data={HAT_ITEMS}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    numColumns={2}
+                    contentContainerStyle={styles.gridContent}
+                    columnWrapperStyle={styles.columnWrapper}
+                    showsVerticalScrollIndicator={false}
+                />
+            </View>
+        </ScreenWrapper>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: LiquidGlass.backgroundColor,
-        paddingTop: 60,
+        paddingTop: 20, // Adjusted since ScreenWrapper handles safe area
     },
     header: {
         flexDirection: 'row',
