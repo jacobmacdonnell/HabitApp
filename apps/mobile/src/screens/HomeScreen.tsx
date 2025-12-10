@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
         letterSpacing: LiquidGlass.header.titleLetterSpacing,
     },
     date: {
-        color: 'rgba(255,255,255,0.6)',
+        color: LiquidGlass.text.secondary,
         fontSize: LiquidGlass.typography.size.footnote,
         fontWeight: '600',
         textTransform: 'uppercase',
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.08)',
+        backgroundColor: LiquidGlass.card.backgroundColor,
         justifyContent: 'center',
         alignItems: 'center',
     },

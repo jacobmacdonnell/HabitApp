@@ -609,12 +609,17 @@ export const Pet = ({
                             onPress={() => router.push('/pet-customize')}
                             icon={<Palette size={18} color="#fff" />}
                             title="Customize"
-                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.15)' }}
+                            style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.25)' }}
                         />
 
                         <GlassButton
                             variant="primary"
-                            style={{ flex: 1, backgroundColor: LiquidGlass.colors.currency }}
+                            style={{
+                                flex: 1,
+                                backgroundColor: LiquidGlass.colors.currency,
+                                borderWidth: 1.5,
+                                borderColor: 'rgba(0,0,0,0.1)',
+                            }}
                             textStyle={{ color: '#1a1a1a' }}
                             onPress={() => router.push('/shop')}
                             icon={<Zap size={18} color="#1a1a1a" fill="#1a1a1a" />}
@@ -825,7 +830,7 @@ const styles = StyleSheet.create({
         width: width - 40,
         borderRadius: 24,
         padding: LiquidGlass.spacing.xxl,
-        backgroundColor: 'rgba(30, 30, 35, 0.6)', // Darker, more visible glass tint
+        backgroundColor: LiquidGlass.card.backgroundColor,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
         overflow: 'hidden',

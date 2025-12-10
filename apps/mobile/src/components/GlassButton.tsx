@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     },
     secondaryBorder: {
         borderWidth: 1.5,
-        borderColor: 'rgba(255,255,255,0.25)',
-        backgroundColor: 'rgba(255,255,255,0.08)',
+        borderColor: 'rgba(255,255,255,0.4)', // Boosted from 0.25
+        backgroundColor: 'rgba(255,255,255,0.12)', // Boosted from 0.08
         borderRadius: LiquidGlass.radius.xxl,
     },
     contentContainer: {

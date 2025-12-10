@@ -117,9 +117,9 @@ export const LiquidGlass = {
     // Text Colors
     text: {
         primary: '#fff',
-        secondary: 'rgba(255,255,255,0.6)',
-        tertiary: 'rgba(255,255,255,0.3)',
-        label: 'rgba(255,255,255,0.5)',
+        secondary: 'rgba(255,255,255,0.7)', // Boosted from 0.6
+        tertiary: 'rgba(255,255,255,0.45)', // Boosted from 0.3 (was too faint)
+        label: 'rgba(255,255,255,0.6)', // Boosted from 0.5
     },
 
     // Colors

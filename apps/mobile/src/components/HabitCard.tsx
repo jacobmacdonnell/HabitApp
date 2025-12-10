@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     },
     badgeText: {
         fontSize: 10,
-        color: 'rgba(255,255,255,0.5)',
+        color: LiquidGlass.text.label,
         fontWeight: '600',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
         paddingRight: 12,
         paddingLeft: 8,
         gap: 8,
-        backgroundColor: '#1c1c1e', // Match app background so buttons don't peek through
+        backgroundColor: LiquidGlass.backgroundColor, // Match app background so buttons don't peek through
     },
     actionButton: {
         padding: 4,
