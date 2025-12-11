@@ -11,7 +11,6 @@ import { PetEyes } from './PetEyes';
 import { PetHat } from './PetHat';
 import { PetMouth } from './PetMouth';
 import { ZParticle } from './ZParticle';
-import { SafeLiquidGlassView } from '../SafeLiquidGlassView';
 import { GlassButton } from '../GlassButton';
 import { LevelBadge } from '../badges/LevelBadge';
 import { LiquidGlass } from '../../theme/theme';
@@ -555,7 +554,7 @@ export const Pet = ({
 
             {/* Stats Card - hidden during onboarding hatching */}
             {!hideStats && (
-                <SafeLiquidGlassView style={styles.statsCard} intensity={25}>
+                <View style={styles.statsCard}>
                     {/* Level Badge - Centered */}
                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 20 }}>
                         <LevelBadge level={currentLevel} variant="filled" size="sm" />
@@ -626,7 +625,7 @@ export const Pet = ({
                             title="Shop"
                         />
                     </View>
-                </SafeLiquidGlassView>
+                </View>
             )}
         </View>
     );
@@ -830,9 +829,9 @@ const styles = StyleSheet.create({
         width: width - 40,
         borderRadius: 24,
         padding: LiquidGlass.spacing.xxl,
-        backgroundColor: LiquidGlass.card.backgroundColor,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: 'rgba(44, 44, 46, 0.4)', // Match HabitCard styling
+        borderWidth: 0.5,
+        borderColor: LiquidGlass.colors.cardBorder,
         overflow: 'hidden',
         marginTop: 20,
     },

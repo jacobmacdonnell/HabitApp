@@ -1,4 +1,3 @@
-import { SafeLiquidGlassView as LiquidGlassView } from './SafeLiquidGlassView';
 import * as Haptics from 'expo-haptics';
 import React from 'react';
 import {
@@ -70,11 +69,7 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
             accessibilityLabel={title}
             accessibilityState={{ disabled: disabled || loading }}
         >
-            {variant === 'secondary' && (
-                <View style={[StyleSheet.absoluteFill, { borderRadius: LiquidGlass.radius.xxl, overflow: 'hidden' }]}>
-                    <LiquidGlassView style={StyleSheet.absoluteFill} interactive />
-                </View>
-            )}
+            {/* Secondary variant uses CSS-based glass styling via secondaryBorder */}
 
             <View style={styles.contentContainer}>
                 {loading ? (

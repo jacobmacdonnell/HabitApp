@@ -1,4 +1,3 @@
-import { SafeLiquidGlassView as LiquidGlassView } from '../components/SafeLiquidGlassView';
 import { useHabit } from '@habitapp/shared';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
