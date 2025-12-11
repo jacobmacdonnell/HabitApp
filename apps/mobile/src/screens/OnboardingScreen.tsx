@@ -190,7 +190,7 @@ export const OnboardingScreen = () => {
                     <View style={styles.welcomeContainer}>
                         <View style={styles.welcomeTop}>
                             <View style={styles.welcomeIcon}>
-                                <Sparkles size={40} color="#fff" />
+                                <Sparkles size={40} color={LiquidGlass.colors.white} />
                             </View>
                             <Text style={styles.heroTitle}>Habit Companion</Text>
                             <Text style={styles.heroSubtitle}>
@@ -202,7 +202,7 @@ export const OnboardingScreen = () => {
                             <GlassButton
                                 title="Get Started"
                                 onPress={handleNext}
-                                icon={<ArrowRight size={20} color="#000" />}
+                                icon={<ArrowRight size={20} color={LiquidGlass.colors.black} />}
                                 style={{ width: '100%' }}
                             />
                         </View>
@@ -239,7 +239,7 @@ export const OnboardingScreen = () => {
                             <View style={styles.inputRow}>
                                 <TextInput
                                     placeholder="Name your pet..."
-                                    placeholderTextColor="rgba(255,255,255,0.3)"
+                                    placeholderTextColor={LiquidGlass.text.tertiary}
                                     value={petName}
                                     onChangeText={setPetName}
                                     style={styles.input}
@@ -305,7 +305,7 @@ export const OnboardingScreen = () => {
                                         <Text
                                             style={[
                                                 styles.presetTitle,
-                                                selectedPreset === preset.id && { color: '#000' },
+                                                selectedPreset === preset.id && { color: LiquidGlass.colors.black },
                                             ]}
                                         >
                                             {preset.title}
@@ -325,13 +325,13 @@ export const OnboardingScreen = () => {
                             style={[
                                 styles.inputRow,
                                 customHabit
-                                    ? { borderColor: '#fff', borderWidth: 1 }
+                                    ? { borderColor: LiquidGlass.colors.white, borderWidth: 1 }
                                     : { borderWidth: 1, borderColor: 'transparent' },
                             ]}
                         >
                             <TextInput
                                 placeholder="Create custom habit..."
-                                placeholderTextColor="rgba(255,255,255,0.3)"
+                                placeholderTextColor={LiquidGlass.text.tertiary}
                                 value={customHabit}
                                 onChangeText={(text: string) => {
                                     setCustomHabit(text);
@@ -375,7 +375,7 @@ export const OnboardingScreen = () => {
                                     accessibilityLabel="Decrease target"
                                     accessibilityRole="button"
                                 >
-                                    <Minus size={20} color="#fff" />
+                                    <Minus size={20} color={LiquidGlass.colors.white} />
                                 </TouchableOpacity>
                                 <View style={styles.counterCenter}>
                                     <Text style={styles.counterValue}>{targetCount}</Text>
@@ -387,7 +387,7 @@ export const OnboardingScreen = () => {
                                     accessibilityLabel="Increase target"
                                     accessibilityRole="button"
                                 >
-                                    <Plus size={20} color="#fff" />
+                                    <Plus size={20} color={LiquidGlass.colors.white} />
                                 </TouchableOpacity>
                             </View>
 
@@ -408,7 +408,7 @@ export const OnboardingScreen = () => {
                             <GlassButton
                                 title="Start Journey"
                                 onPress={handleFinish}
-                                icon={<Check size={20} color="#000" />}
+                                icon={<Check size={20} color={LiquidGlass.colors.black} />}
                                 style={{ flex: 1 }}
                             />
                         </View>
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     },
     progressDotActive: {
         width: 40,
-        backgroundColor: '#fff',
+        backgroundColor: LiquidGlass.colors.white,
     },
     progressDotInactive: {
         width: 10,
@@ -476,13 +476,13 @@ const styles = StyleSheet.create({
     heroTitle: {
         fontSize: 36,
         fontWeight: '800',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         textAlign: 'center',
         marginBottom: LiquidGlass.spacing.lg,
     },
     heroSubtitle: {
         fontSize: 17,
-        color: 'rgba(255,255,255,0.7)',
+        color: LiquidGlass.text.secondary,
         textAlign: 'center',
         lineHeight: 26,
         maxWidth: 300,
@@ -501,13 +501,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         textAlign: 'center',
         marginBottom: LiquidGlass.spacing.sm,
     },
     subtitle: {
         fontSize: 15,
-        color: 'rgba(255,255,255,0.6)',
+        color: LiquidGlass.text.label,
         textAlign: 'center',
         lineHeight: 22,
     },
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     colorLabel: {
         fontSize: 12,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.4)',
+        color: LiquidGlass.text.tertiary,
         textAlign: 'center',
         marginBottom: LiquidGlass.spacing.sm,
     },
@@ -554,13 +554,13 @@ const styles = StyleSheet.create({
         borderColor: LiquidGlass.colors.border,
     },
     presetCardSelected: {
-        backgroundColor: '#fff',
-        borderColor: '#fff',
+        backgroundColor: LiquidGlass.colors.white,
+        borderColor: LiquidGlass.colors.white,
     },
     presetTitle: {
         fontSize: 13,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.7)',
+        color: LiquidGlass.text.secondary,
         textAlign: 'center',
     },
     dividerRow: {
@@ -577,19 +577,19 @@ const styles = StyleSheet.create({
     orText: {
         fontSize: 11,
         fontWeight: '700',
-        color: 'rgba(255,255,255,0.3)',
+        color: LiquidGlass.text.tertiary,
     },
     label: {
         fontSize: 12,
         fontWeight: '700',
-        color: 'rgba(255,255,255,0.5)',
+        color: LiquidGlass.text.label,
         marginBottom: LiquidGlass.spacing.sm,
     },
     counterRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        backgroundColor: 'rgba(0,0,0,0.2)', // Overlay for contrast
         padding: LiquidGlass.spacing.md,
         borderRadius: 20,
     },
@@ -607,11 +607,11 @@ const styles = StyleSheet.create({
     counterValue: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
     },
     counterUnit: {
         fontSize: 12,
-        color: 'rgba(255,255,255,0.4)',
+        color: LiquidGlass.text.tertiary,
         marginTop: 2,
     },
     inputRow: {
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 17,
         fontWeight: '600',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         padding: LiquidGlass.spacing.md,
         textAlign: 'center',
     },

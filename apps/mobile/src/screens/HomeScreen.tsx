@@ -1,3 +1,4 @@
+import { FlashList } from '@shopify/flash-list';
 import { useHabit, Habit, getLocalDateString } from '@habitapp/shared';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -385,9 +386,9 @@ export const HomeScreen = () => {
                                 accessibilityRole="button"
                             >
                                 {showCompleted ? (
-                                    <Eye size={18} color="#34C759" />
+                                    <Eye size={18} color={LiquidGlass.colors.primary} />
                                 ) : (
-                                    <EyeOff size={18} color="rgba(255,255,255,0.4)" />
+                                    <EyeOff size={18} color={LiquidGlass.text.tertiary} />
                                 )}
                             </TouchableOpacity>
                         </Animated.View>
@@ -395,10 +396,12 @@ export const HomeScreen = () => {
                 </View>
             </View>
 
-            <FlatList
+            <FlashList<Habit>
                 data={filteredHabits}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
+                // @ts-ignore - estimatedItemSize is required by FlashList but types are stale
+                estimatedItemSize={100}
                 contentContainerStyle={[styles.listContent, { paddingBottom: 150 }]}
                 showsVerticalScrollIndicator={false}
                 contentInsetAdjustmentBehavior="never" // Disable native adjustment since we have a fixed header view

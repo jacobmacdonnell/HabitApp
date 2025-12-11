@@ -328,7 +328,7 @@ export const TrendsScreen = () => {
                                                 backgroundColor:
                                                     (day.intensity ?? 0) > 0
                                                         ? LiquidGlass.colors.primary
-                                                        : 'rgba(255,255,255,0.03)',
+                                                        : LiquidGlass.colors.surface,
                                                 opacity:
                                                     (day.intensity ?? 0) > 0 ? Math.max(0.4, day.intensity ?? 0) : 1,
                                             },
@@ -337,7 +337,10 @@ export const TrendsScreen = () => {
                                         <Text
                                             style={[
                                                 styles.dayNum,
-                                                (day.intensity ?? 0) > 0.6 && { color: '#000', fontWeight: '700' }, // Dark text on bright backgrounds
+                                                (day.intensity ?? 0) > 0.6 && {
+                                                    color: LiquidGlass.colors.black,
+                                                    fontWeight: '700',
+                                                }, // Dark text on bright backgrounds
                                                 day.isToday && styles.todayNum,
                                             ]}
                                         >
@@ -388,7 +391,7 @@ export const TrendsScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1c1c1e',
+        backgroundColor: LiquidGlass.backgroundColor,
     },
     content: {
         paddingHorizontal: LiquidGlass.screenPadding,
@@ -429,10 +432,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: LiquidGlass.typography.size.micro,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.3)',
+        color: LiquidGlass.text.tertiary,
     },
     todayLabel: {
-        color: '#fff',
+        color: LiquidGlass.text.primary,
     },
     habitRowCard: {
         flexDirection: 'row',
@@ -450,12 +453,12 @@ const styles = StyleSheet.create({
     habitTitle: {
         fontSize: LiquidGlass.typography.size.body,
         fontWeight: '700',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         marginBottom: LiquidGlass.spacing.xs,
     },
     streakLabel: {
         fontSize: LiquidGlass.typography.size.caption1,
-        color: 'rgba(255,255,255,0.6)',
+        color: LiquidGlass.text.label,
         fontWeight: '500',
     },
     statusBubbleContainer: {
@@ -474,7 +477,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
     emptyBubble: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: LiquidGlass.colors.surfaceHighlight,
     },
 
     // Monthly Calendar Styles
@@ -494,7 +497,7 @@ const styles = StyleSheet.create({
     },
     compactStatLabel: {
         fontSize: LiquidGlass.typography.size.caption1,
-        color: 'rgba(255,255,255,0.4)',
+        color: LiquidGlass.text.tertiary,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
         marginBottom: 6, // More breathing room
@@ -503,7 +506,7 @@ const styles = StyleSheet.create({
     compactStatValue: {
         fontSize: LiquidGlass.typography.size.title3,
         fontWeight: '700',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         fontVariant: ['tabular-nums'],
     },
     statDivider: {
@@ -531,7 +534,7 @@ const styles = StyleSheet.create({
     monthTitle: {
         fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
     },
     weekDaysGrid: {
         flexDirection: 'row',
@@ -542,7 +545,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: LiquidGlass.typography.size.caption2,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.3)',
+        color: LiquidGlass.text.tertiary,
     },
     daysGrid: {
         flexDirection: 'row',
@@ -568,10 +571,10 @@ const styles = StyleSheet.create({
     dayNum: {
         fontSize: LiquidGlass.typography.size.footnote,
         fontWeight: '500',
-        color: 'rgba(255,255,255,0.5)',
+        color: LiquidGlass.text.tertiary, // Was 0.5, using tertiary (0.45) or label (0.6)? 0.5 is closer to tertiary in visual weight usually for disabled/inactive
     },
     todayNum: {
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         fontWeight: '700',
     },
 
@@ -586,7 +589,7 @@ const styles = StyleSheet.create({
     },
     legendText: {
         fontSize: 10,
-        color: 'rgba(255,255,255,0.6)',
+        color: LiquidGlass.text.label,
         fontWeight: '500',
     },
     legendGradient: {

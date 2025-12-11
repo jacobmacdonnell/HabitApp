@@ -140,7 +140,7 @@ export const HabitFormScreen = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="e.g. Drink Water"
-                        placeholderTextColor="rgba(255,255,255,0.3)"
+                        placeholderTextColor={LiquidGlass.text.tertiary}
                         value={title}
                         onChangeText={setTitle}
                     />
@@ -160,7 +160,7 @@ export const HabitFormScreen = () => {
                         accessibilityLabel="Decrease daily target"
                         accessibilityRole="button"
                     >
-                        <Minus size={20} color="#fff" />
+                        <Minus size={20} color={LiquidGlass.colors.white} />
                     </TouchableOpacity>
                     <View style={styles.counterCenter}>
                         <Text style={styles.counterValue}>{targetCount}</Text>
@@ -175,7 +175,7 @@ export const HabitFormScreen = () => {
                         accessibilityLabel="Increase daily target"
                         accessibilityRole="button"
                     >
-                        <Plus size={20} color="#fff" />
+                        <Plus size={20} color={LiquidGlass.colors.white} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -234,7 +234,7 @@ export const HabitFormScreen = () => {
                     <GlassButton
                         title="Delete Habit"
                         variant="danger"
-                        icon={<Trash2 size={20} color="#ef4444" />}
+                        icon={<Trash2 size={20} color={LiquidGlass.colors.danger} />}
                         onPress={handleDelete}
                     />
                 </View>
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 12,
         fontWeight: '700',
-        color: 'rgba(255,255,255,0.5)',
+        color: LiquidGlass.text.label,
         marginBottom: LiquidGlass.spacing.md,
         marginLeft: LiquidGlass.spacing.xs,
     },
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
         borderRadius: LiquidGlass.radius.lg,
         // @ts-ignore
         cornerCurve: 'continuous',
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: LiquidGlass.colors.surfaceHighlight,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -295,10 +295,10 @@ const styles = StyleSheet.create({
     },
     iconSelected: {
         borderWidth: 3,
-        borderColor: '#fff',
+        borderColor: LiquidGlass.colors.white,
     },
     inputRow: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: LiquidGlass.colors.surfaceHighlight,
         borderRadius: LiquidGlass.radius.lg,
         // @ts-ignore
         cornerCurve: 'continuous',
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.15)',
+        backgroundColor: LiquidGlass.colors.cardBorder, // 0.15
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -327,18 +327,18 @@ const styles = StyleSheet.create({
     counterValue: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
     },
     counterUnit: {
         fontSize: 12,
-        color: 'rgba(255,255,255,0.4)',
+        color: LiquidGlass.text.tertiary,
         marginTop: 2,
     },
     input: {
         flex: 1,
         fontSize: 17,
         fontWeight: '600',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         padding: LiquidGlass.spacing.md,
     },
     footer: {

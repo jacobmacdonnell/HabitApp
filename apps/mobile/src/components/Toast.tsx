@@ -119,11 +119,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 14,
         paddingHorizontal: 24,
-        backgroundColor: '#000000', // Pure Black for max contrast
+        backgroundColor: LiquidGlass.colors.black, // Pure Black for max contrast
         borderRadius: 40,
         gap: 12,
         // Pro Shadow - subtle but sharp
-        shadowColor: '#000',
+        shadowColor: LiquidGlass.colors.black,
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.6,
         shadowRadius: 20,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
         zIndex: 9999,
         // Crisp Border
         borderWidth: 1.5, // Thicker border
-        borderColor: 'rgba(255,255,255,0.2)', // Very visible rim
+        borderColor: LiquidGlass.colors.cardBorder, // Use cardBorder for rim
         minWidth: 180,
     },
     icon: {
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     message: {
         fontSize: 16,
         fontWeight: '700', // Bolder text
-        color: '#FFFFFF',
+        color: LiquidGlass.colors.white,
         textAlign: 'center',
         letterSpacing: -0.3,
     },

@@ -45,7 +45,7 @@ export const PetScreen = () => {
                         <TextInput
                             style={styles.input}
                             placeholder="Name your pet..."
-                            placeholderTextColor="rgba(255,255,255,0.3)"
+                            placeholderTextColor={LiquidGlass.text.tertiary}
                             value={name}
                             onChangeText={setName}
                         />
@@ -94,7 +94,7 @@ export const PetScreen = () => {
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        backgroundColor: '#1c1c1e',
+        backgroundColor: LiquidGlass.backgroundColor,
     },
     container: {
         flex: 1,
@@ -124,21 +124,21 @@ const styles = StyleSheet.create({
     eggTitle: {
         fontSize: LiquidGlass.typography.size.title1,
         fontWeight: '800',
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         marginTop: LiquidGlass.spacing.xxl,
         marginBottom: LiquidGlass.spacing.sm,
     },
     eggSubtitle: {
         fontSize: LiquidGlass.typography.size.body,
-        color: 'rgba(255,255,255,0.5)',
+        color: LiquidGlass.text.label,
         marginBottom: 40,
         textAlign: 'center',
     },
     formCard: {
         width: '100%',
         padding: LiquidGlass.spacing.xxl,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 24, // Use LiquidGlass.card.borderRadius if 24 matches
+        backgroundColor: LiquidGlass.colors.surface,
         overflow: 'hidden',
         gap: 20,
     },
@@ -146,19 +146,19 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.3)',
         borderRadius: 16,
         padding: LiquidGlass.spacing.lg,
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
         textAlign: 'center',
     },
     hatchButton: {
-        backgroundColor: '#fff',
+        backgroundColor: LiquidGlass.colors.white,
         padding: LiquidGlass.spacing.lg,
         borderRadius: 16,
         alignItems: 'center',
     },
     hatchText: {
-        color: '#000',
+        color: LiquidGlass.colors.black,
         fontSize: LiquidGlass.typography.size.body,
         fontWeight: '700',
     },

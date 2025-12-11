@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
     },
     secondaryBorder: {
         borderWidth: 1.5,
-        borderColor: 'rgba(255,255,255,0.4)', // Boosted from 0.25
-        backgroundColor: 'rgba(255,255,255,0.12)', // Boosted from 0.08
+        borderColor: LiquidGlass.text.tertiary, // Matches 0.45 opacity
+        backgroundColor: LiquidGlass.colors.surfaceHighlight, // Matches 0.1 opacity
         borderRadius: LiquidGlass.radius.xxl,
     },
     contentContainer: {
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         // Background handled by LiquidGlassView
     },
     danger: {
-        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+        backgroundColor: LiquidGlass.settings.dangerLight, // 0.1 or 0.15 depending on definition, using central token
     },
     text: {
         fontSize: LiquidGlass.typography.size.body,

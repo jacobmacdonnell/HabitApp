@@ -128,12 +128,14 @@ export const ShopScreen = () => {
                                     <View style={styles.actionContainer}>
                                         {isEquipped ? (
                                             <View style={styles.badgeEquipped}>
-                                                <Check size={10} color="#000" strokeWidth={3} />
+                                                <Check size={10} color={LiquidGlass.colors.black} strokeWidth={3} />
                                                 <Text style={styles.badgeText}>On</Text>
                                             </View>
                                         ) : isOwned ? (
                                             <View style={styles.badgeOwned}>
-                                                <Text style={[styles.badgeText, { color: '#fff' }]}>Owned</Text>
+                                                <Text style={[styles.badgeText, { color: LiquidGlass.colors.white }]}>
+                                                    Owned
+                                                </Text>
                                             </View>
                                         ) : (
                                             <View style={styles.priceContainer}>
@@ -142,14 +144,14 @@ export const ShopScreen = () => {
                                                     color={
                                                         canAfford
                                                             ? LiquidGlass.colors.currency
-                                                            : 'rgba(255,255,255,0.4)'
+                                                            : LiquidGlass.text.tertiary
                                                     }
                                                     fill={canAfford ? LiquidGlass.colors.currency : 'none'}
                                                 />
                                                 <Text
                                                     style={[
                                                         styles.priceText,
-                                                        !canAfford && { color: 'rgba(255,255,255,0.4)' },
+                                                        !canAfford && { color: LiquidGlass.text.tertiary },
                                                     ]}
                                                 >
                                                     {item.price}
@@ -252,7 +254,7 @@ const styles = StyleSheet.create({
     },
     guidanceSubtitle: {
         fontSize: LiquidGlass.typography.size.caption1,
-        color: 'rgba(255,255,255,0.6)',
+        color: LiquidGlass.text.label,
         lineHeight: 18,
     },
     card: {
@@ -276,7 +278,7 @@ const styles = StyleSheet.create({
     itemName: {
         fontSize: LiquidGlass.typography.size.caption2,
         fontWeight: '600',
-        color: 'rgba(255,255,255,0.9)',
+        color: LiquidGlass.text.primary,
         marginTop: LiquidGlass.spacing.sm,
         textAlign: 'center',
     },
@@ -313,7 +315,7 @@ const styles = StyleSheet.create({
     badgeText: {
         fontSize: LiquidGlass.typography.size.micro,
         fontWeight: '700',
-        color: '#000',
+        color: LiquidGlass.colors.black,
     },
     emptyState: {
         padding: 40,
@@ -321,13 +323,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     emptyText: {
-        color: '#fff',
+        color: LiquidGlass.text.primary,
         fontSize: LiquidGlass.typography.size.headline,
         fontWeight: '600',
         marginBottom: LiquidGlass.spacing.sm,
     },
     emptySubtext: {
-        color: 'rgba(255,255,255,0.5)',
+        color: LiquidGlass.text.label,
         fontSize: LiquidGlass.typography.size.subheadline,
     },
 });

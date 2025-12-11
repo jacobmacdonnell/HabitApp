@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { LiquidGlass } from '../theme/theme';
 
 interface SwipeTutorialProps {
     onDismiss: () => void;
@@ -83,24 +84,24 @@ const styles = StyleSheet.create({
     tooltip: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(52, 199, 89, 0.95)',
+        backgroundColor: LiquidGlass.colors.primary, // Using primary for the green background
         paddingHorizontal: 14,
         paddingVertical: 8,
         borderRadius: 16,
         gap: 6,
-        shadowColor: '#34C759',
+        shadowColor: LiquidGlass.colors.primary,
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.25,
         shadowRadius: 8,
     },
     arrow: {
         fontSize: 14,
-        color: '#fff',
+        color: LiquidGlass.colors.white,
         fontWeight: '700',
     },
     tooltipText: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#fff',
+        color: LiquidGlass.colors.white,
     },
 });
