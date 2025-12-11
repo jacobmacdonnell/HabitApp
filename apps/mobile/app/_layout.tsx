@@ -7,7 +7,6 @@ import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { SmartNotificationController } from '../src/components/SmartNotificationController';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 import { ToastProvider } from '../src/components/Toast';
 import { ThemeProvider } from '../src/context/ThemeContext';
@@ -20,15 +19,12 @@ import { LiquidGlass } from '../src/theme/theme';
 
 // Initialize notification handler
 Notifications.setNotificationHandler({
-    handleNotification: async () => {
-        return {
-            shouldShowAlert: true,
-            shouldPlaySound: true,
-            shouldSetBadge: false,
-            shouldShowBanner: true,
-            shouldShowList: true,
-        };
-    },
+    handleNotification: async () => ({
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+    }),
 });
 
 // Prevent splash screen from auto-hiding
@@ -113,7 +109,6 @@ export default function RootLayout() {
                         <ThemeProvider>
                             <XPNotificationProvider>
                                 <ToastProvider>
-                                    <SmartNotificationController />
                                     <ThemedRoot />
                                 </ToastProvider>
                             </XPNotificationProvider>

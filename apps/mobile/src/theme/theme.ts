@@ -157,6 +157,26 @@ export const LiquidGlass = {
         border: 'rgba(255,255,255,0.1)',
     },
 
+    // Settings Screen - Semantic Colors
+    settings: {
+        sound: '#6366f1', // Indigo - audio
+        soundLight: 'rgba(99, 102, 241, 0.15)',
+        notifications: '#3b82f6', // Blue - communication
+        notificationsLight: 'rgba(59, 130, 246, 0.15)',
+        streak: '#fb923c', // Orange - fire/urgency
+        streakLight: 'rgba(251, 146, 60, 0.15)',
+        pet: '#ef4444', // Red - attention
+        petLight: 'rgba(239, 68, 68, 0.15)',
+        time: '#8b5cf6', // Violet - schedule
+        timeLight: 'rgba(139, 92, 246, 0.15)',
+        sleep: '#c084fc', // Light purple - rest
+        sleepLight: 'rgba(192, 132, 252, 0.15)',
+        privacy: '#60a5fa', // Light blue - trust
+        privacyLight: 'rgba(96, 165, 250, 0.15)',
+        danger: '#ef4444', // Red - destructive
+        dangerLight: 'rgba(239, 68, 68, 0.1)',
+    },
+
     segmentedControl: {
         backgroundColor: 'transparent', // Fully invisible track
         height: 40,

@@ -5,13 +5,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '../context/ThemeContext';
 import { NotificationService } from '../services/notifications';
 import { LiquidGlass } from '../theme/theme';
 
 export const SettingsScreen = () => {
     const { resetData, settings, updateSettings } = useHabit();
-    const { colors: themeColors } = useTheme();
+
     const [notifications, setNotifications] = useState(settings.notifications ?? true);
     const [sound, setSound] = useState(settings.sound ?? true);
 
@@ -117,40 +116,147 @@ export const SettingsScreen = () => {
                             {/* Sound */}
                             <View style={styles.row}>
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: themeColors.accentLight }]}>
-                                        <Volume2 size={20} color={themeColors.accent} />
+                                    <View
+                                        style={[
+                                            styles.iconContainer,
+                                            { backgroundColor: LiquidGlass.settings.soundLight },
+                                        ]}
+                                    >
+                                        <Volume2 size={20} color={LiquidGlass.settings.sound} />
                                     </View>
                                     <Text style={styles.label}>Sound Effects</Text>
                                 </View>
                                 <Switch
                                     value={sound}
                                     onValueChange={handleSoundChange}
-                                    trackColor={{ false: '#3e3e3e', true: themeColors.accent }}
+                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.settings.sound }}
                                     ios_backgroundColor="#3e3e3e"
                                     accessibilityLabel="Sound effects toggle"
+                                    accessibilityRole="switch"
+                                />
+                            </View>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Notifications */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionHeader}>NOTIFICATIONS</Text>
+                    <View style={[styles.card, { overflow: 'hidden' }]}>
+                        <View style={{ position: 'relative', zIndex: 1 }}>
+                            {/* Master Toggle */}
+                            <View style={styles.row}>
+                                <View style={styles.iconLabel}>
+                                    <View
+                                        style={[
+                                            styles.iconContainer,
+                                            { backgroundColor: LiquidGlass.settings.notificationsLight },
+                                        ]}
+                                    >
+                                        <Bell size={20} color={LiquidGlass.settings.notifications} />
+                                    </View>
+                                    <Text style={styles.label}>Enable Notifications</Text>
+                                </View>
+                                <Switch
+                                    value={notifications}
+                                    onValueChange={handleNotificationChange}
+                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.settings.notifications }}
+                                    ios_backgroundColor="#3e3e3e"
+                                    accessibilityLabel="Notifications toggle"
                                     accessibilityRole="switch"
                                 />
                             </View>
 
                             <View style={styles.separator} />
 
-                            {/* Notifications */}
-                            <View style={styles.row}>
+                            {/* Streak Reminders */}
+                            <View style={[styles.row, !notifications && { opacity: 0.4 }]}>
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: themeColors.accentLight }]}>
-                                        <Bell size={20} color={themeColors.accent} />
+                                    <View
+                                        style={[
+                                            styles.iconContainer,
+                                            { backgroundColor: LiquidGlass.settings.streakLight },
+                                        ]}
+                                    >
+                                        <Text style={{ fontSize: 16 }}>🔥</Text>
                                     </View>
-                                    <Text style={styles.label}>Notifications</Text>
+                                    <View>
+                                        <Text style={styles.label}>Streak Reminders</Text>
+                                        <Text style={styles.sublabel}>Remind me if habits are incomplete</Text>
+                                    </View>
                                 </View>
                                 <Switch
-                                    value={notifications}
-                                    onValueChange={handleNotificationChange}
-                                    trackColor={{ false: '#3e3e3e', true: themeColors.accent }}
+                                    value={settings.streakReminders ?? false}
+                                    onValueChange={(val) => updateSettings({ streakReminders: val })}
+                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.settings.streak }}
                                     ios_backgroundColor="#3e3e3e"
-                                    accessibilityLabel="Notifications toggle"
+                                    disabled={!notifications}
+                                    accessibilityLabel="Streak reminders toggle"
                                     accessibilityRole="switch"
                                 />
                             </View>
+
+                            <View style={styles.separator} />
+
+                            {/* Pet Alerts */}
+                            <View style={[styles.row, !notifications && { opacity: 0.4 }]}>
+                                <View style={styles.iconLabel}>
+                                    <View
+                                        style={[
+                                            styles.iconContainer,
+                                            { backgroundColor: LiquidGlass.settings.petLight },
+                                        ]}
+                                    >
+                                        <Text style={{ fontSize: 16 }}>💔</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.label}>Pet Alerts</Text>
+                                        <Text style={styles.sublabel}>Alert when pet needs attention</Text>
+                                    </View>
+                                </View>
+                                <Switch
+                                    value={settings.petAlerts ?? false}
+                                    onValueChange={(val) => updateSettings({ petAlerts: val })}
+                                    trackColor={{ false: '#3e3e3e', true: LiquidGlass.settings.pet }}
+                                    ios_backgroundColor="#3e3e3e"
+                                    disabled={!notifications}
+                                    accessibilityLabel="Pet alerts toggle"
+                                    accessibilityRole="switch"
+                                />
+                            </View>
+
+                            {/* Reminder Time - only show if streak reminders enabled */}
+                            {notifications && settings.streakReminders && (
+                                <>
+                                    <View style={styles.separator} />
+                                    <View style={styles.timeRow}>
+                                        <View style={styles.iconLabel}>
+                                            <View
+                                                style={[
+                                                    styles.iconContainer,
+                                                    { backgroundColor: LiquidGlass.settings.timeLight },
+                                                ]}
+                                            >
+                                                <Text style={{ fontSize: 16 }}>⏰</Text>
+                                            </View>
+                                            <Text style={styles.label}>Reminder Time</Text>
+                                        </View>
+                                        <DateTimePicker
+                                            value={parseTime(settings.reminderTime || '20:00')}
+                                            mode="time"
+                                            display="compact"
+                                            onChange={(e, d) => {
+                                                if (d) {
+                                                    const timeString = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                                                    updateSettings({ reminderTime: timeString });
+                                                }
+                                            }}
+                                            themeVariant="dark"
+                                            style={{ height: 34 }}
+                                        />
+                                    </View>
+                                </>
+                            )}
                         </View>
                     </View>
                 </View>
@@ -164,22 +270,21 @@ export const SettingsScreen = () => {
                                 'Bedtime',
                                 settings.sleepStart || '23:00',
                                 'bedtime',
-                                <Moon size={20} color={LiquidGlass.colors.sleep} />,
-                                LiquidGlass.colors.sleep,
-                                LiquidGlass.colors.glassBackground
+                                <Moon size={20} color={LiquidGlass.settings.sleep} />,
+                                LiquidGlass.settings.sleep,
+                                LiquidGlass.settings.sleepLight
                             )}
                             <View style={styles.separator} />
                             {renderTimePicker(
                                 'Wake Up',
                                 settings.sleepEnd || '07:00',
                                 'wakeup',
-                                <Sun size={20} color={LiquidGlass.colors.tertiary} />,
-                                LiquidGlass.colors.tertiary,
-                                LiquidGlass.colors.glassBackground
+                                <Sun size={20} color={LiquidGlass.settings.streak} />,
+                                LiquidGlass.settings.streak,
+                                LiquidGlass.settings.streakLight
                             )}
                         </View>
                     </View>
-                    <Text style={styles.helperText}>Your pet sleeps during these hours and wakes up with you!</Text>
                 </View>
 
                 {/* Data & Privacy */}
@@ -194,9 +299,12 @@ export const SettingsScreen = () => {
                             >
                                 <View style={styles.iconLabel}>
                                     <View
-                                        style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.2)' }]}
+                                        style={[
+                                            styles.iconContainer,
+                                            { backgroundColor: LiquidGlass.settings.privacyLight },
+                                        ]}
                                     >
-                                        <Shield size={20} color="#60a5fa" />
+                                        <Shield size={20} color={LiquidGlass.settings.privacy} />
                                     </View>
                                     <Text style={styles.label}>Privacy Policy</Text>
                                 </View>
@@ -213,10 +321,17 @@ export const SettingsScreen = () => {
                                 accessibilityHint="Deletes all habits and pet progress"
                             >
                                 <View style={styles.iconLabel}>
-                                    <View style={[styles.iconContainer, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
-                                        <Trash2 size={20} color="#ef4444" />
+                                    <View
+                                        style={[
+                                            styles.iconContainer,
+                                            { backgroundColor: LiquidGlass.settings.dangerLight },
+                                        ]}
+                                    >
+                                        <Trash2 size={20} color={LiquidGlass.settings.danger} />
                                     </View>
-                                    <Text style={[styles.label, { color: '#ef4444' }]}>Reset All Data</Text>
+                                    <Text style={[styles.label, { color: LiquidGlass.settings.danger }]}>
+                                        Reset All Data
+                                    </Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -232,14 +347,14 @@ export const SettingsScreen = () => {
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        backgroundColor: '#1c1c1e',
+        backgroundColor: LiquidGlass.backgroundColor,
     },
     container: {
         flex: 1,
     },
     content: {
         paddingHorizontal: LiquidGlass.screenPadding,
-        paddingBottom: 100,
+        paddingBottom: 40, // Reduced from 100 - just enough for footer
     },
     headerRow: {
         marginBottom: LiquidGlass.header.marginBottom,
@@ -255,20 +370,13 @@ const styles = StyleSheet.create({
     },
     sectionHeader: {
         fontSize: LiquidGlass.typography.size.caption1,
-        fontWeight: '700',
-        color: 'rgba(255,255,255,0.5)',
+        fontWeight: LiquidGlass.typography.weight.bold,
+        color: LiquidGlass.text.tertiary,
         marginBottom: LiquidGlass.spacing.sm,
         marginLeft: LiquidGlass.spacing.md,
     },
-    helperText: {
-        fontSize: LiquidGlass.typography.size.caption1,
-        color: 'rgba(255,255,255,0.4)',
-        marginTop: LiquidGlass.spacing.sm,
-        marginLeft: LiquidGlass.spacing.md,
-        fontStyle: 'italic',
-    },
     card: {
-        borderRadius: 24,
+        borderRadius: LiquidGlass.card.borderRadius,
         overflow: 'hidden',
         backgroundColor: LiquidGlass.colors.surface,
     },
@@ -287,23 +395,28 @@ const styles = StyleSheet.create({
     iconLabel: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: LiquidGlass.spacing.md,
     },
     iconContainer: {
         width: 36,
         height: 36,
-        borderRadius: 12,
+        borderRadius: LiquidGlass.radius.md,
         justifyContent: 'center',
         alignItems: 'center',
     },
     label: {
         fontSize: LiquidGlass.typography.size.body,
-        fontWeight: '600',
-        color: '#fff',
+        fontWeight: LiquidGlass.typography.weight.semibold,
+        color: LiquidGlass.text.primary,
+    },
+    sublabel: {
+        fontSize: LiquidGlass.typography.size.caption1,
+        color: LiquidGlass.text.tertiary,
+        marginTop: 2,
     },
     separator: {
         height: 1,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: LiquidGlass.colors.border,
         marginLeft: 64,
     },
     footer: {

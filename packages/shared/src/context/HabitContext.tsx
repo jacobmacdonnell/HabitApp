@@ -10,7 +10,7 @@ const HabitContext = createContext<HabitContextType | undefined>(undefined);
 export const HabitProvider = ({
     children,
     storage,
-    widgetService
+    widgetService,
 }: {
     children: React.ReactNode;
     storage: StorageServiceType;
@@ -23,7 +23,10 @@ export const HabitProvider = ({
     const [settings, setSettings] = useState<Settings>({
         sleepStart: '22:00',
         sleepEnd: '06:00',
-        notifications: true,
+        notifications: false, // Master toggle - OFF by default
+        streakReminders: false, // OFF by default - user opts in
+        petAlerts: false, // OFF by default - user opts in
+        reminderTime: '20:00', // 8 PM default
         sound: true,
         theme: 'auto',
     });
@@ -41,7 +44,7 @@ export const HabitProvider = ({
                     mood: updatedPet.mood,
                     hat: updatedPet.hat,
                     color: updatedPet.color,
-                    health: updatedPet.health
+                    health: updatedPet.health,
                 };
                 await widgetService.setSharedData('pet_data', JSON.stringify(widgetData));
                 widgetService.reloadAllTimelines();

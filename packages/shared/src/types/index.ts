@@ -44,7 +44,10 @@ export interface Pet {
 export interface Settings {
     sleepStart: string;
     sleepEnd: string;
-    notifications: boolean;
+    notifications: boolean; // Master toggle for all notifications
+    streakReminders: boolean; // Daily reminder if habits incomplete
+    petAlerts: boolean; // Alert when pet is lonely (24h inactivity)
+    reminderTime: string; // HH:MM format for streak reminder (default "20:00")
     sound: boolean;
     theme: 'auto' | 'light' | 'dark';
 }
