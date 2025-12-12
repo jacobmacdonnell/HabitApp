@@ -393,7 +393,7 @@ export const OnboardingScreen = () => {
 
                             <Text style={[styles.label, { marginTop: 24 }]}>TIME OF DAY</Text>
                             <GlassSegmentedControl
-                                values={['Morning', 'Noon', 'Evening', 'Anytime']}
+                                values={['Morning', 'Afternoon', 'Evening', 'Anytime']}
                                 selectedIndex={['morning', 'midday', 'evening', 'anytime'].indexOf(timeOfDay)}
                                 onChange={(event: { nativeEvent: { selectedSegmentIndex: number } }) => {
                                     const index = event.nativeEvent.selectedSegmentIndex;

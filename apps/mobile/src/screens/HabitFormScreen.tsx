@@ -184,7 +184,7 @@ export const HabitFormScreen = () => {
             <View style={styles.section}>
                 <Text style={styles.label}>TIME OF DAY</Text>
                 <GlassSegmentedControl
-                    values={['Anytime', 'Morning', 'Noon', 'Evening']}
+                    values={['Anytime', 'Morning', 'Afternoon', 'Evening']}
                     selectedIndex={['anytime', 'morning', 'midday', 'evening'].indexOf(timeOfDay)}
                     onChange={(event: NativeSyntheticEvent<{ selectedSegmentIndex: number }>) => {
                         const index = event.nativeEvent.selectedSegmentIndex;

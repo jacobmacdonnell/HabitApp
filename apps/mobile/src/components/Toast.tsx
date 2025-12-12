@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useRef, useCallback } from 
 import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LiquidGlass } from '../theme/theme';
+import { SafeLiquidGlassView } from './SafeLiquidGlassView';
 
 const { width } = Dimensions.get('window');
 
@@ -95,7 +96,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     style={[
                         styles.container,
                         {
-                            top: insets.top + 6, // Tighter to dynamic island area
+                            top: insets.top + 12, // More breathing room
                             opacity,
                             transform: [{ translateY }, { scale }],
                         },
@@ -117,30 +118,33 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 14,
-        paddingHorizontal: 24,
-        backgroundColor: LiquidGlass.colors.black, // Pure Black for max contrast
-        borderRadius: 40,
+        paddingVertical: 16,
+        paddingHorizontal: 32,
+        backgroundColor: '#2C2C2E', // Solid Elevated Dark (No transparency)
+        borderRadius: LiquidGlass.radius.pill,
         gap: 12,
-        // Pro Shadow - subtle but sharp
-        shadowColor: LiquidGlass.colors.black,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.6,
-        shadowRadius: 20,
-        elevation: 20,
         zIndex: 9999,
-        // Crisp Border
-        borderWidth: 1.5, // Thicker border
-        borderColor: LiquidGlass.colors.cardBorder, // Use cardBorder for rim
-        minWidth: 180,
+        minWidth: 200,
+
+        // Neon Glow Shadow (Outer Glow)
+        shadowColor: LiquidGlass.colors.primary,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5, // Slightly softer to match blend
+        shadowRadius: 20, // Wider dispersion
+        elevation: 12,
+
+        // Soft Border (Blends with glow)
+        borderWidth: 1, // Thinner
+        borderColor: 'rgba(52, 199, 89, 0.5)', // 50% Opacity Primary Green (Blends into glow)
     },
     icon: {
-        fontSize: 22, // Larger icon
+        fontSize: 24,
+        color: LiquidGlass.colors.primary,
     },
     message: {
-        fontSize: 16,
-        fontWeight: '700', // Bolder text
-        color: LiquidGlass.colors.white,
+        fontSize: 17,
+        fontWeight: '700',
+        color: '#ffffff',
         textAlign: 'center',
         letterSpacing: -0.3,
     },

@@ -1,6 +1,6 @@
 import { Habit } from '@habitapp/shared';
 import * as Haptics from 'expo-haptics';
-import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon, Trash2, Edit2, Undo2, Zap } from 'lucide-react-native';
+import { Check, Sparkles, Sunrise, Sun, Moon, LucideIcon, Trash2, Edit2, Undo2, Zap, Flame } from 'lucide-react-native';
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import type { Swipeable as SwipeableType } from 'react-native-gesture-handler';
@@ -32,7 +32,7 @@ const TimeIcons: Record<string, LucideIcon> = {
 const TimeLabels: Record<string, string> = {
     anytime: 'Anytime',
     morning: 'Morning',
-    midday: 'Noon',
+    midday: 'Afternoon',
     evening: 'Evening',
 };
 
@@ -220,7 +220,8 @@ export const HabitCard = React.memo(
                                         </View>
                                         {streak >= 1 && (
                                             <View style={styles.streakBadge}>
-                                                <Text style={styles.streakText}>🔥 {streak}</Text>
+                                                <Flame size={10} color="#fb923c" fill="#fb923c" />
+                                                <Text style={styles.streakText}>{streak}</Text>
                                             </View>
                                         )}
                                         {/* XP Badge - only show when not completed */}
@@ -231,7 +232,7 @@ export const HabitCard = React.memo(
                                                     color={LiquidGlass.colors.currency}
                                                     fill={LiquidGlass.colors.currency}
                                                 />
-                                                <Text style={styles.xpText}>+20 XP</Text>
+                                                <Text style={styles.xpText}>+20</Text>
                                             </View>
                                         )}
                                     </View>
@@ -313,14 +314,13 @@ const styles = StyleSheet.create({
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        flexWrap: 'wrap',
+        gap: 6,
     },
     badge: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: LiquidGlass.colors.card,
-        paddingHorizontal: 6,
+        paddingHorizontal: 4,
         paddingVertical: 3,
         borderRadius: 6,
         gap: 4,
@@ -333,10 +333,13 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     streakBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: 'rgba(251, 146, 60, 0.15)',
-        paddingHorizontal: 6,
+        paddingHorizontal: 4,
         paddingVertical: 3,
         borderRadius: 6,
+        gap: 3,
     },
     streakText: {
         fontSize: 10,
@@ -350,7 +353,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'rgba(250, 204, 21, 0.15)', // TODO: Add to theme or calc opacity
-        paddingHorizontal: 6,
+        paddingHorizontal: 4,
         paddingVertical: 3,
         borderRadius: 6,
         gap: 3,

@@ -148,6 +148,7 @@ export const LiquidGlass = {
         growth: '#d8b4fe', // Level/XP (Lavender)
         sleep: '#c084fc', // Light purple for sleep
         health: '#f87171', // Health red
+        achievement: '#facc15', // Major Milestone (Gold) - distinct from mere currency
 
         // Components
         card: 'rgba(255,255,255,0.08)',

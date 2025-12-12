@@ -6,6 +6,7 @@ import { useNavigation, CompositeNavigationProp } from '@react-navigation/native
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import * as StoreReview from 'expo-store-review';
 import { Eye, EyeOff } from 'lucide-react-native';
 import React, { useState, useMemo, useLayoutEffect, useCallback, useRef, useEffect } from 'react';
 import {
@@ -23,6 +24,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState } from '../components/EmptyState';
+
+const DEV_MODE = true; // Toggle this to test Achievement Toasts
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl';
 import { HabitCard } from '../components/HabitCard';
 import { LiquidFab } from '../components/LiquidFab';
@@ -51,6 +54,7 @@ export const HomeScreen = () => {
     const [petBounce, setPetBounce] = useState(0);
     const [hasSeenSwipeHint, setHasSeenSwipeHint] = useState(true); // Default true to not show until loaded
     const [hasEverCompleted, setHasEverCompleted] = useState(true); // Default true until we check
+    const [hasRequestedReview, setHasRequestedReview] = useState(true); // Default true to avoid prompt on load
     const { showToast } = useToast();
 
     const today = getLocalDateString();
@@ -62,6 +66,9 @@ export const HomeScreen = () => {
         });
         AsyncStorage.getItem('hasEverCompletedHabit').then((value) => {
             setHasEverCompleted(value === 'true');
+        });
+        AsyncStorage.getItem('hasRequestedReview').then((value) => {
+            setHasRequestedReview(value === 'true');
         });
     }, []);
 
@@ -99,7 +106,7 @@ export const HomeScreen = () => {
         return habits
             .filter((habit) => {
                 // Time filter
-                if (timeFilter !== 'all' && habit.timeOfDay !== timeFilter && habit.timeOfDay !== 'anytime') {
+                if (timeFilter !== 'all' && habit.timeOfDay !== timeFilter) {
                     return false;
                 }
 
@@ -208,39 +215,128 @@ export const HomeScreen = () => {
             } else {
                 // Check if this is user's first-ever completion
                 const isFirstEverCompletion = !hasEverCompleted;
-                const willComplete =
-                    habit.targetCount === 1 ||
-                    (habit.targetCount > 1 &&
-                        (progress.find((p) => p.habitId === habit.id && p.date === today)?.currentCount || 0) + 1 >=
-                            habit.targetCount);
 
-                // FOR TESTING: Always trigger celebration on every completion
+                // Calculate if this toggle WILL complete the habit
+                const currentCount =
+                    progress.find((p) => p.habitId === habit.id && p.date === today)?.currentCount || 0;
+                const willComplete =
+                    habit.targetCount === 1 || (habit.targetCount > 1 && currentCount + 1 >= habit.targetCount);
+
                 if (willComplete) {
-                    // First-ever completion celebration logic (now runs every time for testing)
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     setTimeout(() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                     }, 150);
+
                     // Bounce the pet widget
                     setPetBounce((prev) => prev + 1);
-                    // Mark as completed forever
-                    setHasEverCompleted(true);
-                    AsyncStorage.setItem('hasEverCompletedHabit', 'true');
 
-                    // Show toast with optimized delay (Pro timing: 250ms)
+                    // Mark as completed forever if first time
+                    if (isFirstEverCompletion) {
+                        setHasEverCompleted(true);
+                        AsyncStorage.setItem('hasEverCompletedHabit', 'true');
+                    }
+
+                    // --- ACHIEVEMENT TOAST LOGIC ---
+                    // Show toast with optimized delay (2.5s) to let XP/Confetti settle
                     setTimeout(() => {
-                        showToast({
-                            message: 'You did it! Your first habit!',
-                            icon: '🎉',
-                            type: 'success',
-                            duration: 4000,
+                        // Achievement Haptics: "Grand Celebration" Sequence
+                        // Pattern: Ta-da-da-DUM
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+                        setTimeout(() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }, 100);
+                        setTimeout(() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        }, 200);
+                        setTimeout(() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                        }, 300);
+
+                        // 1. Calculate Milestones
+                        const currentStreak = getStreak(habit.id);
+                        // Note: currentStreak allows for "New Streak" calculation.
+                        // If logic allows, assume currentStreak is the *new* value after this completion.
+                        // For safety, let's treat currentStreak as valid "now".
+
+                        const isPerfectDay = habits.every((h) => {
+                            if (h.id === habit.id) return true; // This one is now done
+                            // Check others
+                            const p = progress.find((p) => p.habitId === h.id && p.date === today);
+                            return (p?.currentCount || 0) >= h.targetCount;
                         });
-                    }, 250); // Snappy "1-2 Punch" timing with XP popup
+
+                        let message = '';
+                        let icon = '';
+
+                        // 2. Select Message Priority
+                        if (isFirstEverCompletion) {
+                            message = 'You did it! Your first habit!';
+                            icon = '🎉';
+                        } else if (currentStreak === 3) {
+                            message = '3 Day Streak! Heating up!';
+                            icon = '🔥';
+                        } else if (currentStreak === 7) {
+                            message = '7 Day Streak! Unstoppable!';
+                            icon = '⚡';
+                        } else if (currentStreak === 30) {
+                            message = '30 Days! Legend status!';
+                            icon = '🏆';
+                        } else if (isPerfectDay) {
+                            message = 'Perfect Day! All done.';
+                            icon = '🌟';
+                        }
+
+                        // 3. DEV MODE OVERRIDE (Randomizer to see all)
+                        if (DEV_MODE) {
+                            const demos = [
+                                { msg: 'Dev: First Ever Habit!', icon: '🎉' },
+                                { msg: 'Dev: 3 Day Streak!', icon: '🔥' },
+                                { msg: 'Dev: 7 Day Streak!', icon: '⚡' },
+                                { msg: 'Dev: 30 Day Streak!', icon: '�' },
+                                { msg: 'Dev: Perfect Day!', icon: '🌟' },
+                            ];
+                            const randomDemo = demos[Math.floor(Math.random() * demos.length)];
+                            message = randomDemo.msg;
+                            icon = randomDemo.icon;
+                        }
+
+                        // 4. Show Toast if we have a message
+                        if (message) {
+                            showToast({
+                                message,
+                                icon,
+                                type: 'success',
+                                duration: 4000,
+                            });
+                        }
+                    }, 2500); // Delayed until AFTER XP notification settles
                 } else {
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 }
 
                 logProgress(habit.id, today);
+
+                // --- REVIEW PROMPT LOGIC ---
+                // Trigger if:
+                // 1. Not asked yet
+                // 2. New streak will be exactly 3 (current streak + 1)
+                const currentStreak = getStreak(habit.id);
+                // Note: getStreak might already include today if logProgress fired synchronously,
+                // but usually we calculate "will become". Let's assume safe check:
+                // If they are hitting streak 3 right now.
+                // Simple logic: if streak is 2 going on 3.
+                if (!hasRequestedReview && currentStreak === 2) {
+                    setTimeout(async () => {
+                        const isAvailable = await StoreReview.isAvailableAsync();
+                        if (isAvailable) {
+                            await StoreReview.requestReview();
+                            AsyncStorage.setItem('hasRequestedReview', 'true');
+                            setHasRequestedReview(true);
+                        }
+                    }, 2000); // Delay to let the celebration finish
+                }
             }
         },
         [progress, today, logProgress, undoProgress, habits, hasEverCompleted, showToast]
@@ -356,7 +452,7 @@ export const HomeScreen = () => {
                         {/* Time Selector */}
                         <View style={{ flex: 1, zIndex: 1 }}>
                             <GlassSegmentedControl
-                                values={['All', 'Morning', 'Noon', 'Evening']}
+                                values={['All', 'Morning', 'Afternoon', 'Evening']}
                                 selectedIndex={selectedIndex}
                                 onChange={handleSegmentChange}
                             />
@@ -410,8 +506,7 @@ export const HomeScreen = () => {
                     // Check if there ARE habits for this filter that are just hidden because completed
                     const hasHiddenCompleted = habits.some((h) => {
                         // Time match
-                        if (timeFilter !== 'all' && h.timeOfDay !== timeFilter && h.timeOfDay !== 'anytime')
-                            return false;
+                        if (timeFilter !== 'all' && h.timeOfDay !== timeFilter) return false;
                         // Is it completed?
                         const dayProgress = progress.find((p) => p.habitId === h.id && p.date === today);
                         const current = dayProgress?.currentCount || 0;
